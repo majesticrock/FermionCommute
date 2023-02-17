@@ -287,7 +287,7 @@ namespace SymbolicOperators {
 	void Term::renameSums()
 	{
 		const char name_list[3] = { 'q', 'p', 'r' };
-		const char buffer_list[3] = { 'x', 'y', 'z' };
+		const char buffer_list[3] = { ':', ';', '|' };
 		for (int i = 0; i < sum_momenta.size(); i++)
 		{
 			if (i >= 3) {

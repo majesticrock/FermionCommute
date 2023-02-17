@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 
 	// serialization
 	// create an output file stream and a text archive to serialize the vector
-	std::ofstream ofs("wick_terms.txt");
+	std::ofstream ofs("../wick_terms.txt");
 	boost::archive::text_oarchive oa(ofs);
 	oa << wicks;
 	ofs.close();

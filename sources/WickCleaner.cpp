@@ -311,11 +311,11 @@ namespace SymbolicOperators {
 	void WickTerm::renameSums()
 	{
 		const char name_list[3] = { 'q', 'p', 'r' };
-		const char buffer_list[3] = { 'x', 'y', 'z' };
+		const char buffer_list[3] = { ':', ';', '|' };
 		for (int i = 0; i < sum_momenta.size(); i++)
 		{
 			if (i >= 3) {
-				std::cerr << "More than 3 momenta, time to implement this..." << std::endl;
+				throw std::invalid_argument("More than 3 momenta, time to implement this...");
 				break;
 			}
 			if (sum_momenta[i] == name_list[i]) continue;
@@ -349,15 +349,15 @@ namespace SymbolicOperators {
 				Momentum buffer = op.momentum;
 				buffer.flipMomentum();
 				buffer.momentum_list[index].first *= -1;
-				buffer.momentum_list[index].second = 'x';
+				buffer.momentum_list[index].second = buffer_list[0];
 
 				for (auto& op2 : operators) {
 					op2.momentum.replaceOccurances(sum, buffer);
-					op2.momentum.replaceOccurances('x', Momentum(sum));
+					op2.momentum.replaceOccurances(buffer_list[0], Momentum(sum));
 				}
 				for (auto& coeff : coefficients) {
 					coeff.momentum.replaceOccurances(sum, buffer);
-					coeff.momentum.replaceOccurances('x', Momentum(sum));
+					coeff.momentum.replaceOccurances(buffer_list[0], Momentum(sum));
 				}
 			}
 		}
