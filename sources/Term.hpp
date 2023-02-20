@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+
 #include "Operator.hpp"
 #include "Coefficient.hpp"
 #include "WickTerm.hpp"
@@ -120,6 +122,18 @@ namespace SymbolicOperators {
 		friend void commutator(std::vector<Term>& reciever, const Term& left, const Term& right);
 		friend std::ostream& operator<<(std::ostream& os, const Term& term);
 
+		inline void hermitianConjugate() {
+			std::reverse(this->operators.begin(), this->operators.end());
+			for (auto& op : this->operators) {
+				op.hermitianConjugate();
+			}
+		};
+		inline void renameMomenta(char what, char to) {
+			for (auto& op : operators)
+			{
+				op.momentum.replaceOccurances(what, Momentum(to));
+			}
+		};
 		void wick(std::vector<WickTerm>& reciever) const;
 	};
 	void commutator(std::vector<Term>& reciever, const std::vector<Term>& left, const std::vector<Term>& right);

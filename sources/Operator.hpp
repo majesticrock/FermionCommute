@@ -18,6 +18,10 @@ namespace SymbolicOperators {
 		Operator(const momentum_pairs& _momentum, const std::string& index, bool _isDaggered);
 		Operator(char _momentum, bool add_Q, const std::vector<std::string>& _indizes, bool _isDaggered);
 		Operator(char _momentum, int sign, bool add_Q, const std::string& index, bool _isDaggered);
+
+		inline void hermitianConjugate() {
+			this->isDaggered = !(this->isDaggered);
+		}
 	};
 
 	inline bool operator==(const Operator& lhs, const Operator& rhs) {

@@ -7,8 +7,8 @@ int main(int argc, char** argv) {
 	Operator c_k('k', 1, false, UP, false);
 	Operator c_minus_k('k', -1, false, DOWN, false);
 
-	Operator c_l_dagger('l', 1, false, UP, true);
-	Operator c_minus_l_dagger('l', -1, false, DOWN, true);
+	Operator c_k_dagger('k', 1, false, UP, true);
+	Operator c_minus_k_dagger('k', -1, false, DOWN, true);
 
 	Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ "\\sigma" }), std::vector<Operator>({
 		Operator('q', 1, false, "\\sigma", true), Operator('q', 1, false, "\\sigma", false)
@@ -22,46 +22,73 @@ int main(int argc, char** argv) {
 
 	std::vector<Term> H = { H_T, H_U };
 
+	std::vector<Term> basis = {
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
+	};
+	std::vector<Term> basis_daggered(basis);
+	for (auto& t : basis_daggered) {
+		t.hermitianConjugate();
+		t.renameMomenta('k', 'l');
+	}
+
+	for (size_t i = 0; i < basis.size(); i++)
+	{
+		std::vector<Term> commute_with_H;
+		commutator(commute_with_H, H, basis[i]);
+		cleanUp(commute_with_H);
+		for (size_t j = 0; j <= i; j++)
+		{
+			std::vector<Term> terms;
+			commutator(terms, basis_daggered[j], commute_with_H);
+			cleanUp(terms);
+
+			std::vector<WickTerm> wicks;
+			for (const auto& term : terms) {
+				term.wick(wicks);
+			}
+			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j] << ", [H, " << basis[i] << " ]] =" << terms << "\\end{align*}" << std::endl;
+			cleanWicks(wicks);
+			// serialization
+			{
+				// create an output file stream and a text archive to serialize the vector
+				std::ofstream ofs("../wick_M_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				boost::archive::text_oarchive oa(ofs);
+				oa << wicks;
+				ofs.close();
+			}
+
+			terms.clear();
+			wicks.clear();
+			commutator(terms, basis_daggered[j], basis[i]);
+			cleanUp(terms);
+			for (const auto& term : terms) {
+				term.wick(wicks);
+			}
+			cleanWicks(wicks);
+			// serialization
+			{
+				// create an output file stream and a text archive to serialize the vector
+				std::ofstream ofs("../wick_N_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				boost::archive::text_oarchive oa(ofs);
+				oa << wicks;
+				ofs.close();
+			}
+		}
+	}
+
+	/* Output code if needed
+	*
 	Term right(1, Coefficient(), std::vector<Operator>({
 		c_minus_k, c_k
 		}));
-
 	Term left(1, Coefficient(), std::vector<Operator>({
 		c_l_dagger, c_minus_l_dagger
 		}));
 
-	std::vector<Term> commute_with_H, terms;
-	commutator(commute_with_H, H, right);
-	cleanUp(commute_with_H);
-	commutator(terms, left, commute_with_H);
-	cleanUp(terms);
-	int tester = -1;
-	std::cout << "\\begin{align*}\n\t[" << left.toStringWithoutPrefactor() << ", [ H, " << right.toStringWithoutPrefactor() << "] ] = " << std::endl;
-	if (tester < 0) {
-		std::cout << terms << "\\end{align*}" << std::endl;
-	}
-	else {
-		std::cout << terms[tester] << "\\end{align*}" << std::endl;
-	}
-
-	std::vector<WickTerm> wicks;
-	if (tester < 0) {
-		for (const auto& term : terms) {
-			term.wick(wicks);
-		}
-	}
-	else {
-		terms[tester].wick(wicks);
-	}
-	cleanWicks(wicks);
+	std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", " << right.toStringWithoutPrefactor() << "] \\rangle = " << wicks << "\\end{align*}" << std::endl;
 	std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", [ H, " << right.toStringWithoutPrefactor() << "] ] \\rangle = " << wicks << "\\end{align*}" << std::endl;
-
-	// serialization
-	// create an output file stream and a text archive to serialize the vector
-	std::ofstream ofs("../wick_terms.txt");
-	boost::archive::text_oarchive oa(ofs);
-	oa << wicks;
-	ofs.close();
+	*/
 
 	/* Example of how to to read the output
 	// create an input file stream and a text archive to deserialize the vector
