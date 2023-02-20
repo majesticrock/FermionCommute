@@ -509,5 +509,16 @@ namespace SymbolicOperators {
 				}
 			}
 		}
+
+		for (auto& term : terms) {
+			for (std::vector<Coefficient>::iterator it = term.coefficients.begin(); it != term.coefficients.end();) {
+				if (it->name == "") {
+					it = term.coefficients.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+		}
 	}
 }
