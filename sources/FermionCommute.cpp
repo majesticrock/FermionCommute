@@ -32,6 +32,34 @@ int main(int argc, char** argv) {
 		t.renameMomenta('k', 'l');
 	}
 
+	/*
+	std::vector<Term> tester({
+		Term(1, std::vector<char>({ 'q' }), std::vector<Operator>({ 
+			Operator('l', 1, false, UP, true),
+			Operator(momentum_pairs({ std::make_pair(-1, 'l'), std::make_pair(-1, 'q') }), DOWN, true),
+			Operator('k', -1, false, DOWN, false),
+			Operator(momentum_pairs({ std::make_pair(1, 'k'), std::make_pair(-1, 'q') }), UP, false)
+		})),
+		Term(1, std::vector<char>({ 'q' }), std::vector<Operator>({ 
+			Operator(momentum_pairs({ std::make_pair(1, 'l'), std::make_pair(-1, 'q') }), UP, true),
+			Operator('l', -1, false, DOWN, true),
+			Operator(momentum_pairs({ std::make_pair(-1, 'k'), std::make_pair(-1, 'q') }), DOWN, false),
+			Operator('k', 1, false, UP, false)
+		}))
+	});
+	cleanUp(tester);
+	std::cout << "\\begin{align*}\n\t" << tester << "\\end{align*}" << std::endl;
+	std::cout << "-----------------------" << std::endl;
+
+	std::vector<WickTerm> wick_t;
+	for (const auto& term : tester) {
+		term.wick(wick_t);
+	}
+	cleanWicks(wick_t);
+	std::cout << "\\begin{align*}\n\t" << wick_t << "\\end{align*}" << std::endl;
+	*/
+
+	return 0;
 	for (size_t i = 0; i < basis.size(); i++)
 	{
 		std::vector<Term> commute_with_H;
@@ -47,8 +75,9 @@ int main(int argc, char** argv) {
 			for (const auto& term : terms) {
 				term.wick(wicks);
 			}
-			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j] << ", [H, " << basis[i] << " ]] =" << terms << "\\end{align*}" << std::endl;
 			cleanWicks(wicks);
+			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor()
+				<< ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector

@@ -239,48 +239,59 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-		for (int i = 0; i < operators.size(); i++)
-		{
-			for (int j = i + 1; j < operators.size(); j++)
-			{
-				if (operators[i].isDaggered == operators[j].isDaggered) {
-					if (operators[i].isDaggered) {
-						// c^+ c^+
-						if (operators[j].indizes[0] == UP && operators[i].indizes[0] != UP) {
-							std::swap(operators[i], operators[j]);
-							if (abs(i - j) % 2 != 0) flipSign();
-						}
-						else if (operators[i].indizes[0] == DOWN && operators[j].indizes[0] != DOWN) {
-							std::swap(operators[i], operators[j]);
-							if (abs(i - j) % 2 != 0) flipSign();
-						}
-					}
-					else {
-						// c c
-						if (operators[j].indizes[0] == DOWN && operators[i].indizes[0] != DOWN) {
-							std::swap(operators[i], operators[j]);
-							if (abs(i - j) % 2 != 0) flipSign();
-						}
-						else if (operators[i].indizes[0] == UP && operators[j].indizes[0] != UP) {
-							std::swap(operators[i], operators[j]);
-							if (abs(i - j) % 2 != 0) flipSign();
-						}
-					}
-				}
-			}
-		}
-		for (int i = 0; i < operators.size(); i++)
-		{
-			for (int j = i + 1; j < operators.size(); j++)
-			{
-				if (operators[i].isDaggered != operators[j].isDaggered) continue;
-				if (operators[i].indizes[0] != operators[j].indizes[0]) continue;
 
-				if (operators[i].momentum.momentum_list[0].second > operators[j].momentum.momentum_list[0].second) {
-					std::swap(operators[i], operators[j]);
-					if (abs(i - j) % 2 != 0) flipSign();
+		int new_n;
+		int n = operators.size();
+		while (n > 1) {
+			new_n = 0;
+			for (int i = 1; i < n; i++)
+			{
+				if (operators[i].isDaggered != operators[i - 1].isDaggered) continue;
+				if (operators[i].isDaggered) {
+					// c^+ c^+
+					if (operators[i].indizes[0] == UP && operators[i - 1].indizes[0] != UP) {
+						std::swap(operators[i], operators[i - 1]);
+						flipSign();
+						new_n = i;
+					}
+					else if (operators[i - 1].indizes[0] == DOWN && operators[i].indizes[0] != DOWN) {
+						std::swap(operators[i], operators[i - 1]);
+						flipSign();
+						new_n = i;
+					}
+				}
+				else {
+					// c c
+					if (operators[i].indizes[0] == DOWN && operators[i - 1].indizes[0] != DOWN) {
+						std::swap(operators[i], operators[i - 1]);
+						flipSign();
+						new_n = i;
+					}
+					else if (operators[i - 1].indizes[0] == UP && operators[i].indizes[0] != UP) {
+						std::swap(operators[i], operators[i - 1]);
+						flipSign();
+						new_n = i;
+					}
 				}
 			}
+			n = new_n;
+		}
+
+		n = operators.size();
+		while (n > 1) {
+			new_n = 0;
+			for (int i = 1; i < n; i++)
+			{
+				if (operators[i].isDaggered != operators[i - 1].isDaggered) continue;
+				if (operators[i].indizes[0] != operators[i - 1].indizes[0]) continue;
+
+				if (operators[i - 1].momentum.momentum_list[0].second > operators[i].momentum.momentum_list[0].second) {
+					std::swap(operators[i], operators[i - 1]);
+					flipSign();
+					new_n = i;
+				}
+			}
+			n = new_n;
 		}
 	}
 

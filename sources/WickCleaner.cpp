@@ -347,7 +347,7 @@ namespace SymbolicOperators {
 				if (op.momentum.momentum_list.size() == 1) break;
 
 				Momentum buffer = op.momentum;
-				buffer.flipMomentum();
+				if (buffer.momentum_list[index].first > 0) buffer.flipMomentum();
 				buffer.momentum_list[index].first *= -1;
 				buffer.momentum_list[index].second = buffer_list[0];
 
@@ -457,7 +457,7 @@ namespace SymbolicOperators {
 				it = terms.erase(it);
 				continue;
 			}
-			it->discardZeroMomenta();
+			it->discardZeroMomenta();		
 			it->renameSums();
 			it->sort();
 
