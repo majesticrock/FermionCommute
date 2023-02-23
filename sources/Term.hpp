@@ -72,8 +72,8 @@ namespace SymbolicOperators {
 			this->multiplicity *= -1;
 		}
 
-		void setDeltas();
-		void computeSums();
+		bool setDeltas();
+		bool computeSums();
 		void discardZeroMomenta();
 		void sort();
 		// Unifies the sum indizes

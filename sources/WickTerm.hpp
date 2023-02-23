@@ -60,8 +60,14 @@ namespace SymbolicOperators {
 			return !(this->operators.empty());
 		}
 		bool swapToWickOperators(std::vector<WickTerm>& reciever);
+
+		// returns false if there is atleast one delta
+		// or a combination of deltas, that can never be achieved
+		// for example delta_k,k+Q, as k can never be equal to k+Q
 		bool setDeltas();
-		void computeSums();
+		// May call setDeltas. If setDeltas returns false this functions also returns false
+		// In all other cases it returns true
+		bool computeSums();
 		void discardZeroMomenta();
 		void renameSums();
 		void sort();

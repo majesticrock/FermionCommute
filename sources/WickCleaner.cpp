@@ -57,9 +57,39 @@ namespace SymbolicOperators {
 
 		// Set all deltas up to the same notation
 		for (auto& delta : delta_momenta) {
+			for (auto& delta2 : delta_momenta) {
+				for (auto it = delta2.first.momentum_list.begin(); it != delta2.first.momentum_list.end();) {
+					int pos = delta2.second.isUsed(it->second);
+					if (pos < 0) { ++it; continue; }
+					it->first -= delta.second.momentum_list[pos].first;
+					if (it->first == 0) {
+						it = delta.first.momentum_list.erase(it);
+						delta.second.momentum_list.erase(delta.second.momentum_list.begin() + pos);
+						continue;
+					}
+					++it;
+				}
+			}
+
 			if (delta.first.add_Q) {
 				delta.first.add_Q = false;
 				delta.second.add_Q = (delta.second.add_Q != true);
+			}
+			if (delta.first.momentum_list.size() == 0) {
+				if (delta.second.momentum_list.size() == 0) continue;
+				if (delta.second.momentum_list.size() == 1) {
+					std::swap(delta.first, delta.second);
+				}
+				else {
+					delta.first.momentum_list.push_back(delta.second.momentum_list.back());
+					if (delta.first.momentum_list.front().first > 0) {
+						delta.second.flipMomentum();
+					}
+					else {
+						delta.first.flipMomentum();
+					}
+					delta.second.momentum_list.pop_back();
+				}
 			}
 			if (delta.second.momentum_list.size() == 1 && delta.first.momentum_list.size() > 1) {
 				std::swap(delta.first, delta.second);
@@ -101,6 +131,11 @@ namespace SymbolicOperators {
 			}
 			for (auto& coeff : coefficients) {
 				coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+			}
+			for (auto& delta2 : delta_momenta) {
+				if (delta2 == delta) continue;
+				delta2.first.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				delta2.second.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
 		}
 		for (auto& delta : delta_indizes) {
@@ -180,11 +215,10 @@ namespace SymbolicOperators {
 				++it;
 			}
 		}
-
 		return true;
 	}
 
-	void WickTerm::computeSums()
+	bool WickTerm::computeSums()
 	{
 		auto changeAllIndizes = [&](const std::string replaceWhat, const std::string replaceWith) {
 			for (auto& op : operators) {
@@ -253,12 +287,13 @@ namespace SymbolicOperators {
 			for (int j = 0; j < delta_momenta.size(); j++)
 			{
 				if (delta_momenta[j].first.momentum_list[0].second == sum_momenta[i]) {
-					changeAllMomenta(sum_momenta[i], delta_momenta[j].second);
 					if (abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
+					changeAllMomenta(sum_momenta[i], delta_momenta[j].second);
 
 					sum_momenta.erase(sum_momenta.begin() + i);
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
+					if (!(setDeltas())) return false;
 					break;
 				}
 				else {
@@ -278,10 +313,12 @@ namespace SymbolicOperators {
 					sum_momenta.erase(sum_momenta.begin() + i);
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
+					if (!(setDeltas())) return false;
 					break;
 				}
 			}
 		}
+		return true;
 	}
 
 	void WickTerm::discardZeroMomenta()
@@ -445,6 +482,16 @@ namespace SymbolicOperators {
 
 	void cleanWicks(std::vector<WickTerm>& terms)
 	{
+		for (auto& term : terms) {
+			for (std::vector<Coefficient>::iterator it = term.coefficients.begin(); it != term.coefficients.end();) {
+				if (it->name == "") {
+					it = term.coefficients.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+		}
 		for (std::vector<WickTerm>::iterator it = terms.begin(); it != terms.end();) {
 			//std::cout << count++ << " of " << terms.size() << ":&\t" << *it << "\\\\" << std::endl;
 			if (!(it->setDeltas())) {
@@ -452,12 +499,15 @@ namespace SymbolicOperators {
 				continue;
 			}
 			it->discardZeroMomenta();
-			it->computeSums();
+			if (!(it->computeSums())) {
+				it = terms.erase(it);
+				continue;
+			}
 			if (!(it->setDeltas())) {
 				it = terms.erase(it);
 				continue;
 			}
-			it->discardZeroMomenta();		
+			it->discardZeroMomenta();
 			it->renameSums();
 			it->sort();
 
@@ -498,25 +548,19 @@ namespace SymbolicOperators {
 					std::swap(terms[i], terms[j]);
 				}
 				if (terms[i].delta_momenta.size() > 0 && terms[j].delta_momenta.size() > 0) {
-					if (terms[i].delta_momenta.size() > terms[j].delta_momenta.size()) {
+					if (terms[i].delta_momenta.size() < terms[j].delta_momenta.size()) {
 						std::swap(terms[i], terms[j]);
 					}
 					else if (terms[i].delta_momenta.size() == terms[j].delta_momenta.size()) {
 						if (terms[i].delta_momenta[0].second.add_Q && !(terms[j].delta_momenta[0].second.add_Q)) {
 							std::swap(terms[i], terms[j]);
 						}
+						else if (terms[i].coefficients.size() > 0) {
+							if (terms[j].coefficients[0].name == "\\epsilon_0" && terms[i].coefficients[0].name != "\\epsilon_0") {
+								std::swap(terms[i], terms[j]);
+							}
+						}
 					}
-				}
-			}
-		}
-
-		for (auto& term : terms) {
-			for (std::vector<Coefficient>::iterator it = term.coefficients.begin(); it != term.coefficients.end();) {
-				if (it->name == "") {
-					it = term.coefficients.erase(it);
-				}
-				else {
-					++it;
 				}
 			}
 		}

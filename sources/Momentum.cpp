@@ -67,7 +67,7 @@ namespace SymbolicOperators {
 	{
 		for (const auto& x : replaceWith.momentum_list) {
 			if (x.second == replaceWhat) {
-				std::cerr << "You are trying to replace a momentum with itself. This has undefined behaviour!" << std::endl;
+				throw std::invalid_argument("You are trying to replace a momentum with itself. This has undefined behaviour!");
 			}
 		}
 		for (size_t i = 0; i < momentum_list.size(); ++i) {

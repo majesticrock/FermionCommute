@@ -28,13 +28,94 @@ namespace SymbolicOperators {
 		std::cout << *this << std::endl;
 	}
 
-	void Term::setDeltas()
+	bool Term::setDeltas()
 	{
+		for (auto& delta : delta_momenta)
+		{
+			for (auto it = delta.first.momentum_list.begin(); it != delta.first.momentum_list.end(); )
+			{
+				int index = delta.second.isUsed(it->second);
+				if (index < 0) {
+					++it;
+					continue;
+				}
+
+				int remainder = delta.second.momentum_list[index].first - it->first;
+				if (remainder == 0) {
+					delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
+					it = delta.first.momentum_list.erase(it);
+					continue;
+				}
+
+				delta.second.momentum_list[index].first = remainder;
+				it = delta.first.momentum_list.erase(it);
+			}
+			if (delta.first.momentum_list.size() == 0) {
+				if (delta.second.momentum_list.size() == 0) continue;
+				std::swap(delta.first, delta.second);
+			}
+			if (delta.first.add_Q) {
+				delta.first.add_Q = false;
+				delta.second.add_Q = !(delta.second.add_Q);
+			}
+			if (delta.first.momentum_list.front().first < 0) {
+				delta.first.flipMomentum();
+				delta.second.flipMomentum();
+			}
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() == 0) {
+				delta.second.momentum_list.push_back(delta.first.momentum_list[1]);
+				delta.second.flipMomentum();
+				delta.first.momentum_list.erase(delta.first.momentum_list.begin() + 1);
+			}
+		}
+
+		for (auto it = delta_momenta.begin(); it != delta_momenta.end(); )
+		{
+			if (it->first.momentum_list.size() == 0 && it->second.momentum_list.size() == 0) {
+				// 0 = Q can never be achieved
+				if (it->first.add_Q != it->second.add_Q) return false;
+				it = delta_momenta.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+
 		// Set all deltas up to the same notation
 		for (auto& delta : delta_momenta) {
+			for (auto& delta2 : delta_momenta) {
+				for (auto it = delta2.first.momentum_list.begin(); it != delta2.first.momentum_list.end();) {
+					int pos = delta2.second.isUsed(it->second);
+					if (pos < 0) { ++it; continue; }
+					it->first -= delta.second.momentum_list[pos].first;
+					if (it->first == 0) {
+						it = delta.first.momentum_list.erase(it);
+						delta.second.momentum_list.erase(delta.second.momentum_list.begin() + pos);
+						continue;
+					}
+					++it;
+				}
+			}
+
 			if (delta.first.add_Q) {
 				delta.first.add_Q = false;
 				delta.second.add_Q = (delta.second.add_Q != true);
+			}
+			if (delta.first.momentum_list.size() == 0) {
+				if (delta.second.momentum_list.size() == 0) continue;
+				if (delta.second.momentum_list.size() == 1) {
+					std::swap(delta.first, delta.second);
+				}
+				else {
+					delta.first.momentum_list.push_back(delta.second.momentum_list.back());
+					if (delta.first.momentum_list.front().first > 0) {
+						delta.second.flipMomentum();
+					}
+					else {
+						delta.first.flipMomentum();
+					}
+					delta.second.momentum_list.pop_back();
+				}
 			}
 			if (delta.second.momentum_list.size() == 1 && delta.first.momentum_list.size() > 1) {
 				std::swap(delta.first, delta.second);
@@ -77,6 +158,11 @@ namespace SymbolicOperators {
 			for (auto& coeff : coefficients) {
 				coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
+			for (auto& delta2 : delta_momenta) {
+				if (delta2 == delta) continue;
+				delta2.first.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				delta2.second.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+			}
 		}
 		for (auto& delta : delta_indizes) {
 			for (auto& op : operators) {
@@ -106,6 +192,15 @@ namespace SymbolicOperators {
 					--i;
 					break;
 				}
+
+				auto delta_buffer = delta_momenta[j];
+				delta_buffer.first.flipMomentum();
+				delta_buffer.second.flipMomentum();
+				if (pair_equal_allow_permutation(delta_momenta[i], delta_buffer)) {
+					delta_momenta.erase(delta_momenta.begin() + j);
+					--i;
+					break;
+				}
 			}
 		}
 		for (int i = 0; i < delta_indizes.size(); i++)
@@ -119,9 +214,37 @@ namespace SymbolicOperators {
 				}
 			}
 		}
+
+		// Erase delta_k,k etc
+		for (auto it = delta_momenta.begin(); it != delta_momenta.end();)
+		{
+			// k = k + Q can never be achieved
+			if (it->first.differsOnlyInQ(it->second)) return false;
+
+			if (it->first == it->second) {
+				it = delta_momenta.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
+		{
+			// UP can never be DOWN and vice versa
+			if (it->first == UP && it->second == DOWN) return false;
+			if (it->first == DOWN && it->second == UP) return false;
+
+			if (it->first == it->second) {
+				it = delta_indizes.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		return true;
 	}
 
-	void Term::computeSums() {
+	bool Term::computeSums() {
 		auto changeAllIndizes = [&](const std::string& replaceWhat, const std::string& replaceWith) {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
@@ -169,6 +292,11 @@ namespace SymbolicOperators {
 			for (auto& coeff : coefficients) {
 				coeff.momentum.replaceOccurances(replaceWhat, replaceWith);
 			}
+			for (auto it = delta_momenta.begin(); it != delta_momenta.end();) {
+				it->first.replaceOccurances(replaceWhat, replaceWith);
+				it->second.replaceOccurances(replaceWhat, replaceWith);
+				++it;
+			}
 		};
 
 		for (int i = 0; i < sum_momenta.size(); i++)
@@ -182,6 +310,7 @@ namespace SymbolicOperators {
 					sum_momenta.erase(sum_momenta.begin() + i);
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
+					if (!(setDeltas())) return false;
 					break;
 				}
 				else {
@@ -201,10 +330,12 @@ namespace SymbolicOperators {
 					sum_momenta.erase(sum_momenta.begin() + i);
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
+					if (!(setDeltas())) return false;
 					break;
 				}
 			}
 		}
+		return true;
 	}
 
 	void Term::discardZeroMomenta() {
@@ -383,8 +514,7 @@ namespace SymbolicOperators {
 						Term new_term(terms[t]);
 						new_term.flipSign();
 						if (new_term.operators[i - 1].indizes.size() != new_term.operators[i].indizes.size()) {
-							std::cerr << "Operators do not have the same index count." << std::endl;
-							throw;
+							throw std::invalid_argument("Operators do not have the same index count.");
 						}
 
 						if ((new_term.operators[i - 1].indizes[0] == UP || new_term.operators[i - 1].indizes[0] == DOWN)
@@ -517,14 +647,26 @@ namespace SymbolicOperators {
 
 	void cleanUp(std::vector<Term>& terms)
 	{
-		for (auto& term : terms) {
-			term.setDeltas();
-			term.computeSums();
-			term.discardZeroMomenta();
-			term.setDeltas();
-			term.discardZeroMomenta();
-			term.renameSums();
-			term.sort();
+		for (std::vector<Term>::iterator it = terms.begin(); it != terms.end();) {
+			//std::cout << count++ << " of " << terms.size() << ":&\t" << *it << "\\\\" << std::endl;
+			if (!(it->setDeltas())) {
+				it = terms.erase(it);
+				continue;
+			}
+			it->discardZeroMomenta();
+			if (!(it->computeSums())) {
+				it = terms.erase(it);
+				continue;
+			}
+			if (!(it->setDeltas())) {
+				it = terms.erase(it);
+				continue;
+			}
+			it->discardZeroMomenta();
+			it->renameSums();
+			it->sort();
+
+			++it;
 		}
 
 		// remove duplicates
@@ -555,7 +697,7 @@ namespace SymbolicOperators {
 
 	void Term::wick(std::vector<WickTerm>& reciever) const
 	{
-		if (this->operators.size() > 4) std::cerr << "Wick for n>4 not yet implemented!" << std::endl;
+		if (this->operators.size() > 4) throw std::length_error("Wick for n>4 not yet implemented!");
 		if (this->isIdentity()) {
 			reciever.push_back(WickTerm(this));
 		}

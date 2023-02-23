@@ -10,6 +10,12 @@ int main(int argc, char** argv) {
 	Operator c_k_dagger('k', 1, false, UP, true);
 	Operator c_minus_k_dagger('k', -1, false, DOWN, true);
 
+	Operator c_k_Q('k', 1, true, UP, false);
+	Operator c_minus_k_Q('k', -1, true, DOWN, false);
+
+	Operator c_k_Q_dagger('k', 1, true, UP, true);
+	Operator c_minus_k_Q_dagger('k', -1, true, DOWN, true);
+
 	Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ "\\sigma" }), std::vector<Operator>({
 		Operator('q', 1, false, "\\sigma", true), Operator('q', 1, false, "\\sigma", false)
 		}));
@@ -23,41 +29,24 @@ int main(int argc, char** argv) {
 	std::vector<Term> H = { H_T, H_U };
 
 	std::vector<Term> basis = {
+		// f, f^+
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
+		// n_up/down
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
+		// g_up/down
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+		// eta, eta^+
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		t.hermitianConjugate();
 		t.renameMomenta('k', 'l');
 	}
-
-	/*
-	std::vector<Term> tester({
-		Term(1, std::vector<char>({ 'q' }), std::vector<Operator>({ 
-			Operator('l', 1, false, UP, true),
-			Operator(momentum_pairs({ std::make_pair(-1, 'l'), std::make_pair(-1, 'q') }), DOWN, true),
-			Operator('k', -1, false, DOWN, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'k'), std::make_pair(-1, 'q') }), UP, false)
-		})),
-		Term(1, std::vector<char>({ 'q' }), std::vector<Operator>({ 
-			Operator(momentum_pairs({ std::make_pair(1, 'l'), std::make_pair(-1, 'q') }), UP, true),
-			Operator('l', -1, false, DOWN, true),
-			Operator(momentum_pairs({ std::make_pair(-1, 'k'), std::make_pair(-1, 'q') }), DOWN, false),
-			Operator('k', 1, false, UP, false)
-		}))
-	});
-	cleanUp(tester);
-	std::cout << "\\begin{align*}\n\t" << tester << "\\end{align*}" << std::endl;
-	std::cout << "-----------------------" << std::endl;
-
-	std::vector<WickTerm> wick_t;
-	for (const auto& term : tester) {
-		term.wick(wick_t);
-	}
-	cleanWicks(wick_t);
-	std::cout << "\\begin{align*}\n\t" << wick_t << "\\end{align*}" << std::endl;
-	*/
 
 	for (size_t i = 0; i < basis.size(); i++)
 	{
@@ -74,16 +63,17 @@ int main(int argc, char** argv) {
 			for (const auto& term : terms) {
 				term.wick(wicks);
 			}
+			if (i != 1 || j != 0) continue;
 			cleanWicks(wicks);
-			//std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
+			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../wick_M_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				std::ofstream ofs("../commutators/wick_M_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
-				std::cout << "Serialization of M complete." << std::endl;
+				std::cout << i << ", " << j << ":  Serialization of M complete." << std::endl;
 			}
 
 			terms.clear();
@@ -94,15 +84,15 @@ int main(int argc, char** argv) {
 				term.wick(wicks);
 			}
 			cleanWicks(wicks);
-			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
+			//std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../wick_N_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				std::ofstream ofs("../commutators/wick_N_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
-				std::cout << "Serialization of N complete." << std::endl;
+				std::cout << i << ", " << j << ":  Serialization of N complete." << std::endl;
 			}
 		}
 	}
