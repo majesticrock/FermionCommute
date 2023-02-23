@@ -59,7 +59,6 @@ int main(int argc, char** argv) {
 	std::cout << "\\begin{align*}\n\t" << wick_t << "\\end{align*}" << std::endl;
 	*/
 
-	return 0;
 	for (size_t i = 0; i < basis.size(); i++)
 	{
 		std::vector<Term> commute_with_H;
@@ -76,8 +75,7 @@ int main(int argc, char** argv) {
 				term.wick(wicks);
 			}
 			cleanWicks(wicks);
-			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor()
-				<< ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
+			//std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
@@ -85,6 +83,7 @@ int main(int argc, char** argv) {
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
+				std::cout << "Serialization of M complete." << std::endl;
 			}
 
 			terms.clear();
@@ -95,6 +94,7 @@ int main(int argc, char** argv) {
 				term.wick(wicks);
 			}
 			cleanWicks(wicks);
+			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
+				std::cout << "Serialization of N complete." << std::endl;
 			}
 		}
 	}
