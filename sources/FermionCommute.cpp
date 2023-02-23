@@ -30,8 +30,8 @@ int main(int argc, char** argv) {
 
 	std::vector<Term> basis = {
 		// f, f^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 		// n_up/down
 		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
 		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
@@ -39,8 +39,8 @@ int main(int argc, char** argv) {
 		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
 		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
 		// eta, eta^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
-		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
@@ -63,7 +63,6 @@ int main(int argc, char** argv) {
 			for (const auto& term : terms) {
 				term.wick(wicks);
 			}
-			if (i != 1 || j != 0) continue;
 			cleanWicks(wicks);
 			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
