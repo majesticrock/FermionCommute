@@ -409,6 +409,30 @@ namespace SymbolicOperators {
 		sort_map["f"] = 2;
 		sort_map["\\eta"] = 3;
 
+		for (auto& delta : delta_momenta) {
+			if (delta.first.momentum_list.size() == 1 && delta.second.momentum_list.size() == 1) {
+				// This comparison is well defined because we save the momentum as char i.e. byte
+				// which is easily comparable
+				if (delta.first.momentum_list[0].second < delta.second.momentum_list[0].second) {
+					std::swap(delta.first, delta.second);
+					if (delta.first.momentum_list[0].first < 0) {
+						delta.first.flipMomentum();
+						delta.second.flipMomentum();
+					}
+					if (delta.first.add_Q) {
+						delta.first.add_Q = false;
+						delta.second.add_Q = !(delta.second.add_Q);
+					}
+				}
+				for (auto& op : operators) {
+					op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				}
+				for (auto& coeff : coefficients) {
+					coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				}
+			}
+		}
+
 		for (auto& op : operators) {
 			if (op.type == "g" && op.momentum.add_Q) {
 				op.momentum.add_Q = false;
@@ -426,24 +450,6 @@ namespace SymbolicOperators {
 				else if (operators[i].type == operators[j].type) {
 					if (operators[i].momentum.momentum_list[0].second > operators[j].momentum.momentum_list[0].second) {
 						std::swap(operators[i], operators[j]);
-					}
-				}
-			}
-		}
-
-		for (auto& delta : delta_momenta) {
-			if (delta.first.momentum_list.size() == 1 && delta.second.momentum_list.size() == 1) {
-				// This comparison is well defined because we save the momentum as char i.e. byte
-				// which is easily comparable
-				if (delta.first.momentum_list[0].second > delta.second.momentum_list[0].second) {
-					std::swap(delta.first, delta.second);
-					if (delta.first.momentum_list[0].first < 0) {
-						delta.first.flipMomentum();
-						delta.second.flipMomentum();
-					}
-					if (delta.first.add_Q) {
-						delta.first.add_Q = false;
-						delta.second.add_Q = !(delta.second.add_Q);
 					}
 				}
 			}
