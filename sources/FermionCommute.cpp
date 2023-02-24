@@ -39,8 +39,8 @@ int main(int argc, char** argv) {
 		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
 		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
 		// eta, eta^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
@@ -53,12 +53,13 @@ int main(int argc, char** argv) {
 		std::vector<Term> commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
+		//std::cout << "H: " << commute_with_H << std::endl;
 		for (size_t j = 0; j <= i; j++)
 		{
 			std::vector<Term> terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
-
+			//std::cout << "full: " << terms << std::endl;
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				term.wick(wicks);
@@ -83,7 +84,7 @@ int main(int argc, char** argv) {
 				term.wick(wicks);
 			}
 			cleanWicks(wicks);
-			//std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
+			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector

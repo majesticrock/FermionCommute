@@ -11,6 +11,8 @@ namespace SymbolicOperators {
 		bool isDaggered;
 		// if Coeff(k) = Coeff(-k)
 		bool translationalInvariance = true;
+		// if Coeff(k+Q) = -Coeff(k)
+		bool Q_changes_sign = true;
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
@@ -19,6 +21,7 @@ namespace SymbolicOperators {
 			ar& indizes;
 			ar& isDaggered;
 			ar& translationalInvariance;
+			ar& Q_changes_sign;
 		}
 
 		Coefficient();

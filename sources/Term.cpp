@@ -369,6 +369,10 @@ namespace SymbolicOperators {
 					coeff.momentum.flipMomentum();
 				}
 			}
+			if (coeff.Q_changes_sign && coeff.momentum.add_Q) {
+				coeff.momentum.add_Q = false;
+				flipSign();
+			}
 		}
 
 		int new_n;
