@@ -33,14 +33,14 @@ int main(int argc, char** argv) {
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
 		// n_up/down
-		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
-		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
 		// g_up/down
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
 		// eta, eta^+
-		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
