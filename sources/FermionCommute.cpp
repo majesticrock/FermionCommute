@@ -30,14 +30,14 @@ int main(int argc, char** argv) {
 
 	std::vector<Term> basis = {
 		// f, f^+
-		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
 		// n_up/down
 		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
 		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
 		// g_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))
-		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
 		// eta, eta^+
 		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
 		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 			std::vector<Term> terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
-			//std::cout << "full: " << terms << std::endl;
+			//std::cout << "\\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				term.wick(wicks);

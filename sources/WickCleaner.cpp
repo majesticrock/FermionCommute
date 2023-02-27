@@ -71,10 +71,6 @@ namespace SymbolicOperators {
 				}
 			}
 
-			if (delta.first.add_Q) {
-				delta.first.add_Q = false;
-				delta.second.add_Q = (delta.second.add_Q != true);
-			}
 			if (delta.first.momentum_list.size() == 0) {
 				if (delta.second.momentum_list.size() == 0) continue;
 				if (delta.second.momentum_list.size() == 1) {
@@ -94,11 +90,7 @@ namespace SymbolicOperators {
 			if (delta.second.momentum_list.size() == 1 && delta.first.momentum_list.size() > 1) {
 				std::swap(delta.first, delta.second);
 			}
-			if (delta.first.momentum_list.size() == 1 && delta.first.momentum_list[0].first < 0) {
-				delta.first.flipMomentum();
-				delta.second.flipMomentum();
-			}
-			else if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() > 1) {
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() > 1) {
 				bool foundCandidate = false;
 				int index = 0;
 				delta.second -= delta.first;
@@ -123,6 +115,15 @@ namespace SymbolicOperators {
 				delta.first.flipMomentum();
 				if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
 				delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
+			}
+
+			if (delta.first.momentum_list.size() == 1 && delta.first.momentum_list[0].first < 0) {
+				delta.first.flipMomentum();
+				delta.second.flipMomentum();
+			}
+			if (delta.first.add_Q) {
+				delta.first.add_Q = false;
+				delta.second.add_Q = !(delta.second.add_Q);
 			}
 
 			if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
@@ -155,7 +156,6 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-
 		// Remove delta^2
 		for (int i = 0; i < delta_momenta.size(); i++)
 		{
@@ -499,7 +499,6 @@ namespace SymbolicOperators {
 			}
 		}
 		for (std::vector<WickTerm>::iterator it = terms.begin(); it != terms.end();) {
-			//std::cout << count++ << " of " << terms.size() << ":&\t" << *it << "\\\\" << std::endl;
 			if (!(it->setDeltas())) {
 				it = terms.erase(it);
 				continue;

@@ -97,10 +97,6 @@ namespace SymbolicOperators {
 				}
 			}
 
-			if (delta.first.add_Q) {
-				delta.first.add_Q = false;
-				delta.second.add_Q = (delta.second.add_Q != true);
-			}
 			if (delta.first.momentum_list.size() == 0) {
 				if (delta.second.momentum_list.size() == 0) continue;
 				if (delta.second.momentum_list.size() == 1) {
@@ -120,11 +116,7 @@ namespace SymbolicOperators {
 			if (delta.second.momentum_list.size() == 1 && delta.first.momentum_list.size() > 1) {
 				std::swap(delta.first, delta.second);
 			}
-			if (delta.first.momentum_list.size() == 1 && delta.first.momentum_list[0].first < 0) {
-				delta.first.flipMomentum();
-				delta.second.flipMomentum();
-			}
-			else if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() > 1) {
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() > 1) {
 				bool foundCandidate = false;
 				int index = 0;
 				delta.second -= delta.first;
@@ -149,6 +141,14 @@ namespace SymbolicOperators {
 				delta.first.flipMomentum();
 				if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
 				delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
+			}
+			if (delta.first.add_Q) {
+				delta.first.add_Q = false;
+				delta.second.add_Q = !(delta.second.add_Q);
+			}
+			if (delta.first.momentum_list.size() == 1 && delta.first.momentum_list[0].first < 0) {
+				delta.first.flipMomentum();
+				delta.second.flipMomentum();
 			}
 
 			if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;

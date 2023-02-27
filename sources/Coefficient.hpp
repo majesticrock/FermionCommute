@@ -12,7 +12,7 @@ namespace SymbolicOperators {
 		// if Coeff(k) = Coeff(-k)
 		bool translationalInvariance = true;
 		// if Coeff(k+Q) = -Coeff(k)
-		bool Q_changes_sign = true;
+		bool Q_changes_sign = false;
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
