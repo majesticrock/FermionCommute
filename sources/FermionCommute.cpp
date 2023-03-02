@@ -53,13 +53,16 @@ int main(int argc, char** argv) {
 		std::vector<Term> commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
-		//std::cout << "H: " << commute_with_H << std::endl;
-		for (size_t j = 0; j <= i; j++)
+		//std::cout << "H: \\begin{align*}\n\t" << commute_with_H << "\\end{align*}" << std::endl;
+		for (size_t j = 0; j < basis.size(); j++)
 		{
+			//if (i != 2) continue;
+			//if (j != 0) continue;
+			std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
 			std::vector<Term> terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
-			//std::cout << "\\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
+			//std::cout << "full: \\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				term.wick(wicks);
@@ -69,11 +72,10 @@ int main(int argc, char** argv) {
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/wick_M_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				std::ofstream ofs("../commutators/wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
-				std::cout << i << ", " << j << ":  Serialization of M complete." << std::endl;
 			}
 
 			terms.clear();
@@ -88,11 +90,10 @@ int main(int argc, char** argv) {
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/wick_N_" + std::to_string(i) + "_" + std::to_string(j) + ".txt");
+				std::ofstream ofs("../commutators/wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
-				std::cout << i << ", " << j << ":  Serialization of N complete." << std::endl;
 			}
 		}
 	}

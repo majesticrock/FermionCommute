@@ -21,84 +21,105 @@ namespace SymbolicOperators {
 	{
 		this->operators.reserve(temporary_operators.size() / 2);
 		WickTerm this_copy = *this;
+		std::vector<WickTerm> these_copies;
+		these_copies.push_back(*this);
 
-		auto setDeltas = [&](const Operator& left, const Operator& right, bool sc_type) {
+		auto setDeltas = [&](const Operator& left, const Operator& right, bool sc_type, int index) {
 			Momentum copy_momentum = left.momentum;
 			if (sc_type) copy_momentum.flipMomentum();
 
-			for (int j = 1; j < left.indizes.size(); j++)
+			for (int k = 1; k < left.indizes.size(); k++)
 			{
-				this->delta_indizes.push_back(std::make_pair(left.indizes[j], right.indizes[j]));
-				this_copy.delta_indizes.push_back(this->delta_indizes.back());
+				these_copies[index].delta_indizes.push_back(std::make_pair(left.indizes[k], right.indizes[k]));
+				this_copy.delta_indizes.push_back(these_copies[index].delta_indizes.back());
 			}
 
-			this->delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
+			these_copies[index].delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
 			copy_momentum.add_Q = !(copy_momentum.add_Q);
 			this_copy.delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
 		};
 
 		for (int i = 0; i < temporary_operators.size(); i += 2)
 		{
-			if (LEFT.isDaggered == RIGHT.isDaggered) {
-				if (L_SPIN == R_SPIN) return false;
-				if (LEFT.isDaggered) { // c^+ c^+
-					if (L_SPIN == DOWN) {
-						std::cerr << "c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?" << std::endl;
-						throw;
-					}
-					this->delta_indizes.push_back(std::make_pair(L_SPIN, UP));
-					this_copy.delta_indizes.push_back(this->delta_indizes.back());
-					this->delta_indizes.push_back(std::make_pair(R_SPIN, DOWN));
-					this_copy.delta_indizes.push_back(this->delta_indizes.back());
-					// Due to the dagger we need to swap left and right
-					setDeltas(RIGHT, LEFT, true);
+			int copies_size = these_copies.size();
+			for (int j = 0; j < copies_size; j++)
+			{
+				this_copy = these_copies[j];
+				if (LEFT.isDaggered == RIGHT.isDaggered) {
+					if (L_SPIN == R_SPIN) return false;
+					if (LEFT.isDaggered) { // c^+ c^+
+						if (L_SPIN == DOWN) {
+							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
+						}
+						if (L_SPIN != UP) {
+							these_copies[j].delta_indizes.push_back(std::make_pair(L_SPIN, UP));
+							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
+						}
+						if (R_SPIN != DOWN) {
+							these_copies[j].delta_indizes.push_back(std::make_pair(R_SPIN, DOWN));
+							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
+						}
+						// Due to the dagger we need to swap left and right
+						setDeltas(RIGHT, LEFT, true, j);
 
-					this->operators.push_back(WickOperator("f", true, LEFT.momentum));
-					if (LEFT.indizes.size() > 1) {
-						this->operators.back().indizes = std::vector<std::string>(LEFT.indizes.begin() + 1, LEFT.indizes.end());
+						these_copies[j].operators.push_back(WickOperator("f", true, LEFT.momentum));
+						if (LEFT.indizes.size() > 1) {
+							these_copies[j].operators.back().indizes = std::vector<std::string>(LEFT.indizes.begin() + 1, LEFT.indizes.end());
+						}
+						this_copy.operators.push_back(these_copies[j].operators.back());
+						this_copy.operators.back().type = "\\eta";
 					}
-					this_copy.operators.push_back(this->operators.back());
-					this_copy.operators.back().type = "\\eta";
+					else { // cc
+						if (L_SPIN == UP) {
+							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
+						}
+						if (L_SPIN != DOWN) {
+							these_copies[j].delta_indizes.push_back(std::make_pair(L_SPIN, DOWN));
+							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
+						}
+						if (R_SPIN != UP) {
+							these_copies[j].delta_indizes.push_back(std::make_pair(R_SPIN, UP));
+							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
+						}
+						setDeltas(LEFT, RIGHT, true, j);
+
+						these_copies[j].operators.push_back(WickOperator("f", false, RIGHT.momentum));
+						if (RIGHT.indizes.size() > 1) {
+							these_copies[j].operators.back().indizes = std::vector<std::string>(RIGHT.indizes.begin() + 1, RIGHT.indizes.end());
+						}
+						this_copy.operators.push_back(these_copies[j].operators.back());
+						this_copy.operators.back().type = "\\eta";
+					}
 				}
-				else { // cc
-					if (L_SPIN == UP) {
-						std::cerr << "c c: Left spin is up while right isn't. Did you forget to sort the terms?" << std::endl;
-						throw;
+				else {
+					// c^+ c
+					if (L_SPIN == UP && R_SPIN == DOWN) return false;
+					if (L_SPIN == DOWN && R_SPIN == UP) return false;
+
+					if (L_SPIN != R_SPIN) {
+						these_copies[j].delta_indizes.push_back(std::make_pair(L_SPIN, R_SPIN));
+						this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 					}
-					this->delta_indizes.push_back(std::make_pair(L_SPIN, DOWN));
-					this_copy.delta_indizes.push_back(this->delta_indizes.back());
-					this->delta_indizes.push_back(std::make_pair(R_SPIN, UP));
-					this_copy.delta_indizes.push_back(this->delta_indizes.back());
-					setDeltas(LEFT, RIGHT, true);
+					// Left and right are swapped due to the definition of g
+					setDeltas(RIGHT, LEFT, false, j);
 
-					this->operators.push_back(WickOperator("f", false, RIGHT.momentum));
-					if (RIGHT.indizes.size() > 1) {
-						this->operators.back().indizes = std::vector<std::string>(RIGHT.indizes.begin() + 1, RIGHT.indizes.end());
+					these_copies[j].operators.push_back(WickOperator("n", false, LEFT.momentum, LEFT.indizes));
+					this_copy.operators.push_back(these_copies[j].operators.back());
+					this_copy.operators.back().type = "g";
+					if (this_copy.operators.back().momentum.add_Q) {
+						this_copy.operators.back().momentum.add_Q = false;
+						this_copy.operators.back().isDaggered = true;
 					}
-					this_copy.operators.push_back(this->operators.back());
-					this_copy.operators.back().type = "\\eta";
 				}
-			}
-			else {
-				// c^+ c
-				if (L_SPIN == UP && R_SPIN == DOWN) return false;
-				if (L_SPIN == DOWN && R_SPIN == UP) return false;
-
-				this->delta_indizes.push_back(std::make_pair(L_SPIN, R_SPIN));
-				this_copy.delta_indizes.push_back(this->delta_indizes.back());
-				// Left and right are swapped due to the definition of g
-				setDeltas(RIGHT, LEFT, false);
-
-				this->operators.push_back(WickOperator("n", false, LEFT.momentum, LEFT.indizes));
-				this_copy.operators.push_back(this->operators.back());
-				this_copy.operators.back().type = "g";
-				if (this_copy.operators.back().momentum.add_Q) {
-					this_copy.operators.back().momentum.add_Q = false;
-					this_copy.operators.back().isDaggered = true;
-				}
+				these_copies.push_back(this_copy);
 			}
 		}
-		reciever.push_back(this_copy);
+		this->delta_indizes = these_copies.back().delta_indizes;
+		this->delta_momenta = these_copies.back().delta_momenta;
+		this->operators = these_copies.back().operators;
+		these_copies.pop_back();
+
+		reciever.insert(reciever.end(), these_copies.begin(), these_copies.end());
 		return true;
 	}
 
