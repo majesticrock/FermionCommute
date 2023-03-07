@@ -706,6 +706,19 @@ namespace SymbolicOperators {
 			reciever.push_back(WickTerm(this));
 		}
 		else {
+			std::vector<WickTerm> buffer_list;
+			{
+				size_t value = 1;
+				// Computes the double factorial; total number of products in wicks theorem = (2n - 1)!!
+				for (size_t n = 2 * this->operators.size() - 1; n > 0; n -= 2)
+				{
+					value *= n;
+				}
+				buffer_list.reserve(value);
+			}
+
+
+
 			for (int i = 1; i < operators.size(); i++)
 			{
 				WickTerm buffer(this);

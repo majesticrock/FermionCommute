@@ -32,12 +32,12 @@ int main(int argc, char** argv) {
 		// f, f^+
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
-		// n_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
 		// g_up/down
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+		// n_up/down
+		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
 		// eta, eta^+
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
