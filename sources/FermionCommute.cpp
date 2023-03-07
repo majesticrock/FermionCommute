@@ -33,21 +33,29 @@ int main(int argc, char** argv) {
 		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
 		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
 		// g_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-		// n_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
-		// eta, eta^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+		//// n_up/down
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
+		//// eta, eta^+
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		t.hermitianConjugate();
 		t.renameMomenta('k', 'l');
 	}
-
+	//{
+	//	Term test(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger, c_minus_k, c_k }));
+	//	std::vector<WickTerm> wicks;
+	//	wicks_theorem(test, wicks);
+	//	cleanWicks(wicks);
+	//	std::cout << "\\begin{align*}\n\t[ " << ", [H, " << test << " ]] =" << wicks << "\\end{align*}" << std::endl;
+	//	
+	//}
+	//return 0;
 	for (size_t i = 0; i < basis.size(); i++)
 	{
 		std::vector<Term> commute_with_H;
@@ -65,7 +73,7 @@ int main(int argc, char** argv) {
 			//std::cout << "full: \\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
-				term.wick(wicks);
+				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
 			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
@@ -83,7 +91,7 @@ int main(int argc, char** argv) {
 			commutator(terms, basis_daggered[j], basis[i]);
 			cleanUp(terms);
 			for (const auto& term : terms) {
-				term.wick(wicks);
+				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
 			std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;

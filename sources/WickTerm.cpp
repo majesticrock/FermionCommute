@@ -11,10 +11,84 @@ namespace SymbolicOperators {
 		operators(), delta_momenta(base->delta_momenta), delta_indizes(base->delta_indizes), temporary_operators()
 	{
 	}
+	WickTerm::WickTerm(const Term& base)
+		: multiplicity(base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta), sum_indizes(base.sum_indizes),
+		operators(), delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
+	{
+	}
 	WickTerm::WickTerm()
 		: multiplicity(0), coefficients(), sum_momenta(), sum_indizes(),
 		operators(), delta_momenta(), delta_indizes(), temporary_operators()
 	{
+	}
+
+	void wick_processor(const std::vector<Operator>& remaining, std::vector<WickTerm>& reciever_list, std::variant<WickTerm, Term> buffer)
+	{
+		if(remaining.empty()) {
+			reciever_list.push_back(std::get<WickTerm>(buffer));
+			return;
+		}
+		for (size_t i = 1; i < remaining.size(); i++)
+			{
+			if(std::holds_alternative<Term>(buffer)){ 
+				WickTerm temp(std::get<Term>(buffer));
+				buffer = temp;
+			}
+			if ((i % 2) == 0) {
+				std::get<WickTerm>(buffer).multiplicity *= -1;
+			}
+			std::get<WickTerm>(buffer).temporary_operators.reserve(std::get<WickTerm>(buffer).temporary_operators.size() + 2);
+			std::get<WickTerm>(buffer).temporary_operators.push_back(remaining[0]);
+			std::get<WickTerm>(buffer).temporary_operators.push_back(remaining[i]);
+
+			std::vector<Operator> copy_operators = remaining;
+			copy_operators.erase(copy_operators.begin() + i);
+			copy_operators.erase(copy_operators.begin());
+			wick_processor(copy_operators, reciever_list, buffer);
+
+			// delete last two elements, as they are to be updated in the next iteration
+			std::get<WickTerm>(buffer).temporary_operators.pop_back();
+			std::get<WickTerm>(buffer).temporary_operators.pop_back();
+			if ((i % 2) == 0) {
+				std::get<WickTerm>(buffer).multiplicity *= -1;
+			}
+		}
+	}
+
+	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever)
+	{
+		//if (this->operators.size() > 4) throw std::length_error("Wick for n>4 not yet implemented!");
+		if (term.isIdentity()) {
+			reciever.push_back(WickTerm(term));
+		}
+		else {
+			std::vector<WickTerm> buffer_list;
+			{
+				size_t value = 1;
+				// Computes the double factorial; total number of products in wicks theorem = (2n - 1)!!
+				for (long n = 2 * term.getOperators().size() - 1; n > 0; n -= 2)
+				{
+					value *= n;
+				}
+				buffer_list.reserve(value);
+			}
+			wick_processor(term.getOperators(), buffer_list, term);
+			reciever.insert(reciever.end(), buffer_list.begin(), buffer_list.end());
+		}
+
+		for (size_t i = 0; i < reciever.size();)
+		{
+			if (reciever[i].handled()) {
+				++i;
+				continue;
+			}
+			if (!(reciever[i].swapToWickOperators(reciever))) {
+				reciever.erase(reciever.begin() + i);
+			}
+			else {
+				++i;
+			}
+		}
 	}
 
 	bool WickTerm::swapToWickOperators(std::vector<WickTerm>& reciever)

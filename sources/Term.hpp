@@ -31,8 +31,6 @@ namespace SymbolicOperators {
 		return false;
 	};
 
-	struct WickTerm;
-
 	class Term {
 	private:
 		std::vector<Coefficient> coefficients;
@@ -71,6 +69,9 @@ namespace SymbolicOperators {
 		inline void flipSign() {
 			this->multiplicity *= -1;
 		}
+		inline const std::vector<Operator>& getOperators() const{
+			return this->operators;
+		}
 
 		bool setDeltas();
 		bool computeSums();
@@ -78,6 +79,7 @@ namespace SymbolicOperators {
 		void sort();
 		// Unifies the sum indizes
 		void renameSums();
+		//void wick(std::vector<WickTerm>& reciever) const;
 
 		// Checks for equality of everything except of multiplicity
 		inline bool isEqual(const Term& other) const {
@@ -134,7 +136,6 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(what, Momentum(to));
 			}
 		};
-		void wick(std::vector<WickTerm>& reciever) const;
 	};
 	void commutator(std::vector<Term>& reciever, const std::vector<Term>& left, const std::vector<Term>& right);
 	inline void commutator(std::vector<Term>& reciever, const Term& left, const std::vector<Term>& right) {
