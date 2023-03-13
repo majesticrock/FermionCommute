@@ -305,7 +305,9 @@ namespace SymbolicOperators {
 			{
 				if (delta_momenta[j].first.momentum_list[0].second == sum_momenta[i]) {
 					changeAllMomenta(sum_momenta[i], delta_momenta[j].second);
-					if (abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
+					if (!(delta_momenta[j].first.momentum_list.empty())) {
+						if (abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
+					}
 
 					sum_momenta.erase(sum_momenta.begin() + i);
 					delta_momenta.erase(delta_momenta.begin() + j);
