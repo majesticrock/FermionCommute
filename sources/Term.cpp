@@ -127,7 +127,7 @@ namespace SymbolicOperators {
 					index = delta.second.isUsed(m);
 					if (index >= 0) {
 						foundCandidate = true;
-						if (abs(delta.second.momentum_list[index].first) == 1) {
+						if (std::abs(delta.second.momentum_list[index].first) == 1) {
 							break;
 						}
 					}
@@ -139,7 +139,7 @@ namespace SymbolicOperators {
 				}
 				delta.first.momentum_list.push_back(delta.second.momentum_list[index]);
 				delta.first.flipMomentum();
-				if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
+				if (std::abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
 				delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
 			}
 			if (delta.first.add_Q) {
@@ -151,7 +151,7 @@ namespace SymbolicOperators {
 				delta.second.flipMomentum();
 			}
 
-			if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
+			if (std::abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
 			for (auto& op : operators) {
 				op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
@@ -306,7 +306,7 @@ namespace SymbolicOperators {
 				if (delta_momenta[j].first.momentum_list[0].second == sum_momenta[i]) {
 					changeAllMomenta(sum_momenta[i], delta_momenta[j].second);
 					if (!(delta_momenta[j].first.momentum_list.empty())) {
-						if (abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
+						if (std::abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
 					}
 
 					sum_momenta.erase(sum_momenta.begin() + i);
@@ -320,7 +320,7 @@ namespace SymbolicOperators {
 					if (index < 0) continue;
 
 					Momentum buffer(delta_momenta[j].second.momentum_list[index].second, delta_momenta[j].second.momentum_list[index].first);
-					if (abs(buffer.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << buffer << std::endl;
+					if (std::abs(buffer.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << buffer << std::endl;
 					delta_momenta[j].second.momentum_list.erase(delta_momenta[j].second.momentum_list.begin() + index);
 					delta_momenta[j].second -= delta_momenta[j].first;
 

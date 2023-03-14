@@ -98,7 +98,7 @@ namespace SymbolicOperators {
 			else if (it->first == -1) {
 				os << " -";
 			}
-			else if (abs(it->first) != 1) {
+			else if (std::abs(it->first) != 1) {
 				os << it->first;
 			}
 			os << it->second;
