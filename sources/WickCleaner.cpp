@@ -454,6 +454,39 @@ namespace SymbolicOperators {
 				}
 			}
 		}
+
+		for (auto& coeff : coefficients) {
+			coeff.momentum.sort();
+			if (coeff.translationalInvariance && coeff.momentum.momentum_list.size() > 0) {
+				if (coeff.momentum.momentum_list[0].first < 0) {
+					coeff.momentum.flipMomentum();
+				}
+			}
+			if (coeff.Q_changes_sign && coeff.momentum.add_Q) {
+				coeff.momentum.add_Q = false;
+				this->multiplicity *= -1;
+			}
+
+			for (const auto& sum : sum_momenta) {
+				int idx = coeff.momentum.isUsed(sum);
+				if (idx < 0) continue;
+
+				if (coeff.momentum.momentum_list[idx].first < 0) {
+					for (auto& op : operators) {
+						for (auto& mom : op.momentum.momentum_list)
+						{
+							if (mom.second == sum) mom.first *= -1;
+						}
+					}
+					for (auto& coeff2 : coefficients) {
+						for (auto& mom : coeff2.momentum.momentum_list)
+						{
+							if (mom.second == sum) mom.first *= -1;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void WickTerm::applySpinSymmetry()
@@ -519,6 +552,19 @@ namespace SymbolicOperators {
 			it->applyPhaseSymmetry();
 			it->applySpinSymmetry();
 			it->applyTranslationalSymmetry();
+
+			for (auto jt = it->sum_indizes.begin(); jt != it->sum_indizes.end();)
+			{
+				if (it->usesIndex(*jt)) {
+					++jt;
+				}
+				else {
+					// We are assuming there are only spin indizes here (spin 1/2)
+					// If another kind of index arises I have to readress this section.
+					it->multiplicity *= 2;
+					jt = it->sum_indizes.erase(jt);
+				}
+			}
 			++it;
 		}
 		// remove duplicates

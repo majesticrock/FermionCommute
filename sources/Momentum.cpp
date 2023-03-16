@@ -8,6 +8,20 @@ namespace SymbolicOperators {
 	Momentum::Momentum(const momentum_pairs& _momenta, bool Q)
 		: momentum_list(_momenta), add_Q(Q) {}
 
+	void Momentum::sort()
+	{
+		for (size_t i = 0; i < momentum_list.size(); i++)
+		{
+			for (size_t j = i + 1; j < momentum_list.size(); j++)
+			{
+				// Comparing two chars is easy
+				if (momentum_list[i].second > momentum_list[j].second) {
+					std::swap(momentum_list[i], momentum_list[j]);
+				}
+			}
+		}
+	}
+
 	Momentum& Momentum::operator+=(const Momentum& rhs)
 	{
 		this->add_Q = (rhs.add_Q != this->add_Q);

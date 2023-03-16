@@ -8,11 +8,11 @@ namespace SymbolicOperators {
 		Momentum momentum;
 		// Contains all indizes, standard: first index = spin, all others arbitrary, e.g. orbitals, bands etc
 		std::vector<std::string> indizes;
-		bool isDaggered;
 		// if Coeff(k) = Coeff(-k)
 		bool translationalInvariance = true;
 		// if Coeff(k+Q) = -Coeff(k)
-		bool Q_changes_sign = false;
+		bool Q_changes_sign;
+		bool isDaggered;
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
@@ -26,10 +26,17 @@ namespace SymbolicOperators {
 
 		Coefficient();
 		explicit Coefficient(std::string _name);
-		Coefficient(std::string _name, const Momentum& _momentum, const std::vector<std::string>& _indizes, bool _isDaggered = false);
-		Coefficient(std::string _name, char _momentum, bool add_Q, const std::vector<std::string>& _indizes, bool _isDaggered = false);
-		Coefficient(std::string _name, const Momentum& _momentum, bool _isDaggered = false);
-		Coefficient(std::string _name, char _momentum, bool add_Q = false, bool _isDaggered = false);
+		Coefficient(std::string _name, const Momentum& _momentum, const std::vector<std::string>& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, char _momentum, bool add_Q, const std::vector<std::string>& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, char _momentum, bool add_Q = false, bool _Q_changes_sign = false, bool _isDaggered = false);
+
+		inline bool usesIndex(const std::string& index) const {
+			for (const auto& idx : indizes) {
+				if (idx == index) return true;
+			}
+			return false;
+		}
 	};
 
 	inline bool operator==(const Coefficient& lhs, const Coefficient& rhs) {

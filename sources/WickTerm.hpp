@@ -22,6 +22,13 @@ namespace SymbolicOperators {
 		WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::vector<std::string>& _indizes = std::vector<std::string>());
 		WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index);
 		WickOperator();
+
+		inline bool usesIndex(const std::string& index) const {
+			for (const auto& idx : this->indizes) {
+				if (idx == index) return true;
+			}
+			return false;
+		};
 	};
 
 	class Term;
@@ -55,6 +62,15 @@ namespace SymbolicOperators {
 		explicit WickTerm(const Term& base);
 		WickTerm();
 
+		inline bool usesIndex(const std::string& index) const {
+			for (const auto& op : operators) {
+				if (op.usesIndex(index)) return true;
+			}
+			for (const auto& coeff : coefficients) {
+				if (coeff.usesIndex(index)) return true;
+			}
+			return false;
+		}
 		inline bool isIdentity() const {
 			return this->operators.empty();
 		}

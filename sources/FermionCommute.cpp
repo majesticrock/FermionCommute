@@ -26,21 +26,29 @@ int main(int argc, char** argv) {
 		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), UP, false),
 		}));
 
-	std::vector<Term> H = { H_T, H_U };
+	Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({'r', 'p', 'q'}), std::vector<std::string>({"\\sigma", "\\sigma'"}),
+		std::vector<Operator>({
+			Operator('r', 1, false, "\\sigma", true),
+			Operator('p', 1, false, "\\sigma'", true),
+			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), "\\sigma'", false),
+			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), "\\sigma", false),
+		}));
+
+	std::vector<Term> H = { H_V };
 
 	std::vector<Term> basis = {
 		// f, f^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
-		// g_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-		// n_up/down
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
-		// eta, eta^+
-		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-		Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
+		//// g_up/down
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+		//// n_up/down
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
+		//// eta, eta^+
+		//Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+		//Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 	};
 	std::vector<Term> basis_daggered(basis);
 	for (auto& t : basis_daggered) {

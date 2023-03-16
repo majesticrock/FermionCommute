@@ -39,6 +39,8 @@ namespace SymbolicOperators {
 		explicit Momentum(const char value, int plus_minus = 1, bool Q = false);
 		explicit Momentum(const momentum_pairs& _momenta, bool Q = false);
 
+		void sort();
+
 		Momentum& operator+=(const Momentum& rhs);
 		Momentum& operator-=(const Momentum& rhs);
 
