@@ -14,7 +14,7 @@ namespace SymbolicOperators {
 		if (coeff.isDaggered) {
 			os << "^*";
 		}
-		if (!coeff.momentum.momentum_list.empty()) {
+		if (!coeff.momentum.momentum_list.empty() || coeff.momentum.add_Q) {
 			os << " ( " << coeff.momentum << " )";
 		}
 		return os;

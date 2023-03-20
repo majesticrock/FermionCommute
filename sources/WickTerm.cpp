@@ -24,13 +24,13 @@ namespace SymbolicOperators {
 
 	void wick_processor(const std::vector<Operator>& remaining, std::vector<WickTerm>& reciever_list, std::variant<WickTerm, Term> buffer)
 	{
-		if(remaining.empty()) {
+		if (remaining.empty()) {
 			reciever_list.push_back(std::get<WickTerm>(buffer));
 			return;
 		}
 		for (size_t i = 1; i < remaining.size(); i++)
-			{
-			if(std::holds_alternative<Term>(buffer)){ 
+		{
+			if (std::holds_alternative<Term>(buffer)) {
 				WickTerm temp(std::get<Term>(buffer));
 				buffer = temp;
 			}

@@ -353,7 +353,6 @@ namespace SymbolicOperators {
 		{
 			if (i >= 3) {
 				throw std::invalid_argument("More than 3 momenta, time to implement this...");
-				break;
 			}
 			if (sum_momenta[i] == name_list[i]) continue;
 
@@ -591,6 +590,11 @@ namespace SymbolicOperators {
 			}
 		}
 
+		std::map<std::string, int> coeff_map;
+		coeff_map["\\epsilon_0"] = 0;
+		coeff_map["\\frac{U}{N}"] = 1;
+		coeff_map["\\tilde{V}"] = 2;
+
 		for (size_t i = 0; i < terms.size(); i++)
 		{
 			for (size_t j = i + 1; j < terms.size(); j++)
@@ -607,9 +611,16 @@ namespace SymbolicOperators {
 							std::swap(terms[i], terms[j]);
 						}
 						else if (terms[i].coefficients.size() > 0) {
-							if (terms[j].coefficients[0].name == "\\epsilon_0" && terms[i].coefficients[0].name != "\\epsilon_0") {
+							if (coeff_map.find(terms[j].coefficients[0].name)->second < coeff_map.find(terms[i].coefficients[0].name)->second) {
 								std::swap(terms[i], terms[j]);
 							}
+						}
+					}
+				}
+				else if (terms[i].delta_momenta.size() == 0 && terms[j].delta_momenta.size() == 0) {
+					if (terms[i].coefficients.size() > 0) {
+						if (coeff_map.find(terms[j].coefficients[0].name)->second < coeff_map.find(terms[i].coefficients[0].name)->second) {
+							std::swap(terms[i], terms[j]);
 						}
 					}
 				}

@@ -98,9 +98,11 @@ namespace SymbolicOperators {
 	std::ostream& operator<<(std::ostream& os, const Momentum& momentum)
 	{
 		if (momentum.momentum_list.empty()) {
-			os << "0";
 			if (momentum.add_Q) {
-				os << " + Q";
+				os << "Q";
+			}
+			else {
+				os << "0";
 			}
 			return os;
 		}

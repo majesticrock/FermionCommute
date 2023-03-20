@@ -34,7 +34,7 @@ namespace SymbolicOperators {
 	class Term;
 
 	struct WickTerm
-	{	
+	{
 		int multiplicity;
 		std::vector<Coefficient> coefficients;
 		std::vector<char> sum_momenta;
@@ -78,7 +78,7 @@ namespace SymbolicOperators {
 			if (this->temporary_operators.empty()) return true;
 			return !(this->operators.empty());
 		}
-		bool swapToWickOperators(std::vector<WickTerm>& reciever);	
+		bool swapToWickOperators(std::vector<WickTerm>& reciever);
 		// returns false if there is atleast one delta
 		// or a combination of deltas, that can never be achieved
 		// for example delta_k,k+Q, as k can never be equal to k+Q

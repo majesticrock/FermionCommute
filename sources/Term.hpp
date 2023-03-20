@@ -69,7 +69,7 @@ namespace SymbolicOperators {
 		inline void flipSign() {
 			this->multiplicity *= -1;
 		}
-		inline const std::vector<Operator>& getOperators() const{
+		inline const std::vector<Operator>& getOperators() const {
 			return this->operators;
 		}
 
