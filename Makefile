@@ -6,7 +6,7 @@ INCLUDEFLAGS = -isystem ~/usr/local/include
 
 CXXFLAGS = -g $(WARNINGS) -std=c++17 $(OPT) -fopenmp
 
-LDLIBS = -L/sw/gcc/5.3.0/rtf/lib64 -L/home/joshua/usr/local/include/boost_lib/ -lboost_serialization
+LDLIBS = -L/sw/gcc/5.3.0/rtf/lib64 -L/home/joshua/usr/local/include/boost_lib/ -lboost_serialization -lz -lboost_iostreams
 
 WARNINGS = -Wall -Wno-sign-compare
 
@@ -30,6 +30,4 @@ build:
 	mkdir -p build
 
 clean:
-	rm -f $(OBJS)
-	rm -f main
-	rm -rf build
+	rm -rf build/*
