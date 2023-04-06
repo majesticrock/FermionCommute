@@ -125,6 +125,7 @@ namespace SymbolicOperators {
 	};
 
 	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever);
+	void clearEtas(std::vector<WickTerm>& terms);
 	void cleanWicks(std::vector<WickTerm>& terms);
 
 	std::ostream& operator<<(std::ostream& os, const WickOperator& op);

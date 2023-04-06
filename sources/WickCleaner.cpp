@@ -517,9 +517,30 @@ namespace SymbolicOperators {
 			}
 		}
 	}
+	
+	void clearEtas(std::vector<WickTerm>& terms)
+	{
+		for (auto it = terms.begin(); it != terms.end();) {
+			bool isEta = false;
+			for (const auto& op : it->operators) {
+				if (op.type == "\\eta") {
+					isEta = true;
+					break;
+				}
+			}
+			if (isEta) {
+				it = terms.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+	}
 
 	void cleanWicks(std::vector<WickTerm>& terms)
 	{
+		// Assuming (for now) that all <eta> = 0
+		clearEtas(terms);
 		for (auto& term : terms) {
 			for (std::vector<Coefficient>::iterator it = term.coefficients.begin(); it != term.coefficients.end();) {
 				if (it->name == "") {

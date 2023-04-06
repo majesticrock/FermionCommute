@@ -159,4 +159,28 @@ namespace SymbolicOperators {
 	std::ostream& operator<<(std::ostream& os, const std::vector<Term>& terms);
 
 	void cleanUp(std::vector<Term>& terms);
+	inline void hermitianConjugate(std::vector<Term>& terms) {
+		for (auto& t : terms) {
+			t.hermitianConjugate();
+		}
+	};
+	inline void renameMomenta(std::vector<Term>& terms, char what, char to) {
+		for (auto& t : terms) {
+			t.renameMomenta(what, to);
+		}
+	};
+	inline std::string toStringWithoutPrefactor(const std::vector<Term>& terms) {
+		std::string ret = "";
+		for (size_t i = 0; i < terms.size(); i++)
+		{
+			if (terms[i].multiplicity < 0) {
+				ret += "-";
+			}
+			else if (i > 0) {
+				ret += "+";
+			}
+			ret += terms[i].toStringWithoutPrefactor();
+		}
+		return ret;
+	}
 }
