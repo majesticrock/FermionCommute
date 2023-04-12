@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#define _USE_XP_BASIS
+//#define _USE_XP_BASIS
 using namespace SymbolicOperators;
 
 int main(int argc, char** argv) {
@@ -45,30 +45,25 @@ int main(int argc, char** argv) {
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 		}),
-		// 1: n_up
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
-		}),
-		// 2: n_down
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
-		}),
-		// 3: eta + eta^+
+		// 1: eta + eta^+
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 		}),
-		// 4: g_up + g_up^+
+		// 2/3: g_up/down +
 		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))//,	Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
 		}),
-		// 5: g_down + g_down^+
 		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))//,	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
 		}),
-		// Anithermitian part
+		// 4/5: n_up/down
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
+		}),
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
+		}),
 		// 6: f - f^+
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
@@ -78,18 +73,49 @@ int main(int argc, char** argv) {
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
 			Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		}),
-		// 8: g_up - g_up^+
+		})/*,
+		// 8/9: g_up/down -
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
 			Term(-1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
 		}),
-		// 9: g_down - g_down^+
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
 			Term(-1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-		}),
+		})*/
 	};
+#else
+	std::vector<std::vector<Term>> basis = {
+		// f, f^+
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))
+		}),
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
+		}),
+		// n_up/down
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
+		}),
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
+		}),
+		// g_up/down
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))
+		}),
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
+		}),
+		// eta, eta^+
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
+		}),
+		std::vector<Term>({
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
+		})
+	};
+#endif
 	std::vector<std::vector<Term>> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
@@ -97,28 +123,23 @@ int main(int argc, char** argv) {
 	}
 	for (size_t i = 0; i < basis.size(); i++)
 	{
+		//std::cout << toStringWithoutPrefactor(basis[i]) << " &\\, and \\, " << toStringWithoutPrefactor(basis_daggered[i]) << " \\\\" << std::endl;
+		//continue;
 		std::vector<Term> commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
-		//std::cout << "H: \\begin{align*}\n\t" << commute_with_H << "\\end{align*}" << std::endl;
 		for (size_t j = 0; j < basis.size(); j++)
 		{
-			//if (i != 2) continue;
-			//if (j != 0) continue;
 			std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
 			std::vector<Term> terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
-			//auto x = terms[1];
-			//terms.clear();
-			//terms.emplace_back(x);
-			//std::cout << "full: \\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
-			std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j]) 
+			std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
 				<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
@@ -137,7 +158,7 @@ int main(int argc, char** argv) {
 				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
-			std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j]) 
+			std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
 				<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			{
@@ -149,79 +170,6 @@ int main(int argc, char** argv) {
 			}
 		}
 	}
-#else
-std::vector<Term> basis = {
-	// f, f^+
-	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))/**/,
-	Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger })),
-	// g_up/down
-	Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-	// n_up/down
-	Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k })),
-	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k })),
-	// eta, eta^+
-	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-	Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-};
-std::vector<Term> basis_daggered(basis);
-for (auto& t : basis_daggered) {
-	t.hermitianConjugate();
-	t.renameMomenta('k', 'l');
-}
-for (size_t i = 0; i < basis.size(); i++)
-{
-	std::vector<Term> commute_with_H;
-	commutator(commute_with_H, H, basis[i]);
-	cleanUp(commute_with_H);
-	//std::cout << "H: \\begin{align*}\n\t" << commute_with_H << "\\end{align*}" << std::endl;
-	for (size_t j = 0; j < basis.size(); j++)
-	{
-		//if (i != 2) continue;
-		//if (j != 0) continue;
-		std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
-		std::vector<Term> terms;
-		commutator(terms, basis_daggered[j], commute_with_H);
-		cleanUp(terms);
-		//auto x = terms[1];
-		//terms.clear();
-		//terms.emplace_back(x);
-		//std::cout << "full: \\begin{align*}\n\t" << terms << "\\end{align*}" << std::endl;
-		std::vector<WickTerm> wicks;
-		for (const auto& term : terms) {
-			wicks_theorem(term, wicks);
-		}
-		cleanWicks(wicks);
-		std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", [H, " << basis[i].toStringWithoutPrefactor() << " ]] =" << wicks << "\\end{align*}" << std::endl;
-		// serialization
-		{
-			// create an output file stream and a text archive to serialize the vector
-			std::ofstream ofs("../commutators/wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
-			boost::archive::text_oarchive oa(ofs);
-			oa << wicks;
-			ofs.close();
-		}
-
-		terms.clear();
-		wicks.clear();
-		commutator(terms, basis_daggered[j], basis[i]);
-		cleanUp(terms);
-		for (const auto& term : terms) {
-			wicks_theorem(term, wicks);
-		}
-		cleanWicks(wicks);
-		std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].toStringWithoutPrefactor() << ", " << basis[i].toStringWithoutPrefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
-		// serialization
-		{
-			// create an output file stream and a text archive to serialize the vector
-			std::ofstream ofs("../commutators/wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
-			boost::archive::text_oarchive oa(ofs);
-			oa << wicks;
-			ofs.close();
-		}
-	}
-}
-#endif
 
 	/* Output code if needed
 	*

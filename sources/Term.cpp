@@ -87,10 +87,10 @@ namespace SymbolicOperators {
 				for (auto it = delta2.first.momentum_list.begin(); it != delta2.first.momentum_list.end();) {
 					int pos = delta2.second.isUsed(it->second);
 					if (pos < 0) { ++it; continue; }
-					it->first -= delta.second.momentum_list[pos].first;
+					it->first -= delta2.second.momentum_list[pos].first;
 					if (it->first == 0) {
-						it = delta.first.momentum_list.erase(it);
-						delta.second.momentum_list.erase(delta.second.momentum_list.begin() + pos);
+						it = delta2.first.momentum_list.erase(it);
+						delta2.second.momentum_list.erase(delta2.second.momentum_list.begin() + pos);
 						continue;
 					}
 					++it;
@@ -549,6 +549,9 @@ namespace SymbolicOperators {
 							new_term.delta_momenta.push_back(
 								std::make_pair(new_term.operators[i - 1].momentum, new_term.operators[i].momentum)
 							);
+						}
+						else {
+							other_deltas = true;
 						}
 
 						new_term.operators.erase(new_term.operators.begin() + i - 1, new_term.operators.begin() + i + 1);

@@ -17,7 +17,7 @@ SRCS=$(PART_SRCS) FermionCommute.cpp
 
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
 
-all: build build/main 
+all: build build/main ../commutators
 	./build/main
 
 build/main: $(OBJS) | build
@@ -29,5 +29,9 @@ build/%.o: sources/%.cpp
 build:
 	mkdir -p build
 
+../commutators:
+	mkdir -p ../commutators
+
 clean:
 	rm -rf build/*
+	rm -rf ../commutators/*

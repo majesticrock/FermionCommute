@@ -4,6 +4,20 @@
 namespace SymbolicOperators {
 	bool WickTerm::setDeltas()
 	{
+		// Erase delta_k,k etc
+		for (auto it = delta_momenta.begin(); it != delta_momenta.end();)
+		{
+			// k = k + Q can never be achieved
+			if (it->first.differsOnlyInQ(it->second)) return false;
+
+			if (it->first == it->second) {
+				it = delta_momenta.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+
 		for (auto& delta : delta_momenta)
 		{
 			for (auto it = delta.first.momentum_list.begin(); it != delta.first.momentum_list.end(); )
@@ -61,10 +75,10 @@ namespace SymbolicOperators {
 				for (auto it = delta2.first.momentum_list.begin(); it != delta2.first.momentum_list.end();) {
 					int pos = delta2.second.isUsed(it->second);
 					if (pos < 0) { ++it; continue; }
-					it->first -= delta.second.momentum_list[pos].first;
+					it->first -= delta2.second.momentum_list[pos].first;
 					if (it->first == 0) {
-						it = delta.first.momentum_list.erase(it);
-						delta.second.momentum_list.erase(delta.second.momentum_list.begin() + pos);
+						it = delta2.first.momentum_list.erase(it);
+						delta2.second.momentum_list.erase(delta2.second.momentum_list.begin() + pos);
 						continue;
 					}
 					++it;
@@ -450,6 +464,11 @@ namespace SymbolicOperators {
 					if (operators[i].momentum.momentum_list[0].second > operators[j].momentum.momentum_list[0].second) {
 						std::swap(operators[i], operators[j]);
 					}
+					else if (operators[i].momentum.momentum_list[0].second == operators[j].momentum.momentum_list[0].second) {
+						if (operators[i].momentum.add_Q && !(operators[j].momentum.add_Q)) {
+							std::swap(operators[i], operators[j]);
+						}
+					}
 				}
 			}
 		}
@@ -616,6 +635,7 @@ namespace SymbolicOperators {
 		coeff_map["\\frac{U}{N}"] = 1;
 		coeff_map["\\tilde{V}"] = 2;
 
+		// Sort terms
 		for (size_t i = 0; i < terms.size(); i++)
 		{
 			for (size_t j = i + 1; j < terms.size(); j++)
