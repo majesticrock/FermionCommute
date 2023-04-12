@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-//#define _USE_XP_BASIS
+#define _USE_XP_BASIS
 using namespace SymbolicOperators;
 
 int main(int argc, char** argv) {
@@ -52,10 +52,12 @@ int main(int argc, char** argv) {
 		}),
 		// 2/3: g_up/down +
 		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))//,	Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+			Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
 		}),
 		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))//,	Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
 		}),
 		// 4/5: n_up/down
 		std::vector<Term>({
@@ -73,7 +75,7 @@ int main(int argc, char** argv) {
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
 			Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		})/*,
+		}),
 		// 8/9: g_up/down -
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
@@ -82,7 +84,7 @@ int main(int argc, char** argv) {
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
 			Term(-1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-		})*/
+		})/**/
 	};
 #else
 	const std::vector<std::vector<Term>> basis = {
