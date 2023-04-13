@@ -536,7 +536,7 @@ namespace SymbolicOperators {
 			}
 		}
 	}
-	
+
 	void clearEtas(std::vector<WickTerm>& terms)
 	{
 		for (auto it = terms.begin(); it != terms.end();) {

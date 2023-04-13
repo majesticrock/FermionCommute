@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
 		}),
-		
+
 		// eta, eta^+
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
