@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#define _USE_XP_BASIS
+//#define _USE_XP_BASIS
 using namespace SymbolicOperators;
 
 int main(int argc, char** argv) {
