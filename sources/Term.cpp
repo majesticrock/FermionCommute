@@ -430,6 +430,31 @@ namespace SymbolicOperators {
 			}
 			n = new_n;
 		}
+
+		// check whether we can swap the sign of each momentum in the coefficients
+		for (const auto& coeff : coefficients) {
+			if (!(coeff.translationalInvariance)) return;
+			if (coeff.momentum.momentum_list.size() > 1) return;
+		}
+		
+		for (const auto& sum_mom : sum_momenta) {
+			bool first_occurance = true;
+			for (auto& op : operators) {
+				int i = op.momentum.isUsed(sum_mom);
+				if (i > -1) {
+					if (first_occurance) {
+						if (op.momentum.momentum_list[i].first < 0) {
+							
+							first_occurance = false;
+						}
+						else {
+							break;
+						}
+					}
+					op.momentum.momentum_list[i].first *= -1;
+				}
+			}
+		}
 	}
 
 	void Term::renameSums()
@@ -460,6 +485,20 @@ namespace SymbolicOperators {
 			}
 			for (auto& coeff : coefficients) {
 				coeff.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
+			}
+		}
+
+		if (sum_indizes.size() == 1 && sum_indizes.front() == "\\sigma'") {
+			sum_indizes.front() = "\\sigma";
+			for (auto& op : operators) {
+				for (auto& index : op.indizes) {
+					if (index == "\\sigma'") index = "\\sigma";
+				}
+			}
+			for (auto& coeff : coefficients) {
+				for (auto& index : coeff.indizes) {
+					if (index == "\\sigma'") index = "\\sigma";
+				}
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#define _USE_XP_BASIS
+//#define _USE_XP_BASIS
 using namespace SymbolicOperators;
 
 int main(int argc, char** argv) {
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 		// f, f^+
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))
-		}),
+		})/*,
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 		}),
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 		}),
 		std::vector<Term>({
 			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		})
+		})*/
 	};
 #endif
 	std::vector<std::vector<Term>> basis_daggered(basis);
@@ -131,12 +131,20 @@ int main(int argc, char** argv) {
 		std::vector<Term> commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
+
+		//std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] =" 
+		//	<< commute_with_H << "\\end{align*}" << std::endl;
+
 		for (size_t j = 0; j < basis.size(); j++)
 		{
 			std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
 			std::vector<Term> terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
+
+			//std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
+			//	<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+			
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				wicks_theorem(term, wicks);

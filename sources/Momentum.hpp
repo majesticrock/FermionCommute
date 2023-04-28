@@ -52,6 +52,8 @@ namespace SymbolicOperators {
 		inline void flipMomentum() {
 			multiplyMomentum(-1);
 		};
+		// Returns the position in the momentum_list array of the momentum given in <value>
+		// Return -1 if the value is not contained in momentum_list
 		inline int isUsed(const char value) const {
 			for (int i = 0; i < momentum_list.size(); ++i) {
 				if (momentum_list[i].second == value) return i;
