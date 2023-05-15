@@ -436,7 +436,7 @@ namespace SymbolicOperators {
 			if (!(coeff.translationalInvariance)) return;
 			if (coeff.momentum.momentum_list.size() > 1) return;
 		}
-		
+
 		for (const auto& sum_mom : sum_momenta) {
 			bool first_occurance = true;
 			for (auto& op : operators) {
@@ -444,7 +444,6 @@ namespace SymbolicOperators {
 				if (i > -1) {
 					if (first_occurance) {
 						if (op.momentum.momentum_list[i].first < 0) {
-							
 							first_occurance = false;
 						}
 						else {

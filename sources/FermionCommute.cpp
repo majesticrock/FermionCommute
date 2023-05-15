@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
 
-		//std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] =" 
+		//std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
 		//	<< commute_with_H << "\\end{align*}" << std::endl;
 
 		for (size_t j = 0; j < basis.size(); j++)
