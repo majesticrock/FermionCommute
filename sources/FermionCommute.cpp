@@ -142,8 +142,8 @@ int main(int argc, char** argv) {
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
 
-			//std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-			//	<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+			std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
+				<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
 
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
