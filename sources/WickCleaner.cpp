@@ -559,7 +559,7 @@ namespace SymbolicOperators {
 	void cleanWicks(std::vector<WickTerm>& terms)
 	{
 		// Assuming (for now) that all <eta> = 0
-		clearEtas(terms);
+		// clearEtas(terms);
 		for (auto& term : terms) {
 			for (std::vector<Coefficient>::iterator it = term.coefficients.begin(); it != term.coefficients.end();) {
 				if (it->name == "") {
@@ -588,8 +588,8 @@ namespace SymbolicOperators {
 			it->renameSums();
 			it->sort();
 
-			it->applyPhaseSymmetry();
-			it->applySpinSymmetry();
+			//it->applyPhaseSymmetry();
+			//it->applySpinSymmetry();
 			it->applyTranslationalSymmetry();
 
 			for (auto jt = it->sum_indizes.begin(); jt != it->sum_indizes.end();)
