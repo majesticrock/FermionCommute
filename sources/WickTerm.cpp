@@ -1,4 +1,5 @@
 #include "WickTerm.hpp"
+#include <variant>
 
 #define LEFT temporary_operators[i]
 #define RIGHT temporary_operators[i + 1]
@@ -66,6 +67,7 @@ namespace SymbolicOperators {
 			{
 				size_t value = 1;
 				// Computes the double factorial; total number of products in wicks theorem = (2n - 1)!!
+				// Needs to stay signed in case of size() being 0
 				for (long n = 2 * term.getOperators().size() - 1; n > 0; n -= 2)
 				{
 					value *= n;
@@ -98,11 +100,11 @@ namespace SymbolicOperators {
 		std::vector<WickTerm> these_copies;
 		these_copies.push_back(*this);
 
-		auto setDeltas = [&](const Operator& left, const Operator& right, bool sc_type, int index) {
+		auto setDeltas = [&](const Operator& left, const Operator& right, bool sc_type, size_t index) {
 			Momentum copy_momentum = left.momentum;
 			if (sc_type) copy_momentum.flipMomentum();
 
-			for (int k = 1; k < left.indizes.size(); k++)
+			for (size_t k = 1U; k < left.indizes.size(); ++k)
 			{
 				these_copies[index].delta_indizes.push_back(std::make_pair(left.indizes[k], right.indizes[k]));
 				this_copy.delta_indizes.push_back(these_copies[index].delta_indizes.back());
@@ -113,10 +115,10 @@ namespace SymbolicOperators {
 			this_copy.delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
 		};
 
-		for (int i = 0; i < temporary_operators.size(); i += 2)
+		for (size_t i = 0U; i < temporary_operators.size(); i += 2)
 		{
-			int copies_size = these_copies.size();
-			for (int j = 0; j < copies_size; j++)
+			size_t copies_size = these_copies.size();
+			for (size_t j = 0U; j < copies_size; ++j)
 			{
 				this_copy = these_copies[j];
 				if (LEFT.isDaggered == RIGHT.isDaggered) {
@@ -188,8 +190,8 @@ namespace SymbolicOperators {
 				these_copies.push_back(this_copy);
 			}
 		}
-		this->delta_indizes = these_copies.back().delta_indizes;
-		this->delta_momenta = these_copies.back().delta_momenta;
+		delta_indizes = these_copies.back().delta_indizes;
+		delta_momenta = these_copies.back().delta_momenta;
 		this->operators = these_copies.back().operators;
 		these_copies.pop_back();
 

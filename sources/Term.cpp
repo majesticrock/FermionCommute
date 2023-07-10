@@ -1,7 +1,6 @@
 #define append_vector(a, b) a.insert(a.end(), b.begin(), b.end())
 
 #include "Term.hpp"
-#include <cmath>
 #include <sstream>
 
 namespace SymbolicOperators {
@@ -377,11 +376,11 @@ namespace SymbolicOperators {
 			}
 		}
 
-		int new_n;
-		int n = operators.size();
-		while (n > 1) {
-			new_n = 0;
-			for (int i = 1; i < n; i++)
+		size_t new_n;
+		size_t n = operators.size();
+		while (n > 1U) {
+			new_n = 0U;
+			for (size_t i = 1U; i < n; ++i)
 			{
 				if (operators[i].isDaggered != operators[i - 1].isDaggered) continue;
 				if (operators[i].isDaggered) {
@@ -415,9 +414,9 @@ namespace SymbolicOperators {
 		}
 
 		n = operators.size();
-		while (n > 1) {
-			new_n = 0;
-			for (int i = 1; i < n; i++)
+		while (n > 1U) {
+			new_n = 0U;
+			for (size_t i = 1U; i < n; ++i)
 			{
 				if (operators[i].isDaggered != operators[i - 1].isDaggered) continue;
 				if (operators[i].indizes[0] != operators[i - 1].indizes[0]) continue;
@@ -520,10 +519,10 @@ namespace SymbolicOperators {
 			os << "}";
 		}
 		os << this->coefficients << " ";
-		for (const auto& delta : this->delta_momenta) {
+		for (const auto& delta : delta_momenta) {
 			os << "\\delta_{" << delta.first << ", " << delta.second << "} ";
 		}
-		for (const auto& delta : this->delta_indizes) {
+		for (const auto& delta : delta_indizes) {
 			os << "\\delta_{" << delta.first << ", " << delta.second << "} ";
 		}
 
@@ -541,11 +540,11 @@ namespace SymbolicOperators {
 		for (int t = 0; t < terms.size();) {
 		normalOder_outerLoop:
 			if (t >= terms.size()) break;
-			int n = terms[t].operators.size();
-			int new_n;
-			while (n > 1) {
-				new_n = 0;
-				for (int i = 1; i < terms[t].operators.size(); i++)
+			size_t n = terms[t].operators.size();
+			size_t new_n;
+			while (n > 1U) {
+				new_n = 0U;
+				for (size_t i = 1U; i < terms[t].operators.size(); ++i)
 				{
 					if (!(terms[t].operators[i - 1].isDaggered) && (terms[t].operators[i].isDaggered)) {
 						bool other_deltas = false;

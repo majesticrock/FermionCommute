@@ -1,7 +1,6 @@
 #pragma once
-#include <string>
-#include <iostream>
 #include "Momentum.hpp"
+#include <iostream>
 
 namespace SymbolicOperators {
 	const std::string UP = "\\uparrow";

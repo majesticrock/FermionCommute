@@ -1,9 +1,6 @@
 #pragma once
-#include <algorithm>
 
-#include "Operator.hpp"
 #include "Coefficient.hpp"
-#include "WickTerm.hpp"
 
 namespace SymbolicOperators {
 	typedef std::pair<Momentum, Momentum> pair_of_momenta;
@@ -99,15 +96,15 @@ namespace SymbolicOperators {
 				if (this->sum_momenta[i] != other.sum_momenta[i]) return false;
 			}
 
-			if (this->delta_indizes.size() != other.delta_indizes.size()) return false;
-			if (this->delta_momenta.size() != other.delta_momenta.size()) return false;
+			if (delta_indizes.size() != other.delta_indizes.size()) return false;
+			if (delta_momenta.size() != other.delta_momenta.size()) return false;
 			for (size_t i = 0; i < delta_indizes.size(); i++)
 			{
-				if (this->delta_indizes[i] != other.delta_indizes[i]) return false;
+				if (delta_indizes[i] != other.delta_indizes[i]) return false;
 			}
 			for (size_t i = 0; i < delta_momenta.size(); i++)
 			{
-				if (this->delta_momenta[i] != other.delta_momenta[i]) return false;
+				if (delta_momenta[i] != other.delta_momenta[i]) return false;
 			}
 
 			if (this->operators.size() != other.operators.size()) return false;

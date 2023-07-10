@@ -411,7 +411,7 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-		this->discardZeroMomenta();
+		discardZeroMomenta();
 	}
 
 	void WickTerm::sort()

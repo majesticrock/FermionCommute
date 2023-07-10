@@ -1,6 +1,4 @@
 #pragma once
-#include <variant>
-
 #include "Term.hpp"
 
 namespace SymbolicOperators {
