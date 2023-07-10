@@ -1,4 +1,5 @@
 #include "Term.hpp"
+#include "WickTerm.hpp"
 #include <fstream>
 #include <sstream>
 
