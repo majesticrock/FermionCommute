@@ -3,8 +3,9 @@
 #include <fstream>
 #include <sstream>
 
-//#define _USE_XP_BASIS
 using namespace SymbolicOperators;
+using term_vec = std::vector<Term>;
+using op_vec = std::vector<Operator>;
 
 int main(int argc, char** argv) {
 	const Operator c_k('k', 1, false, UP, false);
@@ -19,108 +20,115 @@ int main(int argc, char** argv) {
 	const Operator c_k_Q_dagger('k', 1, true, UP, true);
 	const Operator c_minus_k_Q_dagger('k', -1, true, DOWN, true);
 
-	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ "\\sigma" }), std::vector<Operator>({
+	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ "\\sigma" }), op_vec({
 		Operator('q', 1, false, "\\sigma", true), Operator('q', 1, false, "\\sigma", false)
 		}));
 
-	const Term H_U(1, Coefficient("\\frac{U}{N}"), std::vector<char>({ 'r', 'p', 'q' }), std::vector<Operator>({
+	const Term H_U(1, Coefficient("\\frac{U}{N}"), std::vector<char>({ 'r', 'p', 'q' }), op_vec({
 		Operator('r', 1, false, UP, true), Operator('p', 1, false, DOWN, true),
 		Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), DOWN, false),
 		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), UP, false),
 		}));
 
 	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), std::vector<std::string>({ "\\sigma", "\\sigma'" }),
-		std::vector<Operator>({
+		op_vec({
 			Operator('r', 1, false, "\\sigma", true),
 			Operator('p', 1, false, "\\sigma'", true),
 			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), "\\sigma'", false),
 			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), "\\sigma", false),
 			}));
 
-	const std::vector<Term> H = { H_T, H_U, H_V };//
+	const term_vec H = { H_T, H_U, H_V };//
 
-#ifdef _USE_XP_BASIS
-	const std::vector<std::vector<Term>> basis = {
-		// 0: f + f^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-		}),
-		// 1: eta + eta^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		}),
-		// 2/3: g_up/down +
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-		}),
-		// 4/5: n_up/down
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
-		}),
-		// 6: f - f^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
-			Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-		}),
-		// 7: eta - eta^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
-			Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		}),
-		// 8/9: g_up/down -
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
-			Term(-1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-			Term(-1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-		})/**/
-	};
-#else
-	const std::vector<std::vector<Term>> basis = {
-		// f, f^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-		}),
-		// n_up/down
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
-		}),
-		// g_up/down
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
-		}),
+	if (argc < 2) {
+		std::cerr << "Which basis?" << std::endl;
+		return 1;
+	}
 
-		// eta, eta^+
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
-		}),
-		std::vector<Term>({
-			Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-		})/**/
-	};
-#endif
-	std::vector<std::vector<Term>> basis_daggered(basis);
+	std::vector<term_vec> basis;
+	if (std::strcmp(argv[1], "XP") == 0) {
+		basis = {
+			// 0: f + f^+
+			term_vec({
+				Term(1, { c_minus_k, c_k }),
+				Term(1, { c_k_dagger, c_minus_k_dagger })
+			}),
+			// 1: eta + eta^+
+			term_vec({
+				Term(1, { c_minus_k_Q, c_k }),
+				Term(1, { c_k_dagger, c_minus_k_Q_dagger })
+			}),
+			// 2/3: g_up/down +
+			term_vec({
+				Term(1, { c_k_dagger, c_k_Q }),
+				Term(1, { c_k_Q_dagger, c_k })
+			}),
+			term_vec({
+				Term(1, { c_minus_k_dagger, c_minus_k_Q }),
+				Term(1, { c_minus_k_Q_dagger, c_minus_k })
+			}),
+			// 4/5: n_up/down
+			term_vec({
+				Term(1, { c_k_dagger, c_k })
+			}),
+			term_vec({
+				Term(1, { c_minus_k_dagger, c_minus_k })
+			}),
+			// 6: f - f^+
+			term_vec({
+				Term(1, { c_minus_k, c_k }),
+				Term(-1, { c_k_dagger, c_minus_k_dagger })
+			}),
+			// 7: eta - eta^+
+			term_vec({
+				Term(1, { c_minus_k_Q, c_k }),
+				Term(-1, { c_k_dagger, c_minus_k_Q_dagger })
+			}),
+			// 8/9: g_up/down -
+			term_vec({
+				Term(1, { c_k_dagger, c_k_Q }),
+				Term(-1, { c_k_Q_dagger, c_k })
+			}),
+			term_vec({
+				Term(1, { c_minus_k_dagger, c_minus_k_Q }),
+				Term(-1, { c_minus_k_Q_dagger, c_minus_k })
+			})/**/
+		};
+	}
+	else {
+		basis = {
+			// f, f^+
+			term_vec({
+				Term(1, { c_minus_k, c_k })
+			}),
+			term_vec({
+				Term(1, { c_k_dagger, c_minus_k_dagger })
+			}),
+			// n_up/down
+			term_vec({
+				Term(1, { c_k_dagger, c_k })
+			}),
+			term_vec({
+				Term(1, { c_minus_k_dagger, c_minus_k })
+			}),
+			// g_up/down
+			term_vec({
+				Term(1, { c_k_dagger, c_k_Q })
+			}),
+			term_vec({
+				Term(1, { c_minus_k_dagger, c_minus_k_Q })
+			}),
+			// eta, eta^+
+			term_vec({
+				Term(1, { c_minus_k_Q, c_k })
+			}),
+			term_vec({
+				Term(1, { c_k_dagger, c_minus_k_Q_dagger })
+			})/**/
+		};
+	}
+
+	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
 		renameMomenta(t, 'k', 'l');
@@ -129,7 +137,7 @@ int main(int argc, char** argv) {
 	{
 		//std::cout << toStringWithoutPrefactor(basis[i]) << " &\\, and \\, " << toStringWithoutPrefactor(basis_daggered[i]) << " \\\\" << std::endl;
 		//continue;
-		std::vector<Term> commute_with_H;
+		term_vec commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
 
@@ -139,7 +147,7 @@ int main(int argc, char** argv) {
 		for (size_t j = 0; j < basis.size(); j++)
 		{
 			std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
-			std::vector<Term> terms;
+			term_vec terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
 
@@ -185,10 +193,10 @@ int main(int argc, char** argv) {
 
 	/* Output code if needed
 	*
-	Term right(1, Coefficient(), std::vector<Operator>({
+	Term right(1, Coefficient(), op_vec({
 		c_minus_k, c_k
 		}));
-	Term left(1, Coefficient(), std::vector<Operator>({
+	Term left(1, Coefficient(), op_vec({
 		c_l_dagger, c_minus_l_dagger
 		}));
 

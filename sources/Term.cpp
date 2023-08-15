@@ -457,9 +457,9 @@ namespace SymbolicOperators {
 
 	void Term::renameSums()
 	{
-		constexpr char name_list[3] = { 'q', 'p', 'r' };
-		constexpr char buffer_list[3] = { ':', ';', '|' };
-		for (int i = 0; i < sum_momenta.size(); i++)
+		constexpr char name_list[3] = { 'q', 'p', 'r'};
+		constexpr char buffer_list[3] = { ':', ';', '|'};
+		for (size_t i = 0U; i < sum_momenta.size(); ++i)
 		{
 			if (i >= 3) {
 				std::cerr << "More than 3 momenta, time to implement this..." << std::endl;
@@ -476,7 +476,7 @@ namespace SymbolicOperators {
 			sum_momenta[i] = name_list[i];
 		}
 
-		for (int i = 0; i < sum_momenta.size(); i++)
+		for (size_t i = 0U; i < sum_momenta.size(); ++i)
 		{
 			for (auto& op : operators) {
 				op.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
@@ -486,7 +486,7 @@ namespace SymbolicOperators {
 			}
 		}
 
-		if (sum_indizes.size() == 1 && sum_indizes.front() == "\\sigma'") {
+		if (sum_indizes.size() == 1U && sum_indizes.front() == "\\sigma'") {
 			sum_indizes.front() = "\\sigma";
 			for (auto& op : operators) {
 				for (auto& index : op.indizes) {
