@@ -30,12 +30,15 @@ namespace SymbolicOperators {
 		Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign = false, bool _isDaggered = false);
 		Coefficient(std::string _name, char _momentum, bool add_Q = false, bool _Q_changes_sign = false, bool _isDaggered = false);
 
-		inline bool usesIndex(const std::string& index) const {
+		inline bool usesIndex(const std::string& index) const noexcept {
 			for (const auto& idx : indizes) {
 				if (idx == index) return true;
 			}
 			return false;
 		}
+		inline bool dependsOnMomentum() const noexcept {
+			return this->momentum.momentum_list.size() > 0;
+		};
 	};
 
 	inline bool operator==(const Coefficient& lhs, const Coefficient& rhs) {

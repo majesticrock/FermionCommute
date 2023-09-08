@@ -21,7 +21,7 @@ namespace SymbolicOperators {
 		WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index);
 		WickOperator();
 
-		inline bool usesIndex(const std::string& index) const {
+		inline bool usesIndex(const std::string& index) const noexcept {
 			for (const auto& idx : this->indizes) {
 				if (idx == index) return true;
 			}
@@ -60,7 +60,10 @@ namespace SymbolicOperators {
 		explicit WickTerm(const Term& base);
 		WickTerm();
 
-		inline bool usesIndex(const std::string& index) const {
+		inline bool hasSingleCoefficient() const noexcept {
+			return this->coefficients.size() == 1U;
+		};
+		inline bool usesIndex(const std::string& index) const noexcept {
 			for (const auto& op : operators) {
 				if (op.usesIndex(index)) return true;
 			}
@@ -69,10 +72,16 @@ namespace SymbolicOperators {
 			}
 			return false;
 		}
-		inline bool isIdentity() const {
+		inline bool isIdentity() const noexcept {
 			return this->operators.empty();
 		}
-		inline bool handled() const {
+		inline bool isBilinear() const noexcept {
+			return this->operators.size() == 1U;
+		};
+		inline bool isQuartic() const noexcept {
+			return this->operators.size() == 2U;
+		}
+		inline bool handled() const noexcept {
 			if (this->temporary_operators.empty()) return true;
 			return !(this->operators.empty());
 		}
