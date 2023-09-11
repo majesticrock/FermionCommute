@@ -27,6 +27,9 @@ namespace SymbolicOperators {
 			}
 			return false;
 		};
+		inline bool dependsOn(char momentum) const noexcept {
+			return this->momentum.isUsed(momentum) != -1;
+		}
 	};
 
 	class Term;
@@ -80,6 +83,19 @@ namespace SymbolicOperators {
 		};
 		inline bool isQuartic() const noexcept {
 			return this->operators.size() == 2U;
+		}
+		// Returns this->multiplicity, but always as a double
+		inline double getFactor() const noexcept {
+			return static_cast<double>(this->multiplicity);
+		}
+		// Returns the position of the first operator that depends on 'momentum'
+		// Returns -1 if no operators depend on 'momentum'.
+		inline int whichOperatorDependsOn(char momentum) const noexcept {
+			for (int i = 0U; i < operators.size(); ++i)
+			{
+				if (operators[i].dependsOn(momentum)) return i;
+			}
+			return -1;
 		}
 		inline bool handled() const noexcept {
 			if (this->temporary_operators.empty()) return true;
