@@ -97,6 +97,11 @@ namespace SymbolicOperators {
 			}
 			return -1;
 		}
+		inline const Coefficient& getFirstCoefficient() const {
+			assert(!(this->coefficients.empty()));
+			return this->coefficients.front();
+		};
+
 		inline bool handled() const noexcept {
 			if (this->temporary_operators.empty()) return true;
 			return !(this->operators.empty());

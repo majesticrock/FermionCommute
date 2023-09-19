@@ -42,6 +42,9 @@ namespace SymbolicOperators {
 		inline bool dependsOn(char momentum) const noexcept {
 			return this->momentum.isUsed(momentum) != -1;
 		}
+		inline bool dependsOnTwoMomenta() const noexcept {
+			return this->momentum.momentum_list.size() == 2U;
+		};
 	};
 
 	inline bool operator==(const Coefficient& lhs, const Coefficient& rhs) {
