@@ -261,7 +261,7 @@ namespace SymbolicOperators {
 					}
 				}
 			}
-		};
+			};
 
 		for (int i = 0; i < sum_indizes.size(); i++)
 		{
@@ -296,7 +296,7 @@ namespace SymbolicOperators {
 				it->second.replaceOccurances(replaceWhat, replaceWith);
 				++it;
 			}
-		};
+			};
 
 		for (int i = 0; i < sum_momenta.size(); i++)
 		{

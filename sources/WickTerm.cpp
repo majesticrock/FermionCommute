@@ -113,7 +113,7 @@ namespace SymbolicOperators {
 			these_copies[index].delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
 			copy_momentum.add_Q = !(copy_momentum.add_Q);
 			this_copy.delta_momenta.push_back(std::make_pair(copy_momentum, right.momentum));
-		};
+			};
 
 		for (size_t i = 0U; i < temporary_operators.size(); i += 2)
 		{
