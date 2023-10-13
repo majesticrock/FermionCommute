@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	const std::string name_prefix = std::strcmp(argv[1], "XP") == 0 ? "XP_" : "";
 	std::vector<term_vec> basis;
 	if (std::strcmp(argv[1], "XP") == 0) {
 		basis = {
@@ -164,7 +165,7 @@ int main(int argc, char** argv) {
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
+				std::ofstream ofs("../commutators/" + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
@@ -183,7 +184,7 @@ int main(int argc, char** argv) {
 			// serialization
 			{
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
+				std::ofstream ofs("../commutators/" + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
