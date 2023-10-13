@@ -18,7 +18,7 @@ SRCS=$(PART_SRCS) FermionCommute.cpp
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
 
 all: build build/main ../commutators
-	./build/main std
+	./build/main XP
 
 build/main: $(OBJS) | build
 	$(CXX) $(INCLUDEFLAGS) -o build/main $(OBJS) $(CXXFLAGS) $(LDLIBS)
