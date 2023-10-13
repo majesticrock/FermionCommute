@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 		hermitianConjugate(t);
 		renameMomenta(t, 'k', 'l');
 	}
-	for (size_t i = 0; i < basis.size(); i++)
+	for (size_t i = 0U; i < basis.size(); ++i)
 	{
 		//std::cout << toStringWithoutPrefactor(basis[i]) << " &\\, and \\, " << toStringWithoutPrefactor(basis_daggered[i]) << " \\\\" << std::endl;
 		//continue;
@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
 		//std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
 		//	<< commute_with_H << "\\end{align*}" << std::endl;
 
-		for (size_t j = 0; j < basis.size(); j++)
+		for (size_t j = 0U; j < basis.size(); ++j)
 		{
 			std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
 			term_vec terms;
