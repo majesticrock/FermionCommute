@@ -50,81 +50,82 @@ int main(int argc, char** argv) {
 	if (std::strcmp(argv[1], "XP") == 0) {
 		basis = {
 			// 0: f + f^+
-			term_vec({
-				Term(1, { c_minus_k, c_k }),
-				Term(1, { c_k_dagger, c_minus_k_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 			}),
 			// 1: eta + eta^+
-			term_vec({
-				Term(1, { c_minus_k_Q, c_k }),
-				Term(1, { c_k_dagger, c_minus_k_Q_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 			}),
 			// 2/3: g_up/down +
-			term_vec({
-				Term(1, { c_k_dagger, c_k_Q }),
-				Term(1, { c_k_Q_dagger, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_minus_k_dagger, c_minus_k_Q }),
-				Term(1, { c_minus_k_Q_dagger, c_minus_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
 			}),
 			// 4/5: n_up/down
-			term_vec({
-				Term(1, { c_k_dagger, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_minus_k_dagger, c_minus_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 			}),
 			// 6: f - f^+
-			term_vec({
-				Term(1, { c_minus_k, c_k }),
-				Term(-1, { c_k_dagger, c_minus_k_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k })),
+				Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 			}),
 			// 7: eta - eta^+
-			term_vec({
-				Term(1, { c_minus_k_Q, c_k }),
-				Term(-1, { c_k_dagger, c_minus_k_Q_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k })),
+				Term(-1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 			}),
 			// 8/9: g_up/down -
-			term_vec({
-				Term(1, { c_k_dagger, c_k_Q }),
-				Term(-1, { c_k_Q_dagger, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q })),
+				Term(-1, Coefficient(), std::vector<Operator>({ c_k_Q_dagger, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_minus_k_dagger, c_minus_k_Q }),
-				Term(-1, { c_minus_k_Q_dagger, c_minus_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
+				Term(-1, Coefficient(), std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
 			})/**/
 		};
 	}
 	else {
 		basis = {
 			// f, f^+
-			term_vec({
-				Term(1, { c_minus_k, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_k_dagger, c_minus_k_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 			}),
 			// n_up/down
-			term_vec({
-				Term(1, { c_k_dagger, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_minus_k_dagger, c_minus_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 			}),
 			// g_up/down
-			term_vec({
-				Term(1, { c_k_dagger, c_k_Q })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_k_Q }))
 			}),
-			term_vec({
-				Term(1, { c_minus_k_dagger, c_minus_k_Q })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
 			}),
+
 			// eta, eta^+
-			term_vec({
-				Term(1, { c_minus_k_Q, c_k })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_minus_k_Q, c_k }))
 			}),
-			term_vec({
-				Term(1, { c_k_dagger, c_minus_k_Q_dagger })
+			std::vector<Term>({
+				Term(1, Coefficient(), std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 			})/**/
 		};
 	}
