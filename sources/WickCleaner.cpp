@@ -588,7 +588,7 @@ namespace SymbolicOperators {
 			it->renameSums();
 			it->sort();
 
-			it->applyPhaseSymmetry();
+			//it->applyPhaseSymmetry();
 			//it->applySpinSymmetry();
 			it->applyTranslationalSymmetry();
 

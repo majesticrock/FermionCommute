@@ -19,6 +19,13 @@ OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
 
 all: build build/main ../commutators
 	./build/main XP
+	./build/main std
+
+XP: build build/main ../commutators
+	./build/main XP
+
+std: build build/main ../commutators
+	./build/main std
 
 build/main: $(OBJS) | build
 	$(CXX) $(INCLUDEFLAGS) -o build/main $(OBJS) $(CXXFLAGS) $(LDLIBS)
