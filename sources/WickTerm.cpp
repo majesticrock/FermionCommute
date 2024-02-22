@@ -138,12 +138,12 @@ namespace SymbolicOperators {
 						// Due to the dagger we need to swap left and right
 						setDeltas(RIGHT, LEFT, true, j);
 
-						these_copies[j].operators.push_back(WickOperator("f", true, LEFT.momentum));
+						these_copies[j].operators.push_back(WickOperator(SC_Type, true, LEFT.momentum));
 						if (LEFT.indizes.size() > 1) {
 							these_copies[j].operators.back().indizes = std::vector<std::string>(LEFT.indizes.begin() + 1, LEFT.indizes.end());
 						}
 						this_copy.operators.push_back(these_copies[j].operators.back());
-						this_copy.operators.back().type = "\\eta";
+						this_copy.operators.back().type = Eta_Type;
 					}
 					else { // cc
 						if (L_SPIN == UP) {
@@ -159,12 +159,12 @@ namespace SymbolicOperators {
 						}
 						setDeltas(LEFT, RIGHT, true, j);
 
-						these_copies[j].operators.push_back(WickOperator("f", false, RIGHT.momentum));
+						these_copies[j].operators.push_back(WickOperator(SC_Type, false, RIGHT.momentum));
 						if (RIGHT.indizes.size() > 1) {
 							these_copies[j].operators.back().indizes = std::vector<std::string>(RIGHT.indizes.begin() + 1, RIGHT.indizes.end());
 						}
 						this_copy.operators.push_back(these_copies[j].operators.back());
-						this_copy.operators.back().type = "\\eta";
+						this_copy.operators.back().type = Eta_Type;
 					}
 				}
 				else {
@@ -179,9 +179,9 @@ namespace SymbolicOperators {
 					// Left and right are swapped due to the definition of g
 					setDeltas(RIGHT, LEFT, false, j);
 
-					these_copies[j].operators.push_back(WickOperator("n", false, LEFT.momentum, LEFT.indizes));
+					these_copies[j].operators.push_back(WickOperator(Number_Type, false, LEFT.momentum, LEFT.indizes));
 					this_copy.operators.push_back(these_copies[j].operators.back());
-					this_copy.operators.back().type = "g";
+					this_copy.operators.back().type = CDW_Type;
 					if (this_copy.operators.back().momentum.add_Q) {
 						this_copy.operators.back().momentum.add_Q = false;
 						this_copy.operators.back().isDaggered = true;
@@ -269,10 +269,10 @@ namespace SymbolicOperators {
 		return os;
 	}
 
-	WickOperator::WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::vector<std::string>& _indizes)
+	WickOperator::WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const std::vector<std::string>& _indizes)
 		: type(_type), isDaggered(_isDaggered), momentum(_momentum), indizes(_indizes) {}
-	WickOperator::WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index)
+	WickOperator::WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index)
 		: type(_type), isDaggered(_isDaggered), momentum(_momentum), indizes(1, _index) {}
 	WickOperator::WickOperator()
-		: type(""), isDaggered(false), momentum(), indizes() {}
+		: type(Undefined_Type), isDaggered(false), momentum(), indizes() {}
 }

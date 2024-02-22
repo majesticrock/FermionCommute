@@ -1,10 +1,33 @@
 #pragma once
 #include "Term.hpp"
+#include <algorithm>
 
 namespace SymbolicOperators {
+	enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type,Undefined_Type};
+
+	inline std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
+		switch (op) {
+		case SC_Type:
+			os << "f";
+			break;
+		case Eta_Type:
+			os << "\\eta";
+			break;
+		case CDW_Type:
+			os << "g";
+			break;
+		case Number_Type:
+			os << "n";
+			break;
+		default:
+			os << "ERROR_OPERATOR";
+		}
+		return os;
+	};
+
 	typedef std::pair<Momentum, Momentum> pair_of_momenta;
 	struct WickOperator {
-		std::string type;
+		OperatorType type;
 		bool isDaggered;
 		Momentum momentum;
 		std::vector<std::string> indizes;
@@ -17,8 +40,8 @@ namespace SymbolicOperators {
 			ar& indizes;
 		}
 
-		WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::vector<std::string>& _indizes = std::vector<std::string>());
-		WickOperator(const std::string& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index);
+		WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const std::vector<std::string>& _indizes = std::vector<std::string>());
+		WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const std::string& _index);
 		WickOperator();
 
 		inline bool usesIndex(const std::string& index) const noexcept {
@@ -63,6 +86,10 @@ namespace SymbolicOperators {
 		explicit WickTerm(const Term& base);
 		WickTerm();
 
+		inline bool includesType(const OperatorType operator_type) const {
+			return std::any_of(this->operators.begin(), this->operators.end(),
+				[operator_type](const WickOperator& op) { return op.type == operator_type; });
+		};
 		inline bool hasSingleCoefficient() const noexcept {
 			return this->coefficients.size() == 1U;
 		};

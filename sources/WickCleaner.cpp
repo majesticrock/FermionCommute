@@ -416,12 +416,6 @@ namespace SymbolicOperators {
 
 	void WickTerm::sort()
 	{
-		std::map<std::string, int> sort_map;
-		sort_map["n"] = 0;
-		sort_map["g"] = 1;
-		sort_map["f"] = 2;
-		sort_map["\\eta"] = 3;
-
 		for (auto& delta : delta_momenta) {
 			if (delta.first.momentum_list.size() == 1 && delta.second.momentum_list.size() == 1) {
 				// This comparison is well defined because we save the momentum as char i.e. byte
@@ -447,7 +441,7 @@ namespace SymbolicOperators {
 		}
 
 		for (auto& op : operators) {
-			if (op.type == "g" && op.momentum.add_Q) {
+			if (op.type == CDW_Type && op.momentum.add_Q) {
 				op.momentum.add_Q = false;
 				op.isDaggered = !(op.isDaggered);
 			}
@@ -457,7 +451,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < operators.size(); j++)
 			{
-				if (sort_map.find(operators[i].type)->second > sort_map.find(operators[j].type)->second) {
+				if (operators[i].type > operators[j].type) {
 					std::swap(operators[i], operators[j]);
 				}
 				else if (operators[i].type == operators[j].type) {
@@ -531,7 +525,7 @@ namespace SymbolicOperators {
 	{
 		// g^+ = g and f^+ = f
 		for (auto& op : operators) {
-			if (op.type == "f" || op.type == "g") {
+			if (op.type == SC_Type || op.type == CDW_Type) {
 				op.isDaggered = false;
 			}
 		}
@@ -542,7 +536,7 @@ namespace SymbolicOperators {
 		for (auto it = terms.begin(); it != terms.end();) {
 			bool isEta = false;
 			for (const auto& op : it->operators) {
-				if (op.type == "\\eta") {
+				if (op.type == Eta_Type) {
 					isEta = true;
 					break;
 				}
