@@ -3,7 +3,7 @@
 #include <algorithm>
 
 namespace SymbolicOperators {
-	enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type,Undefined_Type};
+	enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
 
 	inline std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
 		switch (op) {
