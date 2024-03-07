@@ -1,59 +1,33 @@
 #pragma once
-
+#include "KroneckerDelta.hpp"
 #include "Coefficient.hpp"
 
 namespace SymbolicOperators {
-	typedef std::pair<Momentum, Momentum> pair_of_momenta;
-	inline bool pair_equal_allow_permutation(const std::pair<std::string, std::string>& left, const std::pair<std::string, std::string>& right) {
-		if (left.first == right.first && left.second == right.second) return true;
-		if (left.first == right.second && left.second == right.first) return true;
-		return false;
-	};
-	inline bool pair_equal_allow_permutation(std::pair<Momentum, Momentum> left, std::pair<Momentum, Momentum> right) {
-		if (left.first.add_Q) {
-			left.first.add_Q = false;
-			left.second.add_Q = !(left.second.add_Q);
-		}
-		if (right.first.add_Q) {
-			right.first.add_Q = false;
-			right.second.add_Q = !(right.second.add_Q);
-		}
-		if (left.first == right.first && left.second == right.second) return true;
-
-		if (right.second.add_Q) {
-			right.second.add_Q = false;
-			right.first.add_Q = !(right.first.add_Q);
-		}
-		if (left.first == right.second && left.second == right.first) return true;
-		return false;
-	};
-
 	class Term {
 	private:
 		std::vector<Coefficient> coefficients;
 		std::vector<char> sum_momenta;
-		std::vector<std::string> sum_indizes;
+		IndexWrapper sum_indizes;
 		std::vector<Operator> operators;
-		// symbolises the Kronecker delta
-		std::vector<pair_of_momenta> delta_momenta;
-		std::vector<std::pair<std::string, std::string>> delta_indizes;
+		std::vector<KroneckerDelta<Momentum>> delta_momenta;
+		std::vector<KroneckerDelta<Index>> delta_indizes;
 
 		friend struct WickTerm;
 	public:
 		int multiplicity;
 		Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta,
-			const std::vector<std::string>& _sum_indizes, const std::vector<Operator>& _operators = std::vector<Operator>());
+			const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const std::vector<std::string>& _sum_indizes,
+		Term(int _multiplicity, Coefficient _coefficient, const IndexWrapper& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const std::vector<char>& _sum_momenta, const std::vector<std::string>& _sum_indizes,
+		Term(int _multiplicity, const std::vector<char>& _sum_momenta, const IndexWrapper& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, const std::vector<char>& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const std::vector<std::string>& _sum_indizes,
+		Term(int _multiplicity, const IndexWrapper& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		explicit Term(int _multiplicity,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
@@ -80,38 +54,13 @@ namespace SymbolicOperators {
 
 		// Checks for equality of everything except of multiplicity
 		inline bool isEqual(const Term& other) const {
-			if (this->coefficients.size() != other.coefficients.size()) return false;
-			for (size_t i = 0; i < coefficients.size(); i++)
-			{
-				if (this->coefficients[i] != other.coefficients[i]) return false;
-			}
-			if (this->sum_indizes.size() != other.sum_indizes.size()) return false;
-			if (this->sum_momenta.size() != other.sum_momenta.size()) return false;
-			for (size_t i = 0; i < sum_indizes.size(); i++)
-			{
-				if (this->sum_indizes[i] != other.sum_indizes[i]) return false;
-			}
-			for (size_t i = 0; i < sum_momenta.size(); i++)
-			{
-				if (this->sum_momenta[i] != other.sum_momenta[i]) return false;
-			}
+			if (this->coefficients != other.coefficients) return false;
+			if (this->sum_indizes != other.sum_indizes) return false;
+			if (this->sum_momenta != other.sum_momenta) return false;
+			if (this->delta_indizes != other.delta_indizes) return false;
+			if (this->delta_momenta != other.delta_momenta) return false;
+			if (this->operators != other.operators) return false;
 
-			if (delta_indizes.size() != other.delta_indizes.size()) return false;
-			if (delta_momenta.size() != other.delta_momenta.size()) return false;
-			for (size_t i = 0; i < delta_indizes.size(); i++)
-			{
-				if (delta_indizes[i] != other.delta_indizes[i]) return false;
-			}
-			for (size_t i = 0; i < delta_momenta.size(); i++)
-			{
-				if (delta_momenta[i] != other.delta_momenta[i]) return false;
-			}
-
-			if (this->operators.size() != other.operators.size()) return false;
-			for (size_t i = 0; i < this->operators.size(); i++)
-			{
-				if (this->operators[i] != other.operators[i]) return false;
-			}
 			return true;
 		};
 

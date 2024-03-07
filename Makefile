@@ -12,7 +12,7 @@ WARNINGS = -Wall -Wno-sign-compare
 
 OPT = -march=native -O3
 
-PART_SRCS=Momentum.cpp Coefficient.cpp Operator.cpp Term.cpp WickTerm.cpp WickCleaner.cpp
+PART_SRCS=Momentum.cpp Coefficient.cpp Operator.cpp Term.cpp WickOperator.cpp WickTerm.cpp WickCleaner.cpp
 SRCS=$(PART_SRCS) FermionCommute.cpp
 
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))

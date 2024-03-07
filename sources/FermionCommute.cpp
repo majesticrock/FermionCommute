@@ -24,8 +24,8 @@ int main(int argc, char** argv) {
 	const Operator c_k_Q_down_dagger('k', 1, true, DOWN, true);
 	const Operator c_k_Q_down('k', 1, true, DOWN, false);
 
-	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ "\\sigma" }), op_vec({
-		Operator('q', 1, false, "\\sigma", true), Operator('q', 1, false, "\\sigma", false)
+	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ Sigma }), op_vec({
+		Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
 		}));
 
 	const Term H_U(1, Coefficient("\\frac{U}{N}"), std::vector<char>({ 'r', 'p', 'q' }), op_vec({
@@ -34,12 +34,12 @@ int main(int argc, char** argv) {
 		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), UP, false),
 		}));
 
-	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), std::vector<std::string>({ "\\sigma", "\\sigma'" }),
+	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), std::vector<std::string>({ Sigma, SigmaPrime }),
 		op_vec({
-			Operator('r', 1, false, "\\sigma", true),
-			Operator('p', 1, false, "\\sigma'", true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), "\\sigma'", false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), "\\sigma", false),
+			Operator('r', 1, false, Sigma, true),
+			Operator('p', 1, false, SigmaPrime, true),
+			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SigmaPrime, false),
+			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 			}));
 
 	const term_vec H = { H_T, H_U, H_V };//
