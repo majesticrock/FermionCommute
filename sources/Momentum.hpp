@@ -6,20 +6,6 @@
 #include <boost/serialization/string.hpp>
 
 namespace SymbolicOperators {
-	template <typename T>
-	inline bool operator==(const std::vector<T>& lhs, const std::vector<T>& rhs) {
-		if (lhs.size() != rhs.size()) return false;
-		for (size_t i = 0; i < lhs.size(); i++)
-		{
-			if (lhs[i] != rhs[i]) return false;
-		}
-		return true;
-	}
-	template <typename T>
-	inline bool operator!=(const std::vector<T>& lhs, const std::vector<T>& rhs) {
-		return !(lhs == rhs);
-	}
-
 	typedef std::vector<std::pair<int, char>> momentum_pairs;
 	struct Momentum {
 		// total momentum is then:    sum_i pair_i.first * pair_i.second
