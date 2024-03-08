@@ -175,7 +175,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < delta_momenta.size(); j++)
 			{
-				if (pair_equal_allow_permutation(delta_momenta[i], delta_momenta[j])) {
+				if (delta_momenta[i] == delta_momenta[j]) {
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
 					break;
@@ -184,7 +184,7 @@ namespace SymbolicOperators {
 				auto delta_buffer = delta_momenta[j];
 				delta_buffer.first.flipMomentum();
 				delta_buffer.second.flipMomentum();
-				if (pair_equal_allow_permutation(delta_momenta[i], delta_buffer)) {
+				if (delta_momenta[i] == delta_buffer) {
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
 					break;
@@ -195,7 +195,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < delta_indizes.size(); j++)
 			{
-				if (pair_equal_allow_permutation(delta_indizes[i], delta_indizes[j])) {
+				if (delta_indizes[i] == delta_indizes[j]) {
 					delta_indizes.erase(delta_indizes.begin() + j);
 					--i;
 					break;
@@ -234,7 +234,7 @@ namespace SymbolicOperators {
 
 	bool WickTerm::computeSums()
 	{
-		auto changeAllIndizes = [&](const std::string replaceWhat, const std::string replaceWith) {
+		auto changeAllIndizes = [&](const Index replaceWhat, const Index replaceWith) {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{

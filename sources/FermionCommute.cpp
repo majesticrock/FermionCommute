@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	const Operator c_k_Q_down_dagger('k', 1, true, DOWN, true);
 	const Operator c_k_Q_down('k', 1, true, DOWN, false);
 
-	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ Sigma }), op_vec({
+	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), Sigma, op_vec({
 		Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
 		}));
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), UP, false),
 		}));
 
-	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), std::vector<std::string>({ Sigma, SigmaPrime }),
+	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), IndexWrapper({ Sigma, SigmaPrime }),
 		op_vec({
 			Operator('r', 1, false, Sigma, true),
 			Operator('p', 1, false, SigmaPrime, true),

@@ -5,11 +5,7 @@ namespace SymbolicOperators {
 	{
 		os << coeff.name;
 		if (!coeff.indizes.empty()) {
-			os << "_{ ";
-			for (const auto& index : coeff.indizes) {
-				os << index << " ";
-			}
-			os << "}";
+			os << "_{ " << coeff.indizes << "}";
 		}
 		if (coeff.isDaggered) {
 			os << "^*";
@@ -31,9 +27,9 @@ namespace SymbolicOperators {
 		: name(""), momentum(), indizes(), Q_changes_sign(false), isDaggered(false) {}
 	Coefficient::Coefficient(std::string _name)
 		: name(_name), momentum(), indizes(), Q_changes_sign(false), isDaggered(false) {}
-	Coefficient::Coefficient(std::string _name, const Momentum& _momentum, const std::vector<std::string>& _indizes, bool _Q_changes_sign, bool _isDaggered)
+	Coefficient::Coefficient(std::string _name, const Momentum& _momentum, const IndexWrapper& _indizes, bool _Q_changes_sign, bool _isDaggered)
 		: name(_name), momentum(_momentum), indizes(_indizes), Q_changes_sign(_Q_changes_sign), isDaggered(_isDaggered) {}
-	Coefficient::Coefficient(std::string _name, char _momentum, bool add_Q, const std::vector<std::string>& _indizes, bool _Q_changes_sign, bool _isDaggered)
+	Coefficient::Coefficient(std::string _name, char _momentum, bool add_Q, const IndexWrapper& _indizes, bool _Q_changes_sign, bool _isDaggered)
 		: name(_name), momentum(_momentum, add_Q), indizes(_indizes), Q_changes_sign(_Q_changes_sign), isDaggered(_isDaggered) { }
 	Coefficient::Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign, bool _isDaggered)
 		: name(_name), momentum(_momentum), indizes(), Q_changes_sign(_Q_changes_sign), isDaggered(_isDaggered) {}

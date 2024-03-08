@@ -1,33 +1,19 @@
 #pragma once
 #include <iostream>
+#include <vector>
 
 namespace SymbolicOperators{
     enum Index{ UP, DOWN, Sigma, SigmaPrime, UndefinedIndex };
 
-	inline std::ostream& operator<<(std::ostream& os, const Index) {
-		switch (Spin)
-		{
-		case UP:
-			os << "\\uparrow";
-			break;
-		case DOWN:
-			os << "\\downarrow";
-			break;
-		case Sigma:
-			os << "\\sigma";
-			break;
-		case SigmaPrime:
-			os << "\\sigma'";
-			break;
-		default:
-			os << "ERROR_INDEX";
-			break;
-		}
-		return os;
-	};
+	std::ostream& operator<<(std::ostream& os, const Index index);
 
     struct IndexWrapper{
         std::vector<Index> indizes;
+
+		template<class Archive>
+		void serialize(Archive& ar, const unsigned int version) {
+			ar& indizes;
+		}
 
 		inline Index& operator[](size_t i) {
 			return indizes[i];
@@ -46,6 +32,43 @@ namespace SymbolicOperators{
 		}
 		inline auto end() const {
 			return indizes.end();
+		}
+		inline bool empty() const noexcept {
+			return indizes.empty();
+		}
+		inline size_t size() const noexcept {
+			return indizes.size();
+		}
+		inline void push_back(const Index index) {
+			indizes.push_back(index);
+		}
+		inline Index front() const {
+			return indizes.front();
+		}
+		inline Index& front() {
+			return indizes.front();
+		}
+		inline Index back() const {
+			return indizes.back();
+		}
+		inline Index& back() {
+			return indizes.back();
+		}
+		template <class iterator>
+		inline auto erase(iterator pos) {
+			return indizes.erase(pos);
+		}
+		template <class iterator>
+		inline auto erase(iterator first, iterator last) {
+			return indizes.erase(first, last);
+		}
+		template <class iterator>
+		inline auto insert(iterator pos, const Index value) {
+			return indizes.insert(pos, value);
+		}
+		template <class iterator, class input_iterator>
+		inline auto insert(iterator pos, input_iterator first, input_iterator last) {
+			return indizes.insert(pos, first, last);
 		}
 
         IndexWrapper() = default;

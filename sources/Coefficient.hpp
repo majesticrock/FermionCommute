@@ -1,12 +1,13 @@
 #pragma once
 #include "Operator.hpp"
+#include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
 	struct Coefficient {
 		std::string name;
 		Momentum momentum;
 		// Contains all indizes, standard: first index = spin, all others arbitrary, e.g. orbitals, bands etc
-		std::vector<std::string> indizes;
+		IndexWrapper indizes;
 		// if Coeff(k) = Coeff(-k)
 		bool translationalInvariance = true;
 		// if Coeff(k+Q) = -Coeff(k)
@@ -25,12 +26,12 @@ namespace SymbolicOperators {
 
 		Coefficient();
 		explicit Coefficient(std::string _name);
-		Coefficient(std::string _name, const Momentum& _momentum, const std::vector<std::string>& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
-		Coefficient(std::string _name, char _momentum, bool add_Q, const std::vector<std::string>& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, const Momentum& _momentum, const IndexWrapper& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, char _momentum, bool add_Q, const IndexWrapper& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
 		Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign = false, bool _isDaggered = false);
 		Coefficient(std::string _name, char _momentum, bool add_Q = false, bool _Q_changes_sign = false, bool _isDaggered = false);
 
-		inline bool usesIndex(const std::string& index) const noexcept {
+		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& idx : indizes) {
 				if (idx == index) return true;
 			}

@@ -11,12 +11,12 @@ namespace SymbolicOperators {
 		int multiplicity;
 		std::vector<Coefficient> coefficients;
 		std::vector<char> sum_momenta;
-		std::vector<std::string> sum_indizes;
+		IndexWrapper sum_indizes;
 		std::vector<WickOperator> operators;
 
 		// symbolises the Kronecker delta
-		std::vector<pair_of_momenta> delta_momenta;
-		std::vector<std::pair<std::string, std::string>> delta_indizes;
+		std::vector<KroneckerDelta<Momentum>> delta_momenta;
+		std::vector<KroneckerDelta<Index>> delta_indizes;
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
@@ -42,7 +42,7 @@ namespace SymbolicOperators {
 		inline bool hasSingleCoefficient() const noexcept {
 			return this->coefficients.size() == 1U;
 		};
-		inline bool usesIndex(const std::string& index) const noexcept {
+		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& op : operators) {
 				if (op.usesIndex(index)) return true;
 			}

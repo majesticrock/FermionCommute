@@ -1,6 +1,6 @@
 #pragma once
 #include "Momentum.hpp"
-#include <IndexWrapper.hpp>
+#include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
 	//const std::string UP = "\\uparrow";
