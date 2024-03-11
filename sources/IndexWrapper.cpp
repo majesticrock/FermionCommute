@@ -1,14 +1,14 @@
 #include "IndexWrapper.hpp"
 
-namespace SymbolicOperators{
-    std::ostream& operator<<(std::ostream& os, const Index index)
+namespace SymbolicOperators {
+	std::ostream& operator<<(std::ostream& os, const Index index)
 	{
 		switch (index)
 		{
-		case UP:
+		case SpinUp:
 			os << "\\uparrow";
 			break;
-		case DOWN:
+		case SpinDown:
 			os << "\\downarrow";
 			break;
 		case Sigma:
@@ -24,10 +24,10 @@ namespace SymbolicOperators{
 		return os;
 	}
 
-    std::ostream& operator<<(std::ostream& os, const IndexWrapper& indizes){
-        for(const auto& idx : indizes){
-            os << idx << " ";
-        }
-        return os;
-    }
+	std::ostream& operator<<(std::ostream& os, const IndexWrapper& indizes) {
+		for (const auto& idx : indizes) {
+			os << idx << " ";
+		}
+		return os;
+	}
 }

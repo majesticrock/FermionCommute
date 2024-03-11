@@ -10,8 +10,8 @@ namespace SymbolicOperators {
 	{
 		int multiplicity;
 		std::vector<Coefficient> coefficients;
-		std::vector<char> sum_momenta;
-		IndexWrapper sum_indizes;
+		MomentumSum sum_momenta;
+		IndexSum sum_indizes;
 		std::vector<WickOperator> operators;
 
 		// symbolises the Kronecker delta
@@ -115,13 +115,7 @@ namespace SymbolicOperators {
 		if (lhs.delta_indizes != rhs.delta_indizes) return false;
 		if (lhs.delta_momenta != rhs.delta_momenta) return false;
 
-		if (lhs.operators.size() != rhs.operators.size()) return false;
-		// The Wick "operators" are actually just numbers
-		// therefore I might be interested to implement permutations as well...
-		for (size_t i = 0; i < lhs.operators.size(); i++)
-		{
-			if (lhs.operators[i] != rhs.operators[i]) return false;
-		}
+		if (lhs.operators != rhs.operators) return false;
 		return true;
 	};
 	inline bool operator!=(const WickTerm& lhs, const WickTerm& rhs) {

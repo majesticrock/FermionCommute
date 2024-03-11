@@ -157,7 +157,7 @@ namespace SymbolicOperators {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{
-					if (delta.first == UP || delta.first == DOWN) {
+					if (delta.first == SpinUp || delta.first == SpinDown) {
 						if (*it == delta.second) {
 							*it = delta.first;
 						}
@@ -218,9 +218,9 @@ namespace SymbolicOperators {
 		}
 		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
 		{
-			// UP can never be DOWN and vice versa
-			if (it->first == UP && it->second == DOWN) return false;
-			if (it->first == DOWN && it->second == UP) return false;
+			// SpinUp can never be SpinDown and vice versa
+			if (it->first == SpinUp && it->second == SpinDown) return false;
+			if (it->first == SpinDown && it->second == SpinUp) return false;
 
 			if (it->first == it->second) {
 				it = delta_indizes.erase(it);
@@ -506,7 +506,7 @@ namespace SymbolicOperators {
 		// Expectation values for spin up and down are the same
 		for (auto& op : operators) {
 			if (op.indizes.size() > 0) {
-				op.indizes[0] = UP;
+				op.indizes[0] = SpinUp;
 			}
 		}
 	}

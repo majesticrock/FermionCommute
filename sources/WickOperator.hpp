@@ -4,7 +4,7 @@
 #include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
-    enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
+	enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
 
 	std::ostream& operator<<(std::ostream& os, const OperatorType op);
 

@@ -8,14 +8,14 @@
 
 namespace SymbolicOperators {
 	WickTerm::WickTerm(const Term* base)
-		: multiplicity(base->multiplicity), coefficients(base->coefficients), sum_momenta(base->sum_momenta), 
-		sum_indizes(base->sum_indizes),operators(), delta_momenta(base->delta_momenta), 
+		: multiplicity(base->multiplicity), coefficients(base->coefficients), sum_momenta(base->sum_momenta),
+		sum_indizes(base->sum_indizes), operators(), delta_momenta(base->delta_momenta),
 		delta_indizes(base->delta_indizes), temporary_operators()
 	{
 	}
 	WickTerm::WickTerm(const Term& base)
-		: multiplicity(base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta), 
-		sum_indizes(base.sum_indizes), operators(), delta_momenta(base.delta_momenta), 
+		: multiplicity(base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta),
+		sum_indizes(base.sum_indizes), operators(), delta_momenta(base.delta_momenta),
 		delta_indizes(base.delta_indizes), temporary_operators()
 	{
 	}
@@ -126,15 +126,15 @@ namespace SymbolicOperators {
 				if (LEFT.isDaggered == RIGHT.isDaggered) {
 					if (L_SPIN == R_SPIN) return false;
 					if (LEFT.isDaggered) { // c^+ c^+
-						if (L_SPIN == DOWN) {
+						if (L_SPIN == SpinDown) {
 							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
 						}
-						if (L_SPIN != UP) {
-							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, UP));
+						if (L_SPIN != SpinUp) {
+							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, SpinUp));
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
-						if (R_SPIN != DOWN) {
-							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, DOWN));
+						if (R_SPIN != SpinDown) {
+							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, SpinDown));
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
 						// Due to the dagger we need to swap left and right
@@ -148,15 +148,15 @@ namespace SymbolicOperators {
 						this_copy.operators.back().type = Eta_Type;
 					}
 					else { // cc
-						if (L_SPIN == UP) {
+						if (L_SPIN == SpinUp) {
 							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
 						}
-						if (L_SPIN != DOWN) {
-							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, DOWN));
+						if (L_SPIN != SpinDown) {
+							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, SpinDown));
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
-						if (R_SPIN != UP) {
-							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, UP));
+						if (R_SPIN != SpinUp) {
+							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, SpinUp));
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
 						setDeltas(LEFT, RIGHT, true, j);
@@ -171,8 +171,8 @@ namespace SymbolicOperators {
 				}
 				else {
 					// c^+ c
-					if (L_SPIN == UP && R_SPIN == DOWN) return false;
-					if (L_SPIN == DOWN && R_SPIN == UP) return false;
+					if (L_SPIN == SpinUp && R_SPIN == SpinDown) return false;
+					if (L_SPIN == SpinDown && R_SPIN == SpinUp) return false;
 
 					if (L_SPIN != R_SPIN) {
 						these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, R_SPIN));

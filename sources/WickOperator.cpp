@@ -1,7 +1,7 @@
 #include "WickOperator.hpp"
 
 namespace SymbolicOperators {
-    WickOperator::WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const IndexWrapper& _indizes)
+	WickOperator::WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const IndexWrapper& _indizes)
 		: type(_type), isDaggered(_isDaggered), momentum(_momentum), indizes(_indizes) {}
 	WickOperator::WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const Index _index)
 		: type(_type), isDaggered(_isDaggered), momentum(_momentum), indizes(_index) {}
