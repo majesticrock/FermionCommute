@@ -1,13 +1,14 @@
 #pragma once
 #include "KroneckerDelta.hpp"
 #include "Coefficient.hpp"
+#include "SymbolicSum.hpp"
 
 namespace SymbolicOperators {
 	class Term {
 	private:
 		std::vector<Coefficient> coefficients;
-		std::vector<char> sum_momenta;
-		IndexWrapper sum_indizes;
+		MomentumSum sum_momenta;
+		IndexSum sum_indizes;
 		std::vector<Operator> operators;
 		std::vector<KroneckerDelta<Momentum>> delta_momenta;
 		std::vector<KroneckerDelta<Index>> delta_indizes;
@@ -15,19 +16,19 @@ namespace SymbolicOperators {
 		friend struct WickTerm;
 	public:
 		int multiplicity;
-		Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta,
-			const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta,
+		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
+			const IndexSum& _sum_indizes, const std::vector<Operator>& _operators = std::vector<Operator>());
+		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const IndexWrapper& _sum_indizes,
+		Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const std::vector<char>& _sum_momenta, const IndexWrapper& _sum_indizes,
+		Term(int _multiplicity, const MomentumSum& _sum_momenta, const IndexSum& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const std::vector<char>& _sum_momenta,
+		Term(int _multiplicity, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const IndexWrapper& _sum_indizes,
+		Term(int _multiplicity, const IndexSum& _sum_indizes,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		explicit Term(int _multiplicity,
 			const std::vector<Operator>& _operators = std::vector<Operator>());

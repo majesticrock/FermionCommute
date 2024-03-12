@@ -8,33 +8,33 @@ using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 
 int main(int argc, char** argv) {
-	const Operator c_k('k', 1, false, UP, false);
-	const Operator c_minus_k('k', -1, false, DOWN, false);
+	const Operator c_k('k', 1, false, SpinUp, false);
+	const Operator c_minus_k('k', -1, false, SpinDown, false);
 
-	const Operator c_k_dagger('k', 1, false, UP, true);
-	const Operator c_minus_k_dagger('k', -1, false, DOWN, true);
+	const Operator c_k_dagger('k', 1, false, SpinUp, true);
+	const Operator c_minus_k_dagger('k', -1, false, SpinDown, true);
 
-	const Operator c_k_Q('k', 1, true, UP, false);
-	const Operator c_minus_k_Q('k', -1, true, DOWN, false);
+	const Operator c_k_Q('k', 1, true, SpinUp, false);
+	const Operator c_minus_k_Q('k', -1, true, SpinDown, false);
 
-	const Operator c_k_Q_dagger('k', 1, true, UP, true);
-	const Operator c_minus_k_Q_dagger('k', -1, true, DOWN, true);
+	const Operator c_k_Q_dagger('k', 1, true, SpinUp, true);
+	const Operator c_minus_k_Q_dagger('k', -1, true, SpinDown, true);
 
 	// transversal magnon
-	const Operator c_k_Q_down_dagger('k', 1, true, DOWN, true);
-	const Operator c_k_Q_down('k', 1, true, DOWN, false);
+	const Operator c_k_Q_down_dagger('k', 1, true, SpinDown, true);
+	const Operator c_k_Q_down('k', 1, true, SpinDown, false);
 
-	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), std::vector<char>({ 'q' }), std::vector<std::string>({ Sigma }), op_vec({
+	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), MomentumSum({ 'q' }), Sigma, op_vec({
 		Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
 		}));
 
-	const Term H_U(1, Coefficient("\\frac{U}{N}"), std::vector<char>({ 'r', 'p', 'q' }), op_vec({
-		Operator('r', 1, false, UP, true), Operator('p', 1, false, DOWN, true),
-		Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), DOWN, false),
-		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), UP, false),
+	const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), op_vec({
+		Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
+		Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SpinDown, false),
+		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), SpinUp, false),
 		}));
 
-	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), std::vector<char>({ 'r', 'p', 'q' }), std::vector<std::string>({ Sigma, SigmaPrime }),
+	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true), MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }),
 		op_vec({
 			Operator('r', 1, false, Sigma, true),
 			Operator('p', 1, false, SigmaPrime, true),

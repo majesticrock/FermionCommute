@@ -1,10 +1,10 @@
 #pragma once
 #include "Momentum.hpp"
-#include <IndexWrapper.hpp>
+#include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
-	//const std::string UP = "\\uparrow";
-	//const std::string DOWN = "\\downarrow";
+	//const std::string SpinUp = "\\uparrow";
+	//const std::string SpinDown = "\\downarrow";
 
 	struct Operator {
 		Momentum momentum;
@@ -24,7 +24,7 @@ namespace SymbolicOperators {
 
 	inline bool operator==(const Operator& lhs, const Operator& rhs) {
 		if (lhs.isDaggered != rhs.isDaggered) return false;
-		if(lhs.indizes != rhs.indizes) return false;
+		if (lhs.indizes != rhs.indizes) return false;
 		return (lhs.momentum == rhs.momentum);
 	}
 	inline bool operator!=(const Operator& lhs, const Operator& rhs) {

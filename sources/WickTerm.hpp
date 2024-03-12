@@ -10,13 +10,13 @@ namespace SymbolicOperators {
 	{
 		int multiplicity;
 		std::vector<Coefficient> coefficients;
-		std::vector<char> sum_momenta;
-		std::vector<std::string> sum_indizes;
+		MomentumSum sum_momenta;
+		IndexSum sum_indizes;
 		std::vector<WickOperator> operators;
 
 		// symbolises the Kronecker delta
-		std::vector<pair_of_momenta> delta_momenta;
-		std::vector<std::pair<std::string, std::string>> delta_indizes;
+		std::vector<KroneckerDelta<Momentum>> delta_momenta;
+		std::vector<KroneckerDelta<Index>> delta_indizes;
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
@@ -42,7 +42,7 @@ namespace SymbolicOperators {
 		inline bool hasSingleCoefficient() const noexcept {
 			return this->coefficients.size() == 1U;
 		};
-		inline bool usesIndex(const std::string& index) const noexcept {
+		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& op : operators) {
 				if (op.usesIndex(index)) return true;
 			}
@@ -115,13 +115,7 @@ namespace SymbolicOperators {
 		if (lhs.delta_indizes != rhs.delta_indizes) return false;
 		if (lhs.delta_momenta != rhs.delta_momenta) return false;
 
-		if (lhs.operators.size() != rhs.operators.size()) return false;
-		// The Wick "operators" are actually just numbers
-		// therefore I might be interested to implement permutations as well...
-		for (size_t i = 0; i < lhs.operators.size(); i++)
-		{
-			if (lhs.operators[i] != rhs.operators[i]) return false;
-		}
+		if (lhs.operators != rhs.operators) return false;
 		return true;
 	};
 	inline bool operator!=(const WickTerm& lhs, const WickTerm& rhs) {

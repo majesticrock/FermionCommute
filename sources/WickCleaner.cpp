@@ -157,7 +157,7 @@ namespace SymbolicOperators {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{
-					if (delta.first == UP || delta.first == DOWN) {
+					if (delta.first == SpinUp || delta.first == SpinDown) {
 						if (*it == delta.second) {
 							*it = delta.first;
 						}
@@ -175,7 +175,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < delta_momenta.size(); j++)
 			{
-				if (pair_equal_allow_permutation(delta_momenta[i], delta_momenta[j])) {
+				if (delta_momenta[i] == delta_momenta[j]) {
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
 					break;
@@ -184,7 +184,7 @@ namespace SymbolicOperators {
 				auto delta_buffer = delta_momenta[j];
 				delta_buffer.first.flipMomentum();
 				delta_buffer.second.flipMomentum();
-				if (pair_equal_allow_permutation(delta_momenta[i], delta_buffer)) {
+				if (delta_momenta[i] == delta_buffer) {
 					delta_momenta.erase(delta_momenta.begin() + j);
 					--i;
 					break;
@@ -195,7 +195,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < delta_indizes.size(); j++)
 			{
-				if (pair_equal_allow_permutation(delta_indizes[i], delta_indizes[j])) {
+				if (delta_indizes[i] == delta_indizes[j]) {
 					delta_indizes.erase(delta_indizes.begin() + j);
 					--i;
 					break;
@@ -218,9 +218,9 @@ namespace SymbolicOperators {
 		}
 		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
 		{
-			// UP can never be DOWN and vice versa
-			if (it->first == UP && it->second == DOWN) return false;
-			if (it->first == DOWN && it->second == UP) return false;
+			// SpinUp can never be SpinDown and vice versa
+			if (it->first == SpinUp && it->second == SpinDown) return false;
+			if (it->first == SpinDown && it->second == SpinUp) return false;
 
 			if (it->first == it->second) {
 				it = delta_indizes.erase(it);
@@ -234,7 +234,7 @@ namespace SymbolicOperators {
 
 	bool WickTerm::computeSums()
 	{
-		auto changeAllIndizes = [&](const std::string replaceWhat, const std::string replaceWith) {
+		auto changeAllIndizes = [&](const Index replaceWhat, const Index replaceWith) {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{
@@ -506,7 +506,7 @@ namespace SymbolicOperators {
 		// Expectation values for spin up and down are the same
 		for (auto& op : operators) {
 			if (op.indizes.size() > 0) {
-				op.indizes[0] = UP;
+				op.indizes[0] = SpinUp;
 			}
 		}
 	}

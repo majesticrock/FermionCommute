@@ -4,19 +4,19 @@
 #include <sstream>
 
 namespace SymbolicOperators {
-	Term::Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta, const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sum_momenta(_sum_momenta), sum_indizes(_sum_indizes), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, Coefficient _coefficient, const std::vector<char>& _sum_momenta, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sum_momenta(_sum_momenta), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, Coefficient _coefficient, const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sum_indizes(_sum_indizes), operators(_operators), multiplicity(_multiplicity) {}
 	Term::Term(int _multiplicity, Coefficient _coefficient, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const std::vector<char>& _sum_momenta, const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, const MomentumSum& _sum_momenta, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(), sum_momenta(_sum_momenta), sum_indizes(_sum_indizes), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const std::vector<char>& _sum_momenta, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
 		: coefficients(), sum_momenta(_sum_momenta), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const IndexWrapper& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(int _multiplicity, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(), sum_indizes(_sum_indizes), operators(_operators), multiplicity(_multiplicity) {}
 	Term::Term(int _multiplicity, const std::vector<Operator>& _operators)
 		: coefficients(), operators(_operators), multiplicity(_multiplicity) {}
@@ -167,7 +167,7 @@ namespace SymbolicOperators {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{
-					if (delta.first == UP || delta.first == DOWN) {
+					if (delta.first == SpinUp || delta.first == SpinDown) {
 						if (*it == delta.second) {
 							*it = delta.first;
 						}
@@ -206,7 +206,7 @@ namespace SymbolicOperators {
 		{
 			for (int j = i + 1; j < delta_indizes.size(); j++)
 			{
-				if (pair_equal_allow_permutation(delta_indizes[i], delta_indizes[j])) {
+				if (delta_indizes[i] == delta_indizes[j]) {
 					delta_indizes.erase(delta_indizes.begin() + j);
 					--i;
 					break;
@@ -229,9 +229,9 @@ namespace SymbolicOperators {
 		}
 		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
 		{
-			// UP can never be DOWN and vice versa
-			if (it->first == UP && it->second == DOWN) return false;
-			if (it->first == DOWN && it->second == UP) return false;
+			// SpinUp can never be SpinDown and vice versa
+			if (it->first == SpinUp && it->second == SpinDown) return false;
+			if (it->first == SpinDown && it->second == SpinUp) return false;
 
 			if (it->first == it->second) {
 				it = delta_indizes.erase(it);
@@ -244,7 +244,7 @@ namespace SymbolicOperators {
 	}
 
 	bool Term::computeSums() {
-		auto changeAllIndizes = [&](const std::string& replaceWhat, const std::string& replaceWith) {
+		auto changeAllIndizes = [&](const Index replaceWhat, const Index replaceWith) {
 			for (auto& op : operators) {
 				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
 				{
@@ -385,12 +385,12 @@ namespace SymbolicOperators {
 				if (operators[i].isDaggered != operators[i - 1].isDaggered) continue;
 				if (operators[i].isDaggered) {
 					// c^+ c^+
-					if (operators[i].indizes[0] == UP && operators[i - 1].indizes[0] != UP) {
+					if (operators[i].indizes[0] == SpinUp && operators[i - 1].indizes[0] != SpinUp) {
 						std::swap(operators[i], operators[i - 1]);
 						flipSign();
 						new_n = i;
 					}
-					else if (operators[i - 1].indizes[0] == DOWN && operators[i].indizes[0] != DOWN) {
+					else if (operators[i - 1].indizes[0] == SpinDown && operators[i].indizes[0] != SpinDown) {
 						std::swap(operators[i], operators[i - 1]);
 						flipSign();
 						new_n = i;
@@ -398,12 +398,12 @@ namespace SymbolicOperators {
 				}
 				else {
 					// c c
-					if (operators[i].indizes[0] == DOWN && operators[i - 1].indizes[0] != DOWN) {
+					if (operators[i].indizes[0] == SpinDown && operators[i - 1].indizes[0] != SpinDown) {
 						std::swap(operators[i], operators[i - 1]);
 						flipSign();
 						new_n = i;
 					}
-					else if (operators[i - 1].indizes[0] == UP && operators[i].indizes[0] != UP) {
+					else if (operators[i - 1].indizes[0] == SpinUp && operators[i].indizes[0] != SpinUp) {
 						std::swap(operators[i], operators[i - 1]);
 						flipSign();
 						new_n = i;
@@ -486,16 +486,16 @@ namespace SymbolicOperators {
 			}
 		}
 
-		if (sum_indizes.size() == 1U && sum_indizes.front() == "\\sigma'") {
-			sum_indizes.front() = "\\sigma";
+		if (sum_indizes.size() == 1U && sum_indizes.front() == SigmaPrime) {
+			sum_indizes.front() = Sigma;
 			for (auto& op : operators) {
 				for (auto& index : op.indizes) {
-					if (index == "\\sigma'") index = "\\sigma";
+					if (index == SigmaPrime) index = Sigma;
 				}
 			}
 			for (auto& coeff : coefficients) {
 				for (auto& index : coeff.indizes) {
-					if (index == "\\sigma'") index = "\\sigma";
+					if (index == SigmaPrime) index = Sigma;
 				}
 			}
 		}
@@ -560,8 +560,8 @@ namespace SymbolicOperators {
 							throw std::invalid_argument("Operators do not have the same index count.");
 						}
 
-						if ((new_term.operators[i - 1].indizes[0] == UP || new_term.operators[i - 1].indizes[0] == DOWN)
-							&& (new_term.operators[i].indizes[0] == UP || new_term.operators[i].indizes[0] == DOWN)) {
+						if ((new_term.operators[i - 1].indizes[0] == SpinUp || new_term.operators[i - 1].indizes[0] == SpinDown)
+							&& (new_term.operators[i].indizes[0] == SpinUp || new_term.operators[i].indizes[0] == SpinDown)) {
 							if (new_term.operators[i - 1].indizes[0] != new_term.operators[i].indizes[0]) {
 								// Case: one up the other down, then free anticommutation
 								continue;
@@ -647,21 +647,8 @@ namespace SymbolicOperators {
 			os << "+";
 		}
 		os << term.multiplicity << " \\cdot ";
-		if (!term.sum_indizes.empty()) {
-			os << "\\sum_{ ";
-			for (const auto& index : term.sum_indizes) {
-				os << index << " ";
-			}
-			os << "}";
-		}
-		if (!term.sum_momenta.empty()) {
-			os << "\\sum_{ ";
-			for (const auto& momentum : term.sum_momenta) {
-				os << momentum << " ";
-			}
-			os << "}";
-		}
-		os << term.coefficients << " ";
+		os << term.sum_indizes << term.sum_momenta;
+
 		for (const auto& delta : term.delta_momenta) {
 			os << delta;
 		}
