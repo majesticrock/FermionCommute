@@ -46,8 +46,7 @@ namespace SymbolicOperators {
 		inline bool differsOnlyInQ(Momentum rhs) const {
 			if (rhs.add_Q == this->add_Q) return false;
 			rhs.add_Q = this->add_Q;
-			if (*this != rhs) return false;
-			return true;
+			return (*this == rhs);
 		};
 
 		void addInPlace(const Momentum& rhs);
@@ -56,13 +55,15 @@ namespace SymbolicOperators {
 			if (this->add_Q != rhs.add_Q) return false;
 			if (this->momentum_list.size() != rhs.momentum_list.size()) return false;
 			bool foundOne = true;
-			for (size_t i = 0; i < this->momentum_list.size(); i++)
+			for (size_t i = 0U; i < this->momentum_list.size(); ++i)
 			{
 				foundOne = false;
-				for (size_t j = 0; j < rhs.momentum_list.size(); j++)
+				for (size_t j = 0U; j < rhs.momentum_list.size(); ++j)
 				{
-					if (this->momentum_list[i] == rhs.momentum_list[j])
+					if (this->momentum_list[i] == rhs.momentum_list[j]){
 						foundOne = true;
+						break;
+					}
 				}
 				if (!foundOne) return false;
 			}

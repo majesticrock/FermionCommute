@@ -3,9 +3,6 @@
 #include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
-	//const std::string SpinUp = "\\uparrow";
-	//const std::string SpinDown = "\\downarrow";
-
 	struct Operator {
 		Momentum momentum;
 		// Contains all indizes, standard: first index = spin, all others arbitrary, e.g., orbitals, bands etc

@@ -31,7 +31,7 @@ namespace SymbolicOperators {
 			reciever_list.push_back(std::get<WickTerm>(buffer));
 			return;
 		}
-		for (size_t i = 1; i < remaining.size(); i++)
+		for (size_t i = 1U; i < remaining.size(); ++i)
 		{
 			if (std::holds_alternative<Term>(buffer)) {
 				WickTerm temp(std::get<Term>(buffer));
@@ -80,7 +80,7 @@ namespace SymbolicOperators {
 			reciever.insert(reciever.end(), buffer_list.begin(), buffer_list.end());
 		}
 
-		for (size_t i = 0; i < reciever.size();)
+		for (size_t i = 0U; i < reciever.size();)
 		{
 			if (reciever[i].handled()) {
 				++i;
@@ -102,9 +102,9 @@ namespace SymbolicOperators {
 		std::vector<WickTerm> these_copies;
 		these_copies.push_back(*this);
 
-		auto setDeltas = [&](const Operator& left, const Operator& right, bool sc_type, size_t index) {
+		auto setDeltas = [&](const Operator& left, const Operator& right, size_t index) {
 			Momentum copy_momentum = left.momentum;
-			if (sc_type) copy_momentum.flipMomentum();
+			if (left.isDaggered == right.isDaggered) copy_momentum.flipMomentum();
 
 			for (size_t k = 1U; k < left.indizes.size(); ++k)
 			{
@@ -117,7 +117,7 @@ namespace SymbolicOperators {
 			this_copy.delta_momenta.push_back(make_delta(copy_momentum, right.momentum));
 			};
 
-		for (size_t i = 0U; i < temporary_operators.size(); i += 2)
+		for (size_t i = 0U; i < temporary_operators.size(); i += 2U)
 		{
 			size_t copies_size = these_copies.size();
 			for (size_t j = 0U; j < copies_size; ++j)
@@ -138,7 +138,7 @@ namespace SymbolicOperators {
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
 						// Due to the dagger we need to swap left and right
-						setDeltas(RIGHT, LEFT, true, j);
+						setDeltas(RIGHT, LEFT, j);
 
 						these_copies[j].operators.push_back(WickOperator(SC_Type, true, LEFT.momentum));
 						if (LEFT.indizes.size() > 1) {
@@ -159,7 +159,7 @@ namespace SymbolicOperators {
 							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, SpinUp));
 							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 						}
-						setDeltas(LEFT, RIGHT, true, j);
+						setDeltas(LEFT, RIGHT, j);
 
 						these_copies[j].operators.push_back(WickOperator(SC_Type, false, RIGHT.momentum));
 						if (RIGHT.indizes.size() > 1) {
@@ -179,7 +179,7 @@ namespace SymbolicOperators {
 						this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
 					}
 					// Left and right are swapped due to the definition of g
-					setDeltas(RIGHT, LEFT, false, j);
+					setDeltas(RIGHT, LEFT, j);
 
 					these_copies[j].operators.push_back(WickOperator(Number_Type, false, LEFT.momentum, LEFT.indizes));
 					this_copy.operators.push_back(these_copies[j].operators.back());
