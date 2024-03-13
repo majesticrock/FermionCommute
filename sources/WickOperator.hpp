@@ -4,14 +4,12 @@
 #include "IndexWrapper.hpp"
 
 namespace SymbolicOperators {
-	enum OperatorType { Number_Type, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
-
+	enum OperatorType { Number_Type = 0, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
 	std::ostream& operator<<(std::ostream& os, const OperatorType op);
 
-	typedef std::pair<Momentum, Momentum> pair_of_momenta;
 	struct WickOperator {
 		OperatorType type;
-		bool isDaggered;
+		bool isDaggered{};
 		Momentum momentum;
 		IndexWrapper indizes;
 

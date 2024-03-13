@@ -95,6 +95,18 @@ namespace SymbolicOperators {
 		}
 	}
 
+	//void identifyWickOperator(const Operator& left, const Operator& right){
+	//	const ?? allowed_momentum_transfer = {0, Q}
+//
+	//	Momentum copy_momentum = left.momentum;
+	//	if (left.isDaggered == right.isDaggered) copy_momentum.flipMomentum();
+//
+	//	KroneckerDelta<Index> delta_index{left.indizes[k], right.indizes[k]};
+	//	KroneckerDelta<Momentum> delta_momentum{copy_momentum, right.momentum};
+//
+//
+	//}
+
 	bool WickTerm::swapToWickOperators(std::vector<WickTerm>& reciever)
 	{
 		this->operators.reserve(temporary_operators.size() / 2);

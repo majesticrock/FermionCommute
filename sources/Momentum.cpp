@@ -10,9 +10,9 @@ namespace SymbolicOperators {
 
 	void Momentum::sort()
 	{
-		for (size_t i = 0; i < momentum_list.size(); i++)
+		for (size_t i = 0U; i < momentum_list.size(); ++i)
 		{
-			for (size_t j = i + 1; j < momentum_list.size(); j++)
+			for (size_t j = i + 1U; j < momentum_list.size(); ++j)
 			{
 				// Comparing two chars is easy
 				if (momentum_list[i].second > momentum_list[j].second) {
@@ -26,10 +26,10 @@ namespace SymbolicOperators {
 	{
 		this->add_Q = (rhs.add_Q != this->add_Q);
 		bool foundOne = false;
-		for (size_t i = 0; i < rhs.momentum_list.size(); i++)
+		for (size_t i = 0U; i < rhs.momentum_list.size(); ++i)
 		{
 			foundOne = false;
-			for (size_t j = 0; j < this->momentum_list.size(); j++)
+			for (size_t j = 0U; j < this->momentum_list.size(); ++j)
 			{
 				if (rhs.momentum_list[i].second == this->momentum_list[j].second) {
 					foundOne = true;
@@ -51,10 +51,10 @@ namespace SymbolicOperators {
 	{
 		this->add_Q = (rhs.add_Q != this->add_Q);
 		bool foundOne = false;
-		for (size_t i = 0; i < rhs.momentum_list.size(); i++)
+		for (size_t i = 0U; i < rhs.momentum_list.size(); ++i)
 		{
 			foundOne = false;
-			for (size_t j = 0; j < this->momentum_list.size(); j++)
+			for (size_t j = 0U; j < this->momentum_list.size(); ++j)
 			{
 				if (rhs.momentum_list[i].second == this->momentum_list[j].second) {
 					foundOne = true;
@@ -84,7 +84,7 @@ namespace SymbolicOperators {
 				throw std::invalid_argument("You are trying to replace a momentum with itself. This has undefined behaviour!");
 			}
 		}
-		for (size_t i = 0; i < momentum_list.size(); ++i) {
+		for (size_t i = 0U; i < momentum_list.size(); ++i) {
 			if (momentum_list[i].second == replaceWhat) {
 				auto buffer = replaceWith;
 				buffer.multiplyMomentum(momentum_list[i].first);

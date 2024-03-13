@@ -3,7 +3,12 @@
 #include "../../Utility/sources/VectorWrapper.hpp"
 
 namespace SymbolicOperators {
-	enum Index { SpinUp, SpinDown, Sigma, SigmaPrime, UndefinedIndex };
+	enum Index { SpinUp = 0, SpinDown, Sigma, SigmaPrime, UndefinedIndex };
+	// Returns true if the index represents a variable and false otherwise
+	// Example: If the index is SpinUp it is fixed, i.e., non-mutable
+	constexpr bool is_mutable(const Index idx) {
+		return (idx < 2);
+	}
 
 	std::ostream& operator<<(std::ostream& os, const Index index);
 

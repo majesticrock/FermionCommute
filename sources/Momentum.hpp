@@ -51,6 +51,7 @@ namespace SymbolicOperators {
 
 		void addInPlace(const Momentum& rhs);
 		void replaceOccurances(const char replaceWhat, const Momentum& replaceWith);
+
 		inline bool operator==(const Momentum& rhs) const {
 			if (this->add_Q != rhs.add_Q) return false;
 			if (this->momentum_list.size() != rhs.momentum_list.size()) return false;
