@@ -26,11 +26,18 @@ namespace SymbolicOperators {
 
 		Momentum& operator+=(const Momentum& rhs);
 		Momentum& operator-=(const Momentum& rhs);
+		inline Momentum& operator*=(const int rhs) {
+			if (rhs % 2 == 0) {
+				this->add_Q = false;
+			}
+			for (auto& m : momentum_list) {
+				m.first *= rhs;
+			}
+			return *this;
+		};
 
 		inline void multiplyMomentum(int factor) {
-			for (auto& m : momentum_list) {
-				m.first *= factor;
-			}
+			(*this) *= factor;
 		};
 		inline void flipMomentum() {
 			multiplyMomentum(-1);
@@ -82,6 +89,14 @@ namespace SymbolicOperators {
 	inline Momentum operator-(Momentum lhs, const Momentum& rhs) {
 		lhs -= rhs;
 		return lhs;
+	}
+	inline Momentum operator*(Momentum lhs, const int rhs) {
+		lhs *= rhs;
+		return lhs;
+	}
+	inline Momentum operator*(const int lhs, Momentum rhs) {
+		rhs *= lhs;
+		return rhs;
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Momentum& momentum);

@@ -1,12 +1,14 @@
 #include "WickOperatorTemplate.hpp"
 #include <algorithm>
 #include <iterator>
+#include "Momentum.hpp"
+#include "KroneckerDelta.hpp"
 
 namespace SymbolicOperators{
     std::optional<WickOperator> WickOperatorTemplate::_handle_sc_type(const Operator& left, const Operator& right){
         // c_{-k} c_{k} or c_{k}^+ c_{-k}^+
-        const Momentum& base{left.isDaggered ? left.momentum : right.momentum}
-        Momentum momentum_diff = left.Momentum + right.momentum;
+        const Momentum& base{ left.isDaggered ? left.momentum : right.momentum };
+        Momentum momentum_diff = left.momentum + right.momentum;
 
         KroneckerDelta<Momentum> momentum_delta{this->momentum_difference, momentum_diff};
         std::vector<KroneckerDelta<Index>> index_delta;
@@ -22,19 +24,19 @@ namespace SymbolicOperators{
     }
     std::optional<WickOperator> WickOperatorTemplate::_handle_num_type(const Operator& left, const Operator& right){
         // c_{k}^+ c_{k}
-        Momentum momentum_diff = left.Momentum - right.momentum;
+        Momentum momentum_diff = left.momentum - right.momentum;
 
     }
 
-    std::optional<WickOperator> WickOperatorTemplate::creatFromOperators(const Operator& left, const Operator& right){
+    std::optional<WickOperator> WickOperatorTemplate::createFromOperators(const Operator& left, const Operator& right){
         if(this->is_sc_type){
             if (left.isDaggered != right.isDaggered)
-                return std::null_opt;
-            return this->_handle_sc_type()
+                return std::nullopt;
+            return this->_handle_sc_type(left, right);
         }
 
         if(left.isDaggered == right.isDaggered)
-            return std::null_opt;
-        return this->_handle_num_type();
+            return std::nullopt;
+        return this->_handle_num_type(left, right);
     }
 }

@@ -2,25 +2,16 @@
 #include "KroneckerDelta.hpp"
 #include "Momentum.hpp"
 #include "IndexWrapper.hpp"
-#include <utility>
-#include <type_traits>
+#include "../../Utility/sources/defines_arithmetic_operators.hpp"
 
-template <class T>
-class is_linearly_combinable{
-    struct _true {};
-    struct _false {};
-    
-    template <class _internal>
-    static _true test( decltype(&_internal::operator+=) );
-    template <class _internal>
-    static _false test(...);
-    
-    public:
-    static constexpr bool value = std::is_same_v<decltype(test<T>(0)), _true>;
-};
-
-struct has_plus{
-    has_plus& operator+=(const has_plus& rhs){
-      return *this;
-    };
-};
+namespace SymbolicOperators {
+	template <class T>
+	bool reduce_deltas(std::vector<KroneckerDelta<T>>& deltas) {
+		if constexpr (Utility::is_linearly_combinable_v<T>()) {
+			for (auto& delta : deltas) {
+				delta.first -= delta.second;
+				delta.second = T{};
+			}
+		}
+	}
+}
