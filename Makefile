@@ -12,7 +12,7 @@ WARNINGS = -Wall -Wno-sign-compare
 
 OPT = -march=native -O3
 
-PART_SRCS=IndexWrapper.cpp Momentum.cpp Coefficient.cpp Operator.cpp Term.cpp WickOperator.cpp WickTerm.cpp WickCleaner.cpp
+PART_SRCS=Coefficient.cpp IndexWrapper.cpp Momentum.cpp Operator.cpp Term.cpp WickCleaner.cpp WickOperator.cpp WickOperatorTemplate.cpp WickTerm.cpp 
 SRCS=$(PART_SRCS) FermionCommute.cpp
 
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
@@ -26,6 +26,9 @@ XP: build build/main ../commutators
 
 std: build build/main ../commutators
 	./build/main std
+
+test: build build/main
+	./build/main test
 
 build/main: $(OBJS) | build
 	$(CXX) $(INCLUDEFLAGS) -o build/main $(OBJS) $(CXXFLAGS) $(LDLIBS)

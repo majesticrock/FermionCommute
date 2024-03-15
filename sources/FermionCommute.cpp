@@ -1,5 +1,6 @@
 #include "Term.hpp"
 #include "WickTerm.hpp"
+#include "WickOperatorTemplate.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -23,6 +24,18 @@ int main(int argc, char** argv) {
 	// transversal magnon
 	const Operator c_k_Q_down_dagger('k', 1, true, SpinDown, true);
 	const Operator c_k_Q_down('k', 1, true, SpinDown, false);
+
+	if (std::strcmp(argv[1], "test") == 0) {
+		const WickOperatorTemplate sc_temp{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true };
+		WickTerm wick;
+		wick.multiplicity = 1;
+		wick.temporary_operators = { c_minus_k, c_k };
+		auto wick_results = identifyWickOperators(wick, sc_temp);
+
+		std::cout << wick_results << std::endl;
+
+		return 0;
+	}
 
 	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), MomentumSum({ 'q' }), Sigma, op_vec({
 		Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)

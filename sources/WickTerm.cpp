@@ -19,10 +19,14 @@ namespace SymbolicOperators {
 		delta_indizes(base.delta_indizes), temporary_operators()
 	{
 	}
-	WickTerm::WickTerm()
-		: multiplicity(0), coefficients(), sum_momenta(), sum_indizes(),
-		operators(), delta_momenta(), delta_indizes(), temporary_operators()
+
+	WickTerm::WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result)
+		: multiplicity(result.factor * base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta),
+		sum_indizes(base.sum_indizes), operators(base.operators), delta_momenta(base.delta_momenta),
+		delta_indizes(base.delta_indizes), temporary_operators()
 	{
+		this->operators.push_back(result.op);
+		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
 	}
 
 	void wick_processor(const std::vector<Operator>& remaining, std::vector<WickTerm>& reciever_list, std::variant<WickTerm, Term> buffer)
@@ -95,17 +99,21 @@ namespace SymbolicOperators {
 		}
 	}
 
-	//void identifyWickOperator(const Operator& left, const Operator& right){
-	//	const ?? allowed_momentum_transfer = {0, Q}
-//
-	//	Momentum copy_momentum = left.momentum;
-	//	if (left.isDaggered == right.isDaggered) copy_momentum.flipMomentum();
-//
-	//	KroneckerDelta<Index> delta_index{left.indizes[k], right.indizes[k]};
-	//	KroneckerDelta<Momentum> delta_momentum{copy_momentum, right.momentum};
-//
-//
-	//}
+	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template)
+	{
+		std::vector<WickTerm> ret;
+		for (size_t i = 0U; i < source.temporary_operators.size(); i+=2U)
+		{
+			auto result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
+			ret.reserve(ret.size() + result.results.size());
+			for (size_t j = 0U; j < result.results.size(); ++j)
+			{
+				ret.push_back(WickTerm(source, result.results[j]));
+				ret.back().delta_momenta.push_back(result.momentum_delta);
+			}
+		}
+		return ret;
+	}
 
 	bool WickTerm::swapToWickOperators(std::vector<WickTerm>& reciever)
 	{

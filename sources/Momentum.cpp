@@ -44,7 +44,9 @@ namespace SymbolicOperators {
 				this->momentum_list.push_back(rhs.momentum_list[i]);
 			}
 		}
-
+		this->sort();
+		if (this->momentum_list.empty()) return *this;
+		if (this->momentum_list.front().first < 0) this->flipMomentum();
 		return *this;
 	}
 	Momentum& Momentum::operator-=(const Momentum& rhs)
@@ -69,7 +71,9 @@ namespace SymbolicOperators {
 				this->momentum_list.push_back(std::make_pair(-rhs.momentum_list[i].first, rhs.momentum_list[i].second));
 			}
 		}
-
+		this->sort();
+		if (this->momentum_list.empty()) return *this;
+		if (this->momentum_list.front().first < 0) this->flipMomentum();
 		return *this;
 	}
 	void Momentum::addInPlace(const Momentum& rhs)

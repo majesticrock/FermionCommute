@@ -10,7 +10,7 @@ namespace SymbolicOperators {
 	struct Momentum {
 		// total momentum is then:    sum_i pair_i.first * pair_i.second
 		momentum_pairs momentum_list;
-		bool add_Q;
+		bool add_Q{};
 
 		template<class Archive>
 		void serialize(Archive& ar, const unsigned int version) {
@@ -96,6 +96,10 @@ namespace SymbolicOperators {
 	}
 	inline Momentum operator*(const int lhs, Momentum rhs) {
 		rhs *= lhs;
+		return rhs;
+	}
+	inline Momentum operator-(Momentum rhs) {
+		rhs.flipMomentum();
 		return rhs;
 	}
 

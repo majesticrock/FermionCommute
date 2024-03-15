@@ -6,11 +6,22 @@
 
 namespace SymbolicOperators {
 	template <class T>
-	bool reduce_deltas(std::vector<KroneckerDelta<T>>& deltas) {
+	bool remove_delta_squared(std::vector<KroneckerDelta<T>>& deltas) {
 		if constexpr (Utility::is_linearly_combinable_v<T>()) {
 			for (auto& delta : deltas) {
 				delta.first -= delta.second;
 				delta.second = T{};
+			}
+		}
+		// Remove duplicates as delta^2 = delta
+		for (size_t i = 0U; i < deltas.size(); ++i) {
+			for (auto jt = deltas.begin() + i + 1; jt != deltas.end();) {
+				if (deltas[i] == *jt) {
+					jt = deltas.erase(jt);
+				}
+				else {
+					++jt;
+				}
 			}
 		}
 	}

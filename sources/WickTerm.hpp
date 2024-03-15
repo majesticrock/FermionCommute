@@ -1,6 +1,7 @@
 #pragma once
 #include "Term.hpp"
 #include "WickOperator.hpp"
+#include "WickOperatorTemplate.hpp"
 #include <algorithm>
 
 namespace SymbolicOperators {
@@ -8,7 +9,7 @@ namespace SymbolicOperators {
 
 	struct WickTerm
 	{
-		int multiplicity;
+		int multiplicity{};
 		std::vector<Coefficient> coefficients;
 		MomentumSum sum_momenta;
 		IndexSum sum_indizes;
@@ -33,7 +34,8 @@ namespace SymbolicOperators {
 
 		explicit WickTerm(const Term* base);
 		explicit WickTerm(const Term& base);
-		WickTerm();
+		WickTerm() = default;
+		WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result);
 
 		inline bool includesType(const OperatorType operator_type) const {
 			return std::any_of(this->operators.begin(), this->operators.end(),
@@ -123,6 +125,8 @@ namespace SymbolicOperators {
 	};
 
 	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever);
+	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template);
+	
 	void clearEtas(std::vector<WickTerm>& terms);
 	void cleanWicks(std::vector<WickTerm>& terms);
 
