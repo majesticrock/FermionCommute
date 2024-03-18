@@ -18,6 +18,27 @@ namespace SymbolicOperators {
 			int factor{};
 			WickOperator op;
 			std::vector<KroneckerDelta<Index>> index_deltas;
+
+			// TODO: std::remove_if
+			void clear_delta_equals_one(){
+				for(auto it = this->index_deltas.begin(); it != this->index_deltas.end();){
+					if(it->first == it->second){
+						it = this->index_deltas.erase(it);
+					} 
+					else {
+						++it;
+					}
+				}
+			};
+			// TODO:: std::any_of
+			bool contains_impossible_delta() const {
+				for(const auto& delta : this->index_deltas){
+					if(!is_mutable(delta.first) && !is_mutable(delta.second) && delta.first != delta.second){
+						return true;
+					}
+				}
+				return false;
+			};
 		};
 		std::vector<SingleResult> results;
 		KroneckerDelta<Momentum> momentum_delta;
@@ -59,6 +80,17 @@ namespace SymbolicOperators {
 			std::copy_n(results.begin(), current_size, std::back_inserter(results));
 			return current_size;
 		}
+
+		void clear_impossible(){
+			for(auto it = this->results.begin(); it != this->results.end();){
+				if(it->contains_impossible_delta()){
+					it = this->results.erase(it);
+				}
+				else{
+					++it;
+				}
+			}
+		};
 	};
 
 	struct WickOperatorTemplate {

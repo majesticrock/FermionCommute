@@ -27,12 +27,16 @@ int main(int argc, char** argv) {
 
 	if (std::strcmp(argv[1], "test") == 0) {
 		const WickOperatorTemplate sc_temp{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true };
+		const WickOperatorTemplate cdw_temp{ {IndexComparison{true}}, Momentum({}, true), CDW_Type, false };
 		WickTerm wick;
 		wick.multiplicity = 1;
-		wick.temporary_operators = { c_minus_k, c_k };
+		wick.temporary_operators = { c_minus_k_Q, c_k_Q };
 		auto wick_results = identifyWickOperators(wick, sc_temp);
 
-		std::cout << wick_results << std::endl;
+		std::cout << "Pre clean:  " << wick_results << std::endl;
+		cleanWicks(wick_results);
+		std::cout << "Post clean: " << wick_results << std::endl;
+
 
 		return 0;
 	}

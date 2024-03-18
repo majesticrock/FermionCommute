@@ -43,8 +43,24 @@ namespace SymbolicOperators {
 		KroneckerDelta<Momentum> momentum_delta{ this->momentum_difference, momentum_diff };
 
 		std::vector<KroneckerDelta<Index>> index_delta;
+		
+		TemplateResult result(1U, this->type, left.momentum);
+ 		result.results.front().op.isDaggered = false;
+		result.momentum_delta = make_delta(this->momentum_difference, momentum_diff);
 
-		return {};
+	for (size_t i = 0U; i < indexComparison.size(); ++i)
+		{
+			if (indexComparison[i].any_identical) {
+				result.add_index_delta(make_delta(left.indizes[i], right.indizes[i]));
+			}
+			else {
+				const size_t previous_size{ result.create_branch() };
+				result.add_index_delta_range(make_delta(left.indizes[i], indexComparison[i].base), 0U, previous_size);
+				result.add_index_delta_range(make_delta(right.indizes[i], indexComparison[i].other), 0U, previous_size);
+			}
+		}
+
+		return result;
 	}
 
 	TemplateResult WickOperatorTemplate::createFromOperators(const Operator& left, const Operator& right) const {
@@ -56,6 +72,9 @@ namespace SymbolicOperators {
 
 		if (left.isDaggered == right.isDaggered)
 			return {};
+		// The input needs to be normal ordered.
+		// This means that if right is not daggered, left cannot be daggered either
+		assert(! left.isDaggered);
 		return this->_handle_num_type(left, right);
 	}
 }
