@@ -19,50 +19,32 @@ namespace SymbolicOperators {
 			WickOperator op;
 			std::vector<KroneckerDelta<Index>> index_deltas;
 
-			// TODO: std::remove_if
-			void clear_delta_equals_one(){
-				for(auto it = this->index_deltas.begin(); it != this->index_deltas.end();){
-					if(it->first == it->second){
-						it = this->index_deltas.erase(it);
-					} 
-					else {
-						++it;
-					}
-				}
+			inline void clear_delta_equals_one(){
+				std::remove_if(this->index_deltas.begin(), this->index_deltas.end(), [](const KroneckerDelta<Index>& delta){
+					return delta.first == delta.second;
+				});
 			};
-			// TODO:: std::any_of
-			bool contains_impossible_delta() const {
-				for(const auto& delta : this->index_deltas){
-					if(!is_mutable(delta.first) && !is_mutable(delta.second) && delta.first != delta.second){
-						return true;
-					}
-				}
-				return false;
+			inline bool contains_impossible_delta() const {
+				return std::any_of(this->index_deltas.begin(), this->index_deltas.end(), [](const KroneckerDelta<Index>& delta){
+					return (!is_mutable(delta.first) && !is_mutable(delta.second) && delta.first != delta.second);
+				});
 			};
 		};
 		std::vector<SingleResult> results;
 		KroneckerDelta<Momentum> momentum_delta;
 
 		TemplateResult() = default;
-		TemplateResult(size_t initial_size, OperatorType operator_type, const Momentum& base_momentum)
-			: results(initial_size) {
-			for (auto& result : results)
-			{
-				result.op.type = operator_type;
-				result.op.momentum = base_momentum;
-				result.factor = 1;
-			}
-		}
+		TemplateResult(size_t initial_size, OperatorType operator_type, const Momentum& base_momentum);
 
-		template<class Operation>
-		void operation_on_range(const Operation& operation, size_t begin, size_t n) {
+		template<class UnaryOperation>
+		void operation_on_range(const UnaryOperation& operation, size_t begin, size_t n) {
 			for (size_t i = begin; i < begin + n; ++i)
 			{
 				operation(results[i]);
 			}
 		}
-		template<class Operation>
-		void operation_on_each(const Operation& operation) {
+		template<class UnaryOperation>
+		void operation_on_each(const UnaryOperation& operation) {
 			for (auto& res : results)
 			{
 				operation(res);
@@ -81,16 +63,17 @@ namespace SymbolicOperators {
 			return current_size;
 		}
 
-		void clear_impossible(){
-			for(auto it = this->results.begin(); it != this->results.end();){
-				if(it->contains_impossible_delta()){
-					it = this->results.erase(it);
-				}
-				else{
-					++it;
-				}
-			}
+		inline void clear_impossible(){
+			std::remove_if(this->results.begin(), this->results.end(), [](const SingleResult& result){
+				return result.contains_impossible_delta();
+			});
 		};
+		inline void clean_up(){
+			for(auto& result : results){
+				result.clear_delta_equals_one();
+			}
+			this->clear_impossible();
+		}
 	};
 
 	struct WickOperatorTemplate {

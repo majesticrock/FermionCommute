@@ -5,6 +5,17 @@
 #include "KroneckerDelta.hpp"
 
 namespace SymbolicOperators {
+	TemplateResult::TemplateResult(size_t initial_size, OperatorType operator_type, const Momentum& base_momentum)
+		: results(initial_size) 
+	{
+		for (auto& result : results)
+		{
+			result.op.type = operator_type;
+			result.op.momentum = base_momentum;
+			result.factor = 1;
+		}
+	}
+
 	TemplateResult WickOperatorTemplate::_handle_sc_type(const Operator& left, const Operator& right) const {
 		// c_{-k-q} c_{k} or c_{k}^+ c_{-k-q}^+
 		const Operator& base{ left.isDaggered ? left : right };
@@ -20,6 +31,13 @@ namespace SymbolicOperators {
 		{
 			if (indexComparison[i].any_identical) {
 				result.add_index_delta(make_delta(base.indizes[i], other.indizes[i]));
+				result.operation_on_each([&base, &i](WickOperator& op){
+					op.indizes.push_back(base.indizes[i]);
+				});
+				// c^+ c^+ can be swapped for the cost of a sign
+				const size_t previous_size{ result.create_branch() };
+				result.operation_on_range([](TemplateResult::SingleResult& res) { res.factor *= -1; }, previous_size, previous_size);
+				result.operation_on_range([&other](TemplateResult::SingleResult& res) { res.op.momentum = other.momentum; }, previous_size, previous_size);
 			}
 			else {
 				const size_t previous_size{ result.create_branch() };
@@ -33,7 +51,6 @@ namespace SymbolicOperators {
 				result.operation_on_range([&other](TemplateResult::SingleResult& res) { res.op.momentum = other.momentum; }, previous_size, previous_size);
 			}
 		}
-
 		return result;
 	}
 	TemplateResult WickOperatorTemplate::_handle_num_type(const Operator& left, const Operator& right) const {
@@ -48,10 +65,13 @@ namespace SymbolicOperators {
  		result.results.front().op.isDaggered = false;
 		result.momentum_delta = make_delta(this->momentum_difference, momentum_diff);
 
-	for (size_t i = 0U; i < indexComparison.size(); ++i)
+		for (size_t i = 0U; i < indexComparison.size(); ++i)
 		{
 			if (indexComparison[i].any_identical) {
 				result.add_index_delta(make_delta(left.indizes[i], right.indizes[i]));
+				result.operation_on_each([&left, &i](WickOperator& op){
+					op.indizes.push_back(left.indizes[i]);
+				});
 			}
 			else {
 				const size_t previous_size{ result.create_branch() };
@@ -59,7 +79,6 @@ namespace SymbolicOperators {
 				result.add_index_delta_range(make_delta(right.indizes[i], indexComparison[i].other), 0U, previous_size);
 			}
 		}
-
 		return result;
 	}
 
@@ -73,8 +92,8 @@ namespace SymbolicOperators {
 		if (left.isDaggered == right.isDaggered)
 			return {};
 		// The input needs to be normal ordered.
-		// This means that if right is not daggered, left cannot be daggered either
-		assert(! left.isDaggered);
+		// This means that the left input must be daggered here
+		assert(left.isDaggered);
 		return this->_handle_num_type(left, right);
 	}
 }

@@ -99,18 +99,37 @@ namespace SymbolicOperators {
 		}
 	}
 
+	void WickTerm::includeTemplateResult(const TemplateResult::SingleResult& result){
+		this->delta_indizes.insert(this->delta_indizes.begin(), result.index_deltas.begin(), result.index_deltas.end());
+		this->operators.push_back(result.op);
+		this->multiplicity *= result.factor;
+	}
+
 	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template)
 	{
-		std::vector<WickTerm> ret;
+		std::vector<WickTerm> ret(1U, WickTerm());
 		for (size_t i = 0U; i < source.temporary_operators.size(); i+=2U)
 		{
-			auto result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
-			ret.reserve(ret.size() + result.results.size());
-			for (size_t j = 0U; j < result.results.size(); ++j)
-			{
-				ret.push_back(WickTerm(source, result.results[j]));
-				ret.back().delta_momenta.push_back(result.momentum_delta);
+			const auto result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
+			if(result.results.size() > 1U){
+				ret.reserve(result.results.size() * ret.size());
 			}
+			const size_t base_size = ret.size();
+			for (size_t i = 0U; i < base_size; ++i)
+			{
+				
+			}
+		}
+		return ret;
+	}
+	
+	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates)
+	{
+		std::vector<WickTerm> ret;
+		std::vector<WickTerm> buffer;
+		for(const auto& operator_template : operator_templates){
+			buffer = identifyWickOperators(source, operator_template);
+			ret.insert(ret.end(), buffer.begin(), buffer.end());
 		}
 		return ret;
 	}
