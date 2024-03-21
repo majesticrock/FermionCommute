@@ -128,7 +128,7 @@ namespace SymbolicOperators {
 	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever);
 	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template);
 	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates);
-	
+
 	void clearEtas(std::vector<WickTerm>& terms);
 	void cleanWicks(std::vector<WickTerm>& terms);
 

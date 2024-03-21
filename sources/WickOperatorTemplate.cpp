@@ -31,8 +31,8 @@ namespace SymbolicOperators {
 		{
 			if (indexComparison[i].any_identical) {
 				result.add_index_delta(make_delta(base.indizes[i], other.indizes[i]));
-				result.operation_on_each([&base, &i](WickOperator& op){
-					op.indizes.push_back(base.indizes[i]);
+				result.operation_on_each([&base, &i](TemplateResult::SingleResult& res){
+					res.op.indizes.push_back(base.indizes[i]);
 				});
 				// c^+ c^+ can be swapped for the cost of a sign
 				const size_t previous_size{ result.create_branch() };
@@ -69,8 +69,8 @@ namespace SymbolicOperators {
 		{
 			if (indexComparison[i].any_identical) {
 				result.add_index_delta(make_delta(left.indizes[i], right.indizes[i]));
-				result.operation_on_each([&left, &i](WickOperator& op){
-					op.indizes.push_back(left.indizes[i]);
+				result.operation_on_each([&left, &i](TemplateResult::SingleResult& res){
+					res.op.indizes.push_back(left.indizes[i]);
 				});
 			}
 			else {

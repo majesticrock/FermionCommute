@@ -1,4 +1,5 @@
 #include "WickTerm.hpp"
+#include "../../Utility/sources/RangeUtility.hpp"
 #include <variant>
 
 #define LEFT temporary_operators[i]
@@ -108,28 +109,45 @@ namespace SymbolicOperators {
 	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template)
 	{
 		std::vector<WickTerm> ret(1U, WickTerm());
+		ret.front().multiplicity = source.multiplicity;
 		for (size_t i = 0U; i < source.temporary_operators.size(); i+=2U)
 		{
-			const auto result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
-			if(result.results.size() > 1U){
-				ret.reserve(result.results.size() * ret.size());
+			const auto template_result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
+			const size_t current_size = ret.size();
+			if(template_result.results.size() > 1U){
+				Utility::duplicate_n_inplace(ret, template_result.results.size() - 1U);
 			}
-			const size_t base_size = ret.size();
-			for (size_t i = 0U; i < base_size; ++i)
-			{
-				
+			for(size_t template_result_it = 0U; template_result_it < template_result.results.size(); ++template_result_it){
+				for(auto it = ret.begin(); it != ret.begin() + current_size; ++it){
+					(it + template_result_it * current_size)->includeTemplateResult(template_result.results[template_result_it]);
+				}
 			}
+			std::for_each(ret.begin(), ret.end(), [&template_result](WickTerm& ret_element){
+				ret_element.delta_momenta.push_back(template_result.momentum_delta);
+			});
 		}
 		return ret;
 	}
-	
+
 	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates)
 	{
+		auto appender = [](std::vector<WickTerm>& target, const std::vector<WickTerm>& toAppend){
+			const size_t original_size = target.size();
+			if(toAppend.size() > 1U){
+				Utility::duplicate_n_inplace(target, toAppend.size() - 1U);
+			}
+			for(size_t i = 0U; i < toAppend.size(); ++i){
+
+			}
+		};
+
 		std::vector<WickTerm> ret;
-		std::vector<WickTerm> buffer;
 		for(const auto& operator_template : operator_templates){
-			buffer = identifyWickOperators(source, operator_template);
-			ret.insert(ret.end(), buffer.begin(), buffer.end());
+			if(ret.empty()){
+				ret = identifyWickOperators(source, operator_template);
+			} else {
+				appender(ret, identifyWickOperators(source, operator_template));
+			}
 		}
 		return ret;
 	}
