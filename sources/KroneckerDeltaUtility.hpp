@@ -6,7 +6,7 @@
 
 namespace SymbolicOperators {
 	template <class T>
-	bool remove_delta_squared(std::vector<KroneckerDelta<T>>& deltas) {
+	void remove_delta_squared(std::vector<KroneckerDelta<T>>& deltas) {
 		if constexpr (Utility::is_linearly_combinable_v<T>()) {
 			for (auto& delta : deltas) {
 				delta.first -= delta.second;
@@ -22,6 +22,17 @@ namespace SymbolicOperators {
 				else {
 					++jt;
 				}
+			}
+		}
+	}
+
+	template <class T>
+	void remove_delta_is_one(std::vector<KroneckerDelta<T>>& deltas) {
+		for(auto it = deltas.begin(); it != deltas.end();){
+			if(it->isOne()){
+				it = deltas.erase(it);
+			}else{
+				++it;
 			}
 		}
 	}

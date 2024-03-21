@@ -123,7 +123,8 @@ namespace SymbolicOperators {
 				}
 			}
 			std::for_each(ret.begin(), ret.end(), [&template_result](WickTerm& ret_element){
-				ret_element.delta_momenta.push_back(template_result.momentum_delta);
+				if(!template_result.momentum_delta.isOne())
+					ret_element.delta_momenta.push_back(template_result.momentum_delta);
 			});
 		}
 		return ret;
@@ -136,8 +137,16 @@ namespace SymbolicOperators {
 			if(toAppend.size() > 1U){
 				Utility::duplicate_n_inplace(target, toAppend.size() - 1U);
 			}
-			for(size_t i = 0U; i < toAppend.size(); ++i){
-
+			for(size_t i = 0U; i < toAppend.size(); ++i)
+			{
+				for(auto it = target.begin(); it != (target.begin() + original_size); ++it)
+				{
+					const auto current_it = it + i * original_size;
+					current_it->multiplicity *= toAppend[i].multiplicity;
+					Utility::append_vector(current_it->operators, toAppend[i].operators);
+					Utility::append_vector(current_it->delta_momenta, toAppend[i].delta_momenta);
+					Utility::append_vector(current_it->delta_indizes, toAppend[i].delta_indizes);
+				}
 			}
 		};
 

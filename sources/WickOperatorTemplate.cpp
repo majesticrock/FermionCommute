@@ -3,6 +3,7 @@
 #include <iterator>
 #include "Momentum.hpp"
 #include "KroneckerDelta.hpp"
+#include "KroneckerDeltaUtility.hpp"
 
 namespace SymbolicOperators {
 	TemplateResult::TemplateResult(size_t initial_size, OperatorType operator_type, const Momentum& base_momentum)
@@ -51,6 +52,10 @@ namespace SymbolicOperators {
 				result.operation_on_range([&other](TemplateResult::SingleResult& res) { res.op.momentum = other.momentum; }, previous_size, previous_size);
 			}
 		}
+		for(auto& res : result.results){
+			remove_delta_is_one(res.index_deltas);
+			remove_delta_squared(res.index_deltas);
+		}
 		return result;
 	}
 	TemplateResult WickOperatorTemplate::_handle_num_type(const Operator& left, const Operator& right) const {
@@ -78,6 +83,10 @@ namespace SymbolicOperators {
 				result.add_index_delta_range(make_delta(left.indizes[i], indexComparison[i].base), 0U, previous_size);
 				result.add_index_delta_range(make_delta(right.indizes[i], indexComparison[i].other), 0U, previous_size);
 			}
+		}
+		for(auto& res : result.results){
+			remove_delta_is_one(res.index_deltas);
+			remove_delta_squared(res.index_deltas);
 		}
 		return result;
 	}
