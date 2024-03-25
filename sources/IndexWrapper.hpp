@@ -7,7 +7,7 @@ namespace SymbolicOperators {
 	// Returns true if the index represents a variable and false otherwise
 	// Example: If the index is SpinUp it is fixed, i.e., non-mutable
 	constexpr bool is_mutable(const Index idx) {
-		return (idx < 2);
+		return (idx > 1);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Index index);

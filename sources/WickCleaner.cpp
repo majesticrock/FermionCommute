@@ -1,28 +1,16 @@
 #include "WickTerm.hpp"
 #include <map>
-//#include "KroneckerDeltaUtility.hpp"
+#include "KroneckerDeltaUtility.hpp"
 
 namespace SymbolicOperators {
 	bool WickTerm::setDeltas()
 	{
-		 //remove_delta_squared(this->delta_indizes);
-		 //remove_delta_squared(this->delta_momenta);
-		 //remove_delta_is_one(this->delta_indizes);
-		 //remove_delta_is_one(this->delta_momenta);
+		//remove_delta_squared(this->delta_indizes);
+		//remove_delta_squared(this->delta_momenta);
 
 		// Erase delta_k,k etc
-		for (auto it = delta_momenta.begin(); it != delta_momenta.end();)
-		{
-			// k = k + Q can never be achieved
-			if (it->first.differsOnlyInQ(it->second)) return false;
-		
-			if (it->first == it->second) {
-				it = delta_momenta.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+		remove_delta_is_one(this->delta_indizes);
+		remove_delta_is_one(this->delta_momenta);
 
 		for (auto& delta : delta_momenta)
 		{
@@ -180,8 +168,6 @@ namespace SymbolicOperators {
 
 		//remove_delta_squared(this->delta_indizes);
 		//remove_delta_squared(this->delta_momenta);
-		//remove_delta_is_one(this->delta_indizes);
-		//remove_delta_is_one(this->delta_momenta);
 		// Remove delta^2
 		for (int i = 0; i < delta_momenta.size(); i++)
 		{
@@ -216,34 +202,10 @@ namespace SymbolicOperators {
 		}
 		
 		// Erase delta_k,k etc
-		for (auto it = delta_momenta.begin(); it != delta_momenta.end();)
-		{
-			// k = k + Q can never be achieved
-			if (it->first.differsOnlyInQ(it->second)) return false;
-		
-			if (it->first == it->second) {
-				it = delta_momenta.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+		remove_delta_is_one(this->delta_indizes);
+		remove_delta_is_one(this->delta_momenta);
 
-		//return !is_always_zero(this->delta_indizes);
-		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
-		{
-			// SpinUp can never be SpinDown and vice versa
-			if (it->first == SpinUp && it->second == SpinDown) return false;
-			if (it->first == SpinDown && it->second == SpinUp) return false;
-		
-			if (it->first == it->second) {
-				it = delta_indizes.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
-		return true;
+		return !(is_always_zero(this->delta_indizes) || is_always_zero(this->delta_momenta));
 	}
 
 	bool WickTerm::computeSums()

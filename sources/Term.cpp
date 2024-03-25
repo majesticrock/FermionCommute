@@ -179,69 +179,13 @@ namespace SymbolicOperators {
 			}
 		}
 
-		//remove_delta_squared(this->delta_indizes);
-		//remove_delta_squared(this->delta_momenta);
 		// Remove delta^2
-		for (int i = 0; i < delta_momenta.size(); i++)
-		{
-			for (int j = i + 1; j < delta_momenta.size(); j++)
-			{
-				if (delta_momenta[i] == delta_momenta[j]) {
-					delta_momenta.erase(delta_momenta.begin() + j);
-					--i;
-					break;
-				}
+		remove_delta_squared(this->delta_indizes);
+		remove_delta_squared(this->delta_momenta);
 		
-				auto delta_buffer = delta_momenta[j];
-				delta_buffer.first.flipMomentum();
-				delta_buffer.second.flipMomentum();
-				if (delta_momenta[i] == delta_buffer) {
-					delta_momenta.erase(delta_momenta.begin() + j);
-					--i;
-					break;
-				}
-			}
-		}
-		for (int i = 0; i < delta_indizes.size(); i++)
-		{
-			for (int j = i + 1; j < delta_indizes.size(); j++)
-			{
-				if (delta_indizes[i] == delta_indizes[j]) {
-					delta_indizes.erase(delta_indizes.begin() + j);
-					--i;
-					break;
-				}
-			}
-		}
-
-		//remove_delta_is_one(this->delta_indizes);
-		//remove_delta_is_one(this->delta_momenta);
 		// Erase delta_k,k etc
-		for (auto it = delta_momenta.begin(); it != delta_momenta.end();)
-		{
-			// k = k + Q can never be achieved
-			if (it->first.differsOnlyInQ(it->second)) return false;
-		
-			if (it->first == it->second) {
-				it = delta_momenta.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
-		for (auto it = delta_indizes.begin(); it != delta_indizes.end();)
-		{
-			// SpinUp can never be SpinDown and vice versa
-			if (it->first == SpinUp && it->second == SpinDown) return false;
-			if (it->first == SpinDown && it->second == SpinUp) return false;
-		
-			if (it->first == it->second) {
-				it = delta_indizes.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+		remove_delta_is_one(this->delta_indizes);
+		remove_delta_is_one(this->delta_momenta);
 		return true;
 	}
 
