@@ -7,8 +7,7 @@ namespace SymbolicOperators {
 	class Term {
 	private:
 		std::vector<Coefficient> coefficients;
-		MomentumSum sum_momenta;
-		IndexSum sum_indizes;
+		SumContainer sums;
 		std::vector<Operator> operators;
 		std::vector<KroneckerDelta<Momentum>> delta_momenta;
 		std::vector<KroneckerDelta<Index>> delta_indizes;
@@ -16,23 +15,23 @@ namespace SymbolicOperators {
 		friend struct WickTerm;
 	public:
 		int multiplicity;
-		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
-			const IndexSum& _sum_indizes, const std::vector<Operator>& _operators = std::vector<Operator>());
+		Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums, 
+			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_indizes,
+		Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_spins,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const MomentumSum& _sum_momenta, const IndexSum& _sum_indizes,
+		Term(int _multiplicity, const SumContainer& _sums, 
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const IndexSum& _sum_indizes,
+		Term(int _multiplicity, const IndexSum& _sum_spins,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		explicit Term(int _multiplicity,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term();
+		Term() = default;
 
 		inline bool isIdentity() const {
 			return this->operators.empty();
@@ -56,8 +55,7 @@ namespace SymbolicOperators {
 		// Checks for equality of everything except of multiplicity
 		inline bool isEqual(const Term& other) const {
 			if (this->coefficients != other.coefficients) return false;
-			if (this->sum_indizes != other.sum_indizes) return false;
-			if (this->sum_momenta != other.sum_momenta) return false;
+			if (this->sums != other.sums) return false;
 			if (this->delta_indizes != other.delta_indizes) return false;
 			if (this->delta_momenta != other.delta_momenta) return false;
 			if (this->operators != other.operators) return false;

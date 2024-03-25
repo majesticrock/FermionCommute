@@ -2,6 +2,7 @@
 
 #include "../../Utility/sources/VectorWrapper.hpp"
 #include "IndexWrapper.hpp"
+#include "../../Utility/sources/RangeUtility.hpp"
 
 namespace SymbolicOperators {
 	template<class SumIndex>
@@ -33,4 +34,33 @@ namespace SymbolicOperators {
 
 	typedef SymbolicSum<Index> IndexSum;
 	typedef SymbolicSum<char> MomentumSum;
+
+	struct SumContainer {
+		MomentumSum momenta;
+		IndexSum spins;
+
+		template<class Archive>
+		void serialize(Archive& ar, const unsigned int version) {
+			ar& this->momenta;
+			ar& this->spins;
+		};
+
+		inline SumContainer& append(const SumContainer& other) {
+			Utility::append_vector(this->momenta, other.momenta);
+			Utility::append_vector(this->spins, other.spins);
+			return *this;
+		}
+	};
+
+	inline bool operator==(const SumContainer& lhs, const SumContainer& rhs) {
+		return (lhs.momenta == rhs.momenta && lhs.spins == rhs.spins);
+	}
+	inline bool operator!=(const SumContainer& lhs, const SumContainer& rhs) {
+		return !(lhs == rhs);
+	}
+
+	inline std::ostream& operator<<(std::ostream& os, const SumContainer& sums) {
+		os << sums.momenta << sums.spins;
+		return os;
+	}
 }

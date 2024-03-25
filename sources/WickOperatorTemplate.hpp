@@ -20,9 +20,10 @@ namespace SymbolicOperators {
 			std::vector<KroneckerDelta<Index>> index_deltas;
 
 			inline void clear_delta_equals_one(){
-				std::remove_if(this->index_deltas.begin(), this->index_deltas.end(), [](const KroneckerDelta<Index>& delta){
+				auto new_end = std::remove_if(this->index_deltas.begin(), this->index_deltas.end(), [](const KroneckerDelta<Index>& delta){
 					return delta.first == delta.second;
 				});
+				this->index_deltas.erase(new_end, this->index_deltas.end());
 			};
 			inline bool contains_impossible_delta() const {
 				return std::any_of(this->index_deltas.begin(), this->index_deltas.end(), [](const KroneckerDelta<Index>& delta){
@@ -64,9 +65,10 @@ namespace SymbolicOperators {
 		}
 
 		inline void clear_impossible(){
-			std::remove_if(this->results.begin(), this->results.end(), [](const SingleResult& result){
+			auto new_end = std::remove_if(this->results.begin(), this->results.end(), [](const SingleResult& result){
 				return result.contains_impossible_delta();
 			});
+			this->results.erase(new_end, this->results.end());
 		};
 		inline void clean_up(){
 			for(auto& result : results){

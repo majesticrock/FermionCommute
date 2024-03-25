@@ -11,8 +11,7 @@ namespace SymbolicOperators {
 	{
 		int multiplicity{};
 		std::vector<Coefficient> coefficients;
-		MomentumSum sum_momenta;
-		IndexSum sum_indizes;
+		SumContainer sums;
 		std::vector<WickOperator> operators;
 
 		// symbolises the Kronecker delta
@@ -23,8 +22,7 @@ namespace SymbolicOperators {
 		void serialize(Archive& ar, const unsigned int version) {
 			ar& multiplicity;
 			ar& coefficients;
-			ar& sum_momenta;
-			ar& sum_indizes;
+			ar& sums;
 			ar& operators;
 			ar& delta_momenta;
 			ar& delta_indizes;
@@ -112,12 +110,9 @@ namespace SymbolicOperators {
 	};
 	inline bool operator==(const WickTerm& lhs, const WickTerm& rhs) {
 		if (lhs.coefficients != rhs.coefficients) return false;
-		if (lhs.sum_indizes != rhs.sum_indizes) return false;
-		if (lhs.sum_momenta != rhs.sum_momenta) return false;
-
+		if (lhs.sums != rhs.sums) return false;
 		if (lhs.delta_indizes != rhs.delta_indizes) return false;
 		if (lhs.delta_momenta != rhs.delta_momenta) return false;
-
 		if (lhs.operators != rhs.operators) return false;
 		return true;
 	};

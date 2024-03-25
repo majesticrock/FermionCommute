@@ -36,4 +36,10 @@ namespace SymbolicOperators {
 			}
 		}
 	}
+
+	inline bool is_always_zero(const std::vector<KroneckerDelta<Index>>& deltas) {
+		return std::any_of(deltas.begin(), deltas.end(), [](const KroneckerDelta<Index>& delta) {
+			return (delta.first != delta.second && (!is_mutable(delta.first) && !is_mutable(delta.second)));
+			});
+	}
 }

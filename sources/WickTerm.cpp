@@ -9,22 +9,19 @@
 
 namespace SymbolicOperators {
 	WickTerm::WickTerm(const Term* base)
-		: multiplicity(base->multiplicity), coefficients(base->coefficients), sum_momenta(base->sum_momenta),
-		sum_indizes(base->sum_indizes), operators(), delta_momenta(base->delta_momenta),
-		delta_indizes(base->delta_indizes), temporary_operators()
+		: multiplicity(base->multiplicity), coefficients(base->coefficients), sums(base->sums), operators(), 
+		delta_momenta(base->delta_momenta), delta_indizes(base->delta_indizes), temporary_operators()
 	{
 	}
 	WickTerm::WickTerm(const Term& base)
-		: multiplicity(base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta),
-		sum_indizes(base.sum_indizes), operators(), delta_momenta(base.delta_momenta),
-		delta_indizes(base.delta_indizes), temporary_operators()
+		: multiplicity(base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(), 
+		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
 	{
 	}
 
 	WickTerm::WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result)
-		: multiplicity(result.factor * base.multiplicity), coefficients(base.coefficients), sum_momenta(base.sum_momenta),
-		sum_indizes(base.sum_indizes), operators(base.operators), delta_momenta(base.delta_momenta),
-		delta_indizes(base.delta_indizes), temporary_operators()
+		: multiplicity(result.factor * base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(base.operators), 
+		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
 	{
 		this->operators.push_back(result.op);
 		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
@@ -273,16 +270,16 @@ namespace SymbolicOperators {
 			os << "+";
 		}
 		os << term.multiplicity << " \\cdot ";
-		if (!term.sum_indizes.empty()) {
+		if (!term.sums.spins.empty()) {
 			os << "\\sum_{ ";
-			for (const auto& index : term.sum_indizes) {
+			for (const auto& index : term.sums.spins) {
 				os << index << " ";
 			}
 			os << "}";
 		}
-		if (!term.sum_momenta.empty()) {
+		if (!term.sums.momenta.empty()) {
 			os << "\\sum_{ ";
-			for (const auto& momentum : term.sum_momenta) {
+			for (const auto& momentum : term.sums.momenta) {
 				os << momentum << " ";
 			}
 			os << "}";

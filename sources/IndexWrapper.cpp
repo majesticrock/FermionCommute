@@ -12,10 +12,10 @@ namespace SymbolicOperators {
 			os << "\\downarrow";
 			break;
 		case Sigma:
-			os << Sigma;
+			os << "\\sigma";
 			break;
 		case SigmaPrime:
-			os << SigmaPrime;
+			os << "\\sigma'";
 			break;
 		default:
 			os << "ERROR_INDEX";
