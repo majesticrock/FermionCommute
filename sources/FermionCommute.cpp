@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 		term_vec commute_with_H;
 		Term base_f(1, { c_minus_k, c_k });
 		commutator(commute_with_H, H_T, base_f);
-		//cleanUp(commute_with_H);
+		cleanUp(commute_with_H);
 		std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor({ base_f }) << " ] ="
 			<< commute_with_H << "\\end{align*}" << std::endl;
 
@@ -196,10 +196,8 @@ int main(int argc, char** argv) {
 		{
 			term_vec terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
-			std::cout << j << std::endl;
 			cleanUp(terms);
 
-			std::cout << j << std::endl;
 			//std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
 			//	<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
 
@@ -208,7 +206,6 @@ int main(int argc, char** argv) {
 				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
-			std::cout << j << std::endl;
 			//if (i > 9) {
 			//	std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
 			//	std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])

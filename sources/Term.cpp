@@ -1,6 +1,6 @@
 #include "Term.hpp"
 #include "../../Utility/sources/RangeUtility.hpp"
-//#include "KroneckerDeltaUtility.hpp"
+#include "KroneckerDeltaUtility.hpp"
 #include <sstream>
 
 namespace SymbolicOperators {
