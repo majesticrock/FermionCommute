@@ -30,6 +30,9 @@ std: build build/main ../commutators
 test: build build/main
 	./build/main test
 
+debug: build build/main
+	./build/main debug
+
 build/main: $(OBJS) | build
 	$(CXX) $(INCLUDEFLAGS) -o build/main $(OBJS) $(CXXFLAGS) $(LDLIBS)
 

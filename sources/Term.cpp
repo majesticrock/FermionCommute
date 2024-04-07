@@ -594,14 +594,13 @@ namespace SymbolicOperators {
 		}
 		os << term.multiplicity << " \\cdot ";
 		os << term.sums;
-
+		os << term.coefficients << " ";
 		for (const auto& delta : term.delta_momenta) {
 			os << delta;
 		}
 		for (const auto& delta : term.delta_indizes) {
 			os << delta;
 		}
-
 		if (term.isIdentity()) {
 			os << " \\mathbb{1} ";
 			return os;

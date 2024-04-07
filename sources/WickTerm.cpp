@@ -270,20 +270,7 @@ namespace SymbolicOperators {
 			os << "+";
 		}
 		os << term.multiplicity << " \\cdot ";
-		if (!term.sums.spins.empty()) {
-			os << "\\sum_{ ";
-			for (const auto& index : term.sums.spins) {
-				os << index << " ";
-			}
-			os << "}";
-		}
-		if (!term.sums.momenta.empty()) {
-			os << "\\sum_{ ";
-			for (const auto& momentum : term.sums.momenta) {
-				os << momentum << " ";
-			}
-			os << "}";
-		}
+		os << term.sums;
 		os << term.coefficients << " ";
 		for (const auto& delta : term.delta_momenta) {
 			os << "\\delta_{" << delta.first << ", " << delta.second << "} ";

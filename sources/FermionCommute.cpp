@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
 	}
 
 	const std::string name_prefix = std::strcmp(argv[1], "XP") == 0 ? "XP_" : "";
+	const bool debug = std::strcmp(argv[1], "debug") == 0;
 	std::vector<term_vec> basis;
 	if (std::strcmp(argv[1], "XP") == 0) {
 		basis = {
@@ -137,7 +138,7 @@ int main(int argc, char** argv) {
 			})
 		};
 	}
-	else {
+	else if (std::strcmp(argv[1], "std") == 0) {
 		basis = {
 			// f, f^+
 			std::vector<Term>({
@@ -176,21 +177,30 @@ int main(int argc, char** argv) {
 			}),
 		};
 	}
-
+	else if (debug) {
+		basis = {
+			// 0: f + f^+
+			std::vector<Term>({
+				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), c_k}))
+			})
+		};
+	}
 	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
 		renameMomenta(t, 'k', 'l');
+		if (debug) {
+			renameMomenta(t, 'x', 'y');
+		}
 	}
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
-		//std::cout << toStringWithoutPrefactor(basis[i]) << " &\\, and \\, " << toStringWithoutPrefactor(basis_daggered[i]) << " \\\\" << std::endl;
-		//continue;
 		term_vec commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
 		cleanUp(commute_with_H);
-		//std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
-		//	<< commute_with_H << "\\end{align*}" << std::endl;
+		if (debug)
+			std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
+				<< commute_with_H << "\\end{align*}" << std::endl;
 
 		for (size_t j = 0U; j < basis.size(); ++j)
 		{
@@ -198,21 +208,23 @@ int main(int argc, char** argv) {
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
 
-			//std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-			//	<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+			if (debug)
+				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
+					<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
 
 			std::vector<WickTerm> wicks;
 			for (const auto& term : terms) {
 				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
-			//if (i > 9) {
-			//	std::cout << "\\subsection{" << j << ", " << i << "}" << std::endl;
-			//	std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-			//		<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << wicks << "\\end{align*}" << std::endl;
-			//}
+
+			if (debug) {
+				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
+					<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << wicks << "\\end{align*}" << std::endl;
+			}
+
 			// serialization
-			{
+			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
 				std::ofstream ofs("../commutators/" + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
@@ -228,11 +240,12 @@ int main(int argc, char** argv) {
 				wicks_theorem(term, wicks);
 			}
 			cleanWicks(wicks);
-			//if (i > 9)
-			//	std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-			//	<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
+
+			if (debug)
+				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
+					<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
-			{
+			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
 				std::ofstream ofs("../commutators/" + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
