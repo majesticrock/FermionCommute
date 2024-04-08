@@ -165,7 +165,6 @@ namespace SymbolicOperators {
 			}
 		}
 
-
 		//remove_delta_squared(this->delta_indizes);
 		//remove_delta_squared(this->delta_momenta);
 		// Remove delta^2
@@ -178,7 +177,7 @@ namespace SymbolicOperators {
 					--i;
 					break;
 				}
-		
+
 				auto delta_buffer = delta_momenta[j];
 				delta_buffer.first.flipMomentum();
 				delta_buffer.second.flipMomentum();
@@ -200,7 +199,7 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-		
+
 		// Erase delta_k,k etc
 		remove_delta_is_one(this->delta_indizes);
 		remove_delta_is_one(this->delta_momenta);
@@ -507,7 +506,7 @@ namespace SymbolicOperators {
 		}
 	}
 
-	void clearEtas(std::vector<WickTerm>& terms)
+	void clearEtas(WickTermCollector& terms)
 	{
 		for (auto it = terms.begin(); it != terms.end();) {
 			bool isEta = false;
@@ -526,7 +525,7 @@ namespace SymbolicOperators {
 		}
 	}
 
-	void cleanWicks(std::vector<WickTerm>& terms)
+	void cleanWicks(WickTermCollector& terms)
 	{
 		// Assuming (for now) that all <eta> = 0
 		clearEtas(terms);
@@ -540,7 +539,7 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-		for (std::vector<WickTerm>::iterator it = terms.begin(); it != terms.end();) {
+		for (WickTermCollector::iterator it = terms.begin(); it != terms.end();) {
 			if (!(it->setDeltas())) {
 				it = terms.erase(it);
 				continue;

@@ -3,12 +3,19 @@
 #include "WickOperatorTemplate.hpp"
 #include <fstream>
 #include <sstream>
+#include "../../Utility/sources/LaTeXOutput.hpp"
 
 using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 
 int main(int argc, char** argv) {
+	if (argc < 2) {
+		std::cerr << "Which basis?" << std::endl;
+		return 1;
+	}
+	const std::string EXECUTION_TYPE = argv[1];
+
 	const Operator c_k('k', 1, false, SpinUp, false);
 	const Operator c_minus_k('k', -1, false, SpinDown, false);
 
@@ -45,41 +52,32 @@ int main(int argc, char** argv) {
 			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 			}));
 
-	const term_vec H = { H_T, H_U, H_V };//
+	const term_vec H = { H_T, H_U, H_V };// H_T, H_U, H_V };//
 
-	if (argc < 2) {
-		std::cerr << "Which basis?" << std::endl;
-		return 1;
-	}
-	if (std::strcmp(argv[1], "test") == 0) {
-		term_vec commute_with_H;
-		Term base_f(1, { c_minus_k, c_k });
-		commutator(commute_with_H, H_T, base_f);
-		cleanUp(commute_with_H);
-		std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor({ base_f }) << " ] ="
-			<< commute_with_H << "\\end{align*}" << std::endl;
+	const std::vector<WickOperatorTemplate> templates = {
+		WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
+		WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(momentum_pairs(), true), Eta_Type, true },
+		WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false },
+		WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_pairs(), true), CDW_Type, false }
+	};
 
-		const std::vector<WickOperatorTemplate> templates = {
-			WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_pairs(), true), CDW_Type, false }
-		};
+	if (EXECUTION_TYPE == "test") {
 		WickTerm wick;
 		wick.multiplicity = 1;
 		wick.temporary_operators = { c_minus_k_Q, c_k_Q, c_k_Q_dagger, c_k };
 		auto wick_results = identifyWickOperators(wick, templates);
-
-		std::cout << "Pre clean:  " << wick_results << std::endl;
+		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
+		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
 		cleanWicks(wick_results);
-		std::cout << "Post clean: " << wick_results << std::endl;
-
+		std::cout << "Post clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
 
 		return 0;
 	}
 
-	const std::string name_prefix = std::strcmp(argv[1], "XP") == 0 ? "XP_" : "";
-	const bool debug = std::strcmp(argv[1], "debug") == 0;
+	const std::string name_prefix = EXECUTION_TYPE == "XP" ? "XP_" : "";
+	const bool debug = EXECUTION_TYPE == "debug";
 	std::vector<term_vec> basis;
-	if (std::strcmp(argv[1], "XP") == 0) {
+	if (EXECUTION_TYPE == "XP") {
 		basis = {
 			// 0: f + f^+
 			std::vector<Term>({
@@ -138,7 +136,7 @@ int main(int argc, char** argv) {
 			})
 		};
 	}
-	else if (std::strcmp(argv[1], "std") == 0) {
+	else if (EXECUTION_TYPE == "STD") {
 		basis = {
 			// f, f^+
 			std::vector<Term>({
@@ -185,6 +183,7 @@ int main(int argc, char** argv) {
 			})
 		};
 	}
+
 	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
@@ -200,7 +199,7 @@ int main(int argc, char** argv) {
 		cleanUp(commute_with_H);
 		if (debug)
 			std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
-				<< commute_with_H << "\\end{align*}" << std::endl;
+			<< commute_with_H << "\\end{align*}" << std::endl;
 
 		for (size_t j = 0U; j < basis.size(); ++j)
 		{
@@ -210,12 +209,10 @@ int main(int argc, char** argv) {
 
 			if (debug)
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-					<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+				<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
 
-			std::vector<WickTerm> wicks;
-			for (const auto& term : terms) {
-				wicks_theorem(term, wicks);
-			}
+			WickTermCollector wicks;
+			wicks_theorem(terms, templates, wicks);
 			cleanWicks(wicks);
 
 			if (debug) {
@@ -236,14 +233,12 @@ int main(int argc, char** argv) {
 			wicks.clear();
 			commutator(terms, basis_daggered[j], basis[i]);
 			cleanUp(terms);
-			for (const auto& term : terms) {
-				wicks_theorem(term, wicks);
-			}
+			wicks_theorem(terms, templates, wicks);
 			cleanWicks(wicks);
 
 			if (debug)
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-					<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
+				<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
@@ -272,7 +267,7 @@ int main(int argc, char** argv) {
 	// create an input file stream and a text archive to deserialize the vector
 	std::ifstream ifs("wick_terms.txt");
 	boost::archive::text_iarchive ia(ifs);
-	std::vector<WickTerm> deserialized_terms;
+	WickTermCollector deserialized_terms;
 	ia >> deserialized_terms;
 	ifs.close();
 	*/

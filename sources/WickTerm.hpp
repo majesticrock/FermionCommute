@@ -6,6 +6,7 @@
 
 namespace SymbolicOperators {
 	class Term;
+	struct WickTermCollector;
 
 	struct WickTerm
 	{
@@ -82,7 +83,7 @@ namespace SymbolicOperators {
 			if (this->temporary_operators.empty()) return true;
 			return !(this->operators.empty());
 		}
-		bool swapToWickOperators(std::vector<WickTerm>& reciever);
+		bool swapToWickOperators(WickTermCollector& reciever);
 		// returns false if there is atleast one delta
 		// or a combination of deltas, that can never be achieved
 		// for example delta_k,k+Q, as k can never be equal to k+Q
@@ -120,13 +121,34 @@ namespace SymbolicOperators {
 		return !(lhs == rhs);
 	};
 
-	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever);
-	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template);
-	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates);
+	struct WickTermCollector : public Utility::VectorWrapper<WickTerm> {
+		template<class Archive>
+		void serialize(Archive& ar, const unsigned int version) {
+			ar& _vector;
+		};
+	};
 
-	void clearEtas(std::vector<WickTerm>& terms);
-	void cleanWicks(std::vector<WickTerm>& terms);
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTerm& rhs);
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTerm& rhs);
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTermCollector& rhs);
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTermCollector& rhs);
+	inline WickTermCollector operator+(WickTermCollector lhs, const WickTerm& rhs) { lhs += rhs; return lhs; };
+	inline WickTermCollector operator-(WickTermCollector lhs, const WickTerm& rhs) { lhs -= rhs; return lhs; };
+	inline WickTermCollector operator+(const WickTerm& lhs, WickTermCollector rhs) { rhs += lhs; return rhs; };
+	inline WickTermCollector operator-(const WickTerm& lhs, WickTermCollector rhs) { rhs -= lhs; return rhs; };
+	inline WickTermCollector operator+(WickTermCollector lhs, const WickTermCollector& rhs) { lhs += rhs; return lhs; };
+	inline WickTermCollector operator-(WickTermCollector lhs, const WickTermCollector& rhs) { lhs -= rhs; return lhs; };
+
+	// Sorts the operators in 'term' according to Wick's theorem within 'temporary_operators'
+	// Afterwards, these can be rewritten in terms of 'WickOperator's.
+	WickTermCollector prepare_wick(const std::vector<Term>& terms);
+	WickTermCollector identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates);
+	void wicks_theorem_old(const std::vector<Term>& terms, WickTermCollector& reciever);
+	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever);
+
+	void clearEtas(WickTermCollector& terms);
+	void cleanWicks(WickTermCollector& terms);
 
 	std::ostream& operator<<(std::ostream& os, const WickTerm& term);
-	std::ostream& operator<<(std::ostream& os, const std::vector<WickTerm>& terms);
+	std::ostream& operator<<(std::ostream& os, const WickTermCollector& terms);
 }

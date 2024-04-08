@@ -1,6 +1,9 @@
 #include "WickTerm.hpp"
 #include "../../Utility/sources/RangeUtility.hpp"
+#include "../../Utility/sources/MathFunctions.hpp"
+#include "KroneckerDeltaUtility.hpp"
 #include <variant>
+#include <numeric>
 
 #define LEFT temporary_operators[i]
 #define RIGHT temporary_operators[i + 1]
@@ -9,25 +12,25 @@
 
 namespace SymbolicOperators {
 	WickTerm::WickTerm(const Term* base)
-		: multiplicity(base->multiplicity), coefficients(base->coefficients), sums(base->sums), operators(), 
+		: multiplicity(base->multiplicity), coefficients(base->coefficients), sums(base->sums), operators(),
 		delta_momenta(base->delta_momenta), delta_indizes(base->delta_indizes), temporary_operators()
 	{
 	}
 	WickTerm::WickTerm(const Term& base)
-		: multiplicity(base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(), 
+		: multiplicity(base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(),
 		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
 	{
 	}
 
 	WickTerm::WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result)
-		: multiplicity(result.factor * base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(base.operators), 
+		: multiplicity(result.factor* base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(base.operators),
 		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
 	{
 		this->operators.push_back(result.op);
 		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
 	}
 
-	void wick_processor(const std::vector<Operator>& remaining, std::vector<WickTerm>& reciever_list, std::variant<WickTerm, Term> buffer)
+	void wick_processor(const std::vector<Operator>& remaining, WickTermCollector& reciever_list, std::variant<WickTerm, Term> buffer)
 	{
 		if (remaining.empty()) {
 			reciever_list.push_back(std::get<WickTerm>(buffer));
@@ -60,27 +63,71 @@ namespace SymbolicOperators {
 		}
 	}
 
-	void wicks_theorem(const Term& term, std::vector<WickTerm>& reciever)
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTerm& rhs)
 	{
-		//if (this->operators.size() > 4) throw std::length_error("Wick for n>4 not yet implemented!");
-		if (term.isIdentity()) {
-			reciever.push_back(WickTerm(term));
-		}
-		else {
-			std::vector<WickTerm> buffer_list;
-			{
-				size_t value = 1;
-				// Computes the double factorial; total number of products in wicks theorem = (2n - 1)!!
-				// Needs to stay signed in case of size() being 0
-				for (long n = 2 * term.getOperators().size() - 1; n > 0; n -= 2)
-				{
-					value *= n;
-				}
-				buffer_list.reserve(value);
+		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
+			if (*it == rhs) {
+				it->multiplicity += rhs.multiplicity;
+				if (it->multiplicity == 0)
+					lhs.erase(it);
+				return lhs;
 			}
-			wick_processor(term.getOperators(), buffer_list, term);
-			reciever.insert(reciever.end(), buffer_list.begin(), buffer_list.end());
 		}
+		lhs.push_back(rhs);
+		return lhs;
+	}
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTerm& rhs)
+	{
+		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
+			if (*it == rhs) {
+				it->multiplicity -= rhs.multiplicity;
+				if (it->multiplicity == 0)
+					lhs.erase(it);
+				return lhs;
+			}
+		}
+		lhs.push_back(rhs);
+		return lhs;
+	}
+
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTermCollector& rhs)
+	{
+		for (const auto& term : rhs) {
+			lhs += term;
+		}
+		return lhs;
+	}
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTermCollector& rhs)
+	{
+		for (const auto& term : rhs) {
+			lhs -= term;
+		}
+		return lhs;
+	}
+
+	WickTermCollector prepare_wick(const std::vector<Term>& terms)
+	{
+		WickTermCollector prepared_wick;
+		const size_t estimated_size = std::accumulate(terms.begin(), terms.end(), size_t{}, [](size_t current, const Term& term) {
+			return current + Utility::double_factorial(term.getOperators().size());
+			});
+
+		prepared_wick.reserve(estimated_size);
+		for (const auto& term : terms) {
+			if (term.isIdentity()) {
+				prepared_wick.push_back(WickTerm(term));
+			}
+			else {
+				wick_processor(term.getOperators(), prepared_wick, term);
+			}
+		}
+
+		return prepared_wick;
+	}
+
+	void wicks_theorem_old(const std::vector<Term>& terms, WickTermCollector& reciever)
+	{
+		reciever = prepare_wick(terms);
 
 		for (size_t i = 0U; i < reciever.size();)
 		{
@@ -97,72 +144,71 @@ namespace SymbolicOperators {
 		}
 	}
 
-	void WickTerm::includeTemplateResult(const TemplateResult::SingleResult& result){
+	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever)
+	{
+		WickTermCollector prepared_wick = prepare_wick(terms);
+
+		for (auto& w_term : prepared_wick) {
+			Utility::append_if(reciever, identifyWickOperators(w_term, operator_templates), [](const WickTerm& wick) {
+				return !(is_always_zero(wick.delta_indizes) || is_always_zero(wick.delta_momenta));
+				});
+		}
+	}
+
+	void WickTerm::includeTemplateResult(const TemplateResult::SingleResult& result) {
 		this->delta_indizes.insert(this->delta_indizes.begin(), result.index_deltas.begin(), result.index_deltas.end());
 		this->operators.push_back(result.op);
 		this->multiplicity *= result.factor;
 	}
 
-	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const WickOperatorTemplate& operator_template)
+	WickTermCollector identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates)
 	{
-		std::vector<WickTerm> ret(1U, WickTerm());
-		ret.front().multiplicity = source.multiplicity;
-		for (size_t i = 0U; i < source.temporary_operators.size(); i+=2U)
+		WickTermCollector ret;
+		ret.push_back(source);
+		ret.front().temporary_operators.clear();
+
+		for (size_t i = 0U; i < source.temporary_operators.size(); i += 2U)
 		{
-			const auto template_result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
+			std::vector<TemplateResult> template_results;
+			for (const auto& operator_template : operator_templates) {
+				auto template_result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
+				if (template_result)
+					template_results.push_back(std::move(template_result));
+			}
+
 			const size_t current_size = ret.size();
-			if(template_result.results.size() > 1U){
-				Utility::duplicate_n_inplace(ret, template_result.results.size() - 1U);
+			const size_t number_additional_elements = std::accumulate(template_results.begin(), template_results.end(), size_t{}, [](size_t current, const TemplateResult& tr) {
+				return current + tr.results.size();
+				});
+			if (number_additional_elements > 1U) {
+				Utility::duplicate_n_inplace(ret, number_additional_elements - 1U);
 			}
-			for(size_t template_result_it = 0U; template_result_it < template_result.results.size(); ++template_result_it){
-				for(auto it = ret.begin(); it != ret.begin() + current_size; ++it){
-					(it + template_result_it * current_size)->includeTemplateResult(template_result.results[template_result_it]);
+
+			size_t template_result_it{};
+			size_t old_it{};
+			for (const auto& tr : template_results) {
+				old_it = template_result_it;
+				for (const auto& tr_result : tr.results) {
+					for (auto it = ret.begin(); it != ret.begin() + current_size; ++it) {
+						(it + template_result_it * current_size)->includeTemplateResult(tr_result);
+					}
+					++template_result_it;
 				}
+				std::for_each(ret.begin() + old_it * current_size, ret.begin() + current_size * template_result_it, [&tr](WickTerm& ret_element) {
+					if (!tr.momentum_delta.isOne())
+						ret_element.delta_momenta.push_back(tr.momentum_delta);
+					});
 			}
-			std::for_each(ret.begin(), ret.end(), [&template_result](WickTerm& ret_element){
-				if(!template_result.momentum_delta.isOne())
-					ret_element.delta_momenta.push_back(template_result.momentum_delta);
-			});
 		}
+
 		return ret;
 	}
 
-	std::vector<WickTerm> identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates)
-	{
-		auto appender = [](std::vector<WickTerm>& target, const std::vector<WickTerm>& toAppend){
-			const size_t original_size = target.size();
-			if(toAppend.size() > 1U){
-				Utility::duplicate_n_inplace(target, toAppend.size() - 1U);
-			}
-			for(size_t i = 0U; i < toAppend.size(); ++i)
-			{
-				for(auto it = target.begin(); it != (target.begin() + original_size); ++it)
-				{
-					const auto current_it = it + i * original_size;
-					current_it->multiplicity *= toAppend[i].multiplicity;
-					Utility::append_vector(current_it->operators, toAppend[i].operators);
-					Utility::append_vector(current_it->delta_momenta, toAppend[i].delta_momenta);
-					Utility::append_vector(current_it->delta_indizes, toAppend[i].delta_indizes);
-				}
-			}
-		};
-
-		std::vector<WickTerm> ret;
-		for(const auto& operator_template : operator_templates){
-			if(ret.empty()){
-				ret = identifyWickOperators(source, operator_template);
-			} else {
-				appender(ret, identifyWickOperators(source, operator_template));
-			}
-		}
-		return ret;
-	}
-
-	bool WickTerm::swapToWickOperators(std::vector<WickTerm>& reciever)
+	bool WickTerm::swapToWickOperators(WickTermCollector& reciever)
 	{
 		this->operators.reserve(temporary_operators.size() / 2);
 		WickTerm this_copy = *this;
-		std::vector<WickTerm> these_copies;
+		WickTermCollector these_copies;
 		these_copies.push_back(*this);
 
 		auto setDeltas = [&](const Operator& left, const Operator& right, size_t index) {
@@ -247,10 +293,6 @@ namespace SymbolicOperators {
 					these_copies[j].operators.push_back(WickOperator(Number_Type, false, LEFT.momentum, LEFT.indizes));
 					this_copy.operators.push_back(these_copies[j].operators.back());
 					this_copy.operators.back().type = CDW_Type;
-					if (this_copy.operators.back().momentum.add_Q) {
-						this_copy.operators.back().momentum.add_Q = false;
-						this_copy.operators.back().isDaggered = true;
-					}
 				}
 				these_copies.push_back(this_copy);
 			}
@@ -288,9 +330,9 @@ namespace SymbolicOperators {
 		}
 		return os;
 	}
-	std::ostream& operator<<(std::ostream& os, const std::vector<WickTerm>& terms)
+	std::ostream& operator<<(std::ostream& os, const WickTermCollector& terms)
 	{
-		for (std::vector<WickTerm>::const_iterator it = terms.begin(); it != terms.end(); ++it)
+		for (WickTermCollector::const_iterator it = terms.begin(); it != terms.end(); ++it)
 		{
 			os << "\t&" << *it;
 			if (it != terms.end() - 1) {

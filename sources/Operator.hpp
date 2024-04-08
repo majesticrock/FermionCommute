@@ -29,4 +29,5 @@ namespace SymbolicOperators {
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Operator& op);
+	std::ostream& operator<<(std::ostream& os, const std::vector<Operator>& ops);
 }

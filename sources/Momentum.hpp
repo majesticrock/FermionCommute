@@ -68,7 +68,7 @@ namespace SymbolicOperators {
 				foundOne = false;
 				for (size_t j = 0U; j < rhs.momentum_list.size(); ++j)
 				{
-					if (this->momentum_list[i] == rhs.momentum_list[j]){
+					if (this->momentum_list[i] == rhs.momentum_list[j]) {
 						foundOne = true;
 						break;
 					}

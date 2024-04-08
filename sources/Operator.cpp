@@ -10,6 +10,14 @@ namespace SymbolicOperators {
 		return os;
 	}
 
+	std::ostream& operator<<(std::ostream& os, const std::vector<Operator>& ops)
+	{
+		for (const auto& op : ops) {
+			os << op;
+		}
+		return os;
+	}
+
 	Operator::Operator(const Momentum& _momentum, const IndexWrapper _indizes, bool _isDaggered)
 		: momentum(_momentum), indizes(_indizes), isDaggered(_isDaggered) {}
 

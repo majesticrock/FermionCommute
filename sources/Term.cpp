@@ -182,7 +182,7 @@ namespace SymbolicOperators {
 		// Remove delta^2
 		remove_delta_squared(this->delta_indizes);
 		remove_delta_squared(this->delta_momenta);
-		
+
 		// Erase delta_k,k etc
 		remove_delta_is_one(this->delta_indizes);
 		remove_delta_is_one(this->delta_momenta);

@@ -15,7 +15,7 @@ namespace SymbolicOperators {
 		friend struct WickTerm;
 	public:
 		int multiplicity;
-		Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums, 
+		Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
@@ -23,7 +23,7 @@ namespace SymbolicOperators {
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, Coefficient _coefficient,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const SumContainer& _sums, 
+		Term(int _multiplicity, const SumContainer& _sums,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term(int _multiplicity, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
@@ -50,7 +50,7 @@ namespace SymbolicOperators {
 		void sort();
 		// Unifies the sum indizes
 		void renameSums();
-		//void wick(std::vector<WickTerm>& reciever) const;
+		//void wick(WickTermCollector& reciever) const;
 
 		// Checks for equality of everything except of multiplicity
 		inline bool isEqual(const Term& other) const {
