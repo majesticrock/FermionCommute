@@ -63,48 +63,6 @@ namespace SymbolicOperators {
 		}
 	}
 
-	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTerm& rhs)
-	{
-		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
-			if (*it == rhs) {
-				it->multiplicity += rhs.multiplicity;
-				if (it->multiplicity == 0)
-					lhs.erase(it);
-				return lhs;
-			}
-		}
-		lhs.push_back(rhs);
-		return lhs;
-	}
-	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTerm& rhs)
-	{
-		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
-			if (*it == rhs) {
-				it->multiplicity -= rhs.multiplicity;
-				if (it->multiplicity == 0)
-					lhs.erase(it);
-				return lhs;
-			}
-		}
-		lhs.push_back(rhs);
-		return lhs;
-	}
-
-	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTermCollector& rhs)
-	{
-		for (const auto& term : rhs) {
-			lhs += term;
-		}
-		return lhs;
-	}
-	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTermCollector& rhs)
-	{
-		for (const auto& term : rhs) {
-			lhs -= term;
-		}
-		return lhs;
-	}
-
 	WickTermCollector prepare_wick(const std::vector<Term>& terms)
 	{
 		WickTermCollector prepared_wick;
@@ -123,25 +81,6 @@ namespace SymbolicOperators {
 		}
 
 		return prepared_wick;
-	}
-
-	void wicks_theorem_old(const std::vector<Term>& terms, WickTermCollector& reciever)
-	{
-		reciever = prepare_wick(terms);
-
-		for (size_t i = 0U; i < reciever.size();)
-		{
-			if (reciever[i].handled()) {
-				++i;
-				continue;
-			}
-			if (!(reciever[i].swapToWickOperators(reciever))) {
-				reciever.erase(reciever.begin() + i);
-			}
-			else {
-				++i;
-			}
-		}
 	}
 
 	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever)
@@ -204,108 +143,6 @@ namespace SymbolicOperators {
 		return ret;
 	}
 
-	bool WickTerm::swapToWickOperators(WickTermCollector& reciever)
-	{
-		this->operators.reserve(temporary_operators.size() / 2);
-		WickTerm this_copy = *this;
-		WickTermCollector these_copies;
-		these_copies.push_back(*this);
-
-		auto setDeltas = [&](const Operator& left, const Operator& right, size_t index) {
-			Momentum copy_momentum = left.momentum;
-			if (left.isDaggered == right.isDaggered) copy_momentum.flipMomentum();
-
-			for (size_t k = 1U; k < left.indizes.size(); ++k)
-			{
-				these_copies[index].delta_indizes.push_back(make_delta(left.indizes[k], right.indizes[k]));
-				this_copy.delta_indizes.push_back(these_copies[index].delta_indizes.back());
-			}
-
-			these_copies[index].delta_momenta.push_back(make_delta(copy_momentum, right.momentum));
-			copy_momentum.add_Q = !(copy_momentum.add_Q);
-			this_copy.delta_momenta.push_back(make_delta(copy_momentum, right.momentum));
-			};
-
-		for (size_t i = 0U; i < temporary_operators.size(); i += 2U)
-		{
-			size_t copies_size = these_copies.size();
-			for (size_t j = 0U; j < copies_size; ++j)
-			{
-				this_copy = these_copies[j];
-				if (LEFT.isDaggered == RIGHT.isDaggered) {
-					if (L_SPIN == R_SPIN) return false;
-					if (LEFT.isDaggered) { // c^+ c^+
-						if (L_SPIN == SpinDown) {
-							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
-						}
-						if (L_SPIN != SpinUp) {
-							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, SpinUp));
-							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
-						}
-						if (R_SPIN != SpinDown) {
-							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, SpinDown));
-							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
-						}
-						// Due to the dagger we need to swap left and right
-						setDeltas(RIGHT, LEFT, j);
-
-						these_copies[j].operators.push_back(WickOperator(SC_Type, true, LEFT.momentum));
-						if (LEFT.indizes.size() > 1) {
-							these_copies[j].operators.back().indizes = std::vector<Index>(LEFT.indizes.begin() + 1, LEFT.indizes.end());
-						}
-						this_copy.operators.push_back(these_copies[j].operators.back());
-						this_copy.operators.back().type = Eta_Type;
-					}
-					else { // cc
-						if (L_SPIN == SpinUp) {
-							throw std::invalid_argument("c^+ c^+: Left spin is down while right isn't. Did you forget to sort the terms?");
-						}
-						if (L_SPIN != SpinDown) {
-							these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, SpinDown));
-							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
-						}
-						if (R_SPIN != SpinUp) {
-							these_copies[j].delta_indizes.push_back(make_delta(R_SPIN, SpinUp));
-							this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
-						}
-						setDeltas(LEFT, RIGHT, j);
-
-						these_copies[j].operators.push_back(WickOperator(SC_Type, false, RIGHT.momentum));
-						if (RIGHT.indizes.size() > 1) {
-							these_copies[j].operators.back().indizes = std::vector<Index>(RIGHT.indizes.begin() + 1, RIGHT.indizes.end());
-						}
-						this_copy.operators.push_back(these_copies[j].operators.back());
-						this_copy.operators.back().type = Eta_Type;
-					}
-				}
-				else {
-					// c^+ c
-					if (L_SPIN == SpinUp && R_SPIN == SpinDown) return false;
-					if (L_SPIN == SpinDown && R_SPIN == SpinUp) return false;
-
-					if (L_SPIN != R_SPIN) {
-						these_copies[j].delta_indizes.push_back(make_delta(L_SPIN, R_SPIN));
-						this_copy.delta_indizes.push_back(these_copies[j].delta_indizes.back());
-					}
-					// Left and right are swapped due to the definition of g
-					setDeltas(RIGHT, LEFT, j);
-
-					these_copies[j].operators.push_back(WickOperator(Number_Type, false, LEFT.momentum, LEFT.indizes));
-					this_copy.operators.push_back(these_copies[j].operators.back());
-					this_copy.operators.back().type = CDW_Type;
-				}
-				these_copies.push_back(this_copy);
-			}
-		}
-		delta_indizes = these_copies.back().delta_indizes;
-		delta_momenta = these_copies.back().delta_momenta;
-		this->operators = these_copies.back().operators;
-		these_copies.pop_back();
-
-		reciever.insert(reciever.end(), these_copies.begin(), these_copies.end());
-		return true;
-	}
-
 	std::ostream& operator<<(std::ostream& os, const WickTerm& term)
 	{
 		if (term.multiplicity > 0) {
@@ -341,5 +178,46 @@ namespace SymbolicOperators {
 			os << "\n";
 		}
 		return os;
+	}
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTerm& rhs)
+	{
+		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
+			if (*it == rhs) {
+				it->multiplicity += rhs.multiplicity;
+				if (it->multiplicity == 0)
+					lhs.erase(it);
+				return lhs;
+			}
+		}
+		lhs.push_back(rhs);
+		return lhs;
+	}
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTerm& rhs)
+	{
+		for (auto it = lhs.begin(); it != lhs.end(); ++it) {
+			if (*it == rhs) {
+				it->multiplicity -= rhs.multiplicity;
+				if (it->multiplicity == 0)
+					lhs.erase(it);
+				return lhs;
+			}
+		}
+		lhs.push_back(rhs);
+		return lhs;
+	}
+
+	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTermCollector& rhs)
+	{
+		for (const auto& term : rhs) {
+			lhs += term;
+		}
+		return lhs;
+	}
+	WickTermCollector& operator-=(WickTermCollector& lhs, const WickTermCollector& rhs)
+	{
+		for (const auto& term : rhs) {
+			lhs -= term;
+		}
+		return lhs;
 	}
 }

@@ -6,8 +6,6 @@
 
 namespace SymbolicOperators {
 	class Term;
-	struct WickTermCollector;
-
 	struct WickTerm
 	{
 		int multiplicity{};
@@ -83,7 +81,7 @@ namespace SymbolicOperators {
 			if (this->temporary_operators.empty()) return true;
 			return !(this->operators.empty());
 		}
-		bool swapToWickOperators(WickTermCollector& reciever);
+
 		// returns false if there is atleast one delta
 		// or a combination of deltas, that can never be achieved
 		// for example delta_k,k+Q, as k can never be equal to k+Q
@@ -143,7 +141,6 @@ namespace SymbolicOperators {
 	// Afterwards, these can be rewritten in terms of 'WickOperator's.
 	WickTermCollector prepare_wick(const std::vector<Term>& terms);
 	WickTermCollector identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates);
-	void wicks_theorem_old(const std::vector<Term>& terms, WickTermCollector& reciever);
 	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever);
 
 	void clearEtas(WickTermCollector& terms);
