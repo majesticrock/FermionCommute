@@ -15,22 +15,25 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	const std::string EXECUTION_TYPE = argv[1];
+	const Momentum base_k = Momentum(momentum_pairs{ {1, 'k'} }, false);
+	const Momentum base_k_Q = Momentum(momentum_pairs{ {1, 'k'} }, true);
+	const Momentum base_x = Momentum(momentum_pairs{ {1, 'x'} }, false);
 
-	const Operator c_k('k', 1, false, SpinUp, false);
-	const Operator c_minus_k('k', -1, false, SpinDown, false);
+	const Operator c_k(base_k, SpinUp, false);
+	const Operator c_minus_k(-base_k, SpinDown, false);
 
-	const Operator c_k_dagger('k', 1, false, SpinUp, true);
-	const Operator c_minus_k_dagger('k', -1, false, SpinDown, true);
+	const Operator c_k_dagger(base_k, SpinUp, true);
+	const Operator c_minus_k_dagger(-base_k, SpinDown, true);
 
-	const Operator c_k_Q('k', 1, true, SpinUp, false);
-	const Operator c_minus_k_Q('k', -1, true, SpinDown, false);
+	const Operator c_k_Q(base_k_Q, SpinUp, false);
+	const Operator c_minus_k_Q(-base_k_Q, SpinDown, false);
 
-	const Operator c_k_Q_dagger('k', 1, true, SpinUp, true);
-	const Operator c_minus_k_Q_dagger('k', -1, true, SpinDown, true);
+	const Operator c_k_Q_dagger(base_k_Q, SpinUp, true);
+	const Operator c_minus_k_Q_dagger(-base_k_Q, SpinDown, true);
 
 	// transversal magnon
-	const Operator c_k_Q_down_dagger('k', 1, true, SpinDown, true);
-	const Operator c_k_Q_down('k', 1, true, SpinDown, false);
+	const Operator c_k_Q_down_dagger(base_k_Q, SpinDown, true);
+	const Operator c_k_Q_down(base_k_Q, SpinDown, false);
 
 	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), SumContainer{ MomentumSum({ 'q' }), Sigma },
 		op_vec({
