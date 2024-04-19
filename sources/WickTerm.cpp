@@ -1,6 +1,6 @@
 #include "WickTerm.hpp"
 #include "../../Utility/sources/RangeUtility.hpp"
-#include "../../Utility/sources/MathFunctions.hpp"
+#include "../../Utility/sources/Numerics/MathFunctions.hpp"
 #include "KroneckerDeltaUtility.hpp"
 #include <variant>
 #include <numeric>
@@ -67,7 +67,7 @@ namespace SymbolicOperators {
 	{
 		WickTermCollector prepared_wick;
 		const size_t estimated_size = std::accumulate(terms.begin(), terms.end(), size_t{}, [](size_t current, const Term& term) {
-			return current + Utility::double_factorial(term.getOperators().size());
+			return current + Utility::Numerics::double_factorial(term.getOperators().size());
 			});
 
 		prepared_wick.reserve(estimated_size);
