@@ -1,9 +1,7 @@
-#include "Term.hpp"
-#include "WickTerm.hpp"
-#include "WickOperatorTemplate.hpp"
 #include <fstream>
 #include <sstream>
 #include "../../Utility/sources/LaTeXOutput.hpp"
+#include "Definitions/HubbardDefinitions.hpp"
 
 using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
@@ -15,15 +13,9 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	const std::string EXECUTION_TYPE = argv[1];
-	const Momentum base_k = Momentum(momentum_pairs{ {1, 'k'} }, false);
+
 	const Momentum base_k_Q = Momentum(momentum_pairs{ {1, 'k'} }, true);
 	const Momentum base_x = Momentum(momentum_pairs{ {1, 'x'} }, false);
-
-	const Operator c_k(base_k, SpinUp, false);
-	const Operator c_minus_k(-base_k, SpinDown, false);
-
-	const Operator c_k_dagger(base_k, SpinUp, true);
-	const Operator c_minus_k_dagger(-base_k, SpinDown, true);
 
 	const Operator c_k_Q(base_k_Q, SpinUp, false);
 	const Operator c_minus_k_Q(-base_k_Q, SpinDown, false);
@@ -55,7 +47,7 @@ int main(int argc, char** argv) {
 			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 			}));
 
-	const term_vec H = { H_T, H_U, H_V };// H_T, H_U, H_V };//
+	const term_vec H = { H_T, H_U, H_V };
 
 	const std::vector<WickOperatorTemplate> templates = {
 		WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
