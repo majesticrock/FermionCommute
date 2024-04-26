@@ -1,13 +1,6 @@
 #include "Momentum.hpp"
 
 namespace SymbolicOperators {
-	Momentum::Momentum()
-		: momentum_list(), add_Q(false) {}
-	Momentum::Momentum(const char value, int plus_minus, bool Q)
-		: momentum_list(1, std::make_pair(plus_minus, value)), add_Q(Q) {}
-	Momentum::Momentum(const momentum_pairs& _momenta, bool Q)
-		: momentum_list(_momenta), add_Q(Q) {}
-
 	void Momentum::sort()
 	{
 		for (size_t i = 0U; i < momentum_list.size(); ++i)
@@ -91,6 +84,27 @@ namespace SymbolicOperators {
 				this->momentum_list.erase(momentum_list.begin() + i);
 
 				(*this) += buffer;
+			}
+		}
+	}
+
+	void Momentum::remove_zeros()
+	{
+		for (auto it = momentum_list.begin(); it != momentum_list.end();) {
+			if (it->first == 0) {
+				it = momentum_list.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+	}
+
+	void Momentum::flip_single(char momentum)
+	{
+		for (auto& momentum_pair : momentum_list) {
+			if (momentum_pair.second == momentum) {
+				momentum_pair.first *= -1;
 			}
 		}
 	}

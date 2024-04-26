@@ -1,7 +1,9 @@
 #include <fstream>
 #include <sstream>
 #include "../../Utility/sources/LaTeXOutput.hpp"
-#include "Definitions/HubbardDefinitions.hpp"
+#include "Definitions/Hubbard.hpp"
+#include "WickTerm.hpp"
+#include <memory>
 
 using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
@@ -14,52 +16,16 @@ int main(int argc, char** argv) {
 	}
 	const std::string EXECUTION_TYPE = argv[1];
 
-	const Momentum base_k_Q = Momentum(momentum_pairs{ {1, 'k'} }, true);
-	const Momentum base_x = Momentum(momentum_pairs{ {1, 'x'} }, false);
+	const std::unique_ptr<StandardOperators> model = std::make_unique<Hubbard>();
 
-	const Operator c_k_Q(base_k_Q, SpinUp, false);
-	const Operator c_minus_k_Q(-base_k_Q, SpinDown, false);
-
-	const Operator c_k_Q_dagger(base_k_Q, SpinUp, true);
-	const Operator c_minus_k_Q_dagger(-base_k_Q, SpinDown, true);
-
-	// transversal magnon
-	const Operator c_k_Q_down_dagger(base_k_Q, SpinDown, true);
-	const Operator c_k_Q_down(base_k_Q, SpinDown, false);
-
-	const Term H_T(1, Coefficient("\\epsilon_0", 'q'), SumContainer{ MomentumSum({ 'q' }), Sigma },
-		op_vec({
-			Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
-			}));
-
-	const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), op_vec({
-		Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
-		Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SpinDown, false),
-		Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), SpinUp, false),
-		}));
-
-	const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true),
-		SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
-		op_vec({
-			Operator('r', 1, false, Sigma, true),
-			Operator('p', 1, false, SigmaPrime, true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SigmaPrime, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
-			}));
-
-	const term_vec H = { H_T, H_U, H_V };
-
-	const std::vector<WickOperatorTemplate> templates = {
-		WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
-		WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(momentum_pairs(), true), Eta_Type, true },
-		WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false },
-		WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_pairs(), true), CDW_Type, false }
-	};
+	const term_vec H = model->hamiltonian();
+	const std::vector<WickOperatorTemplate> templates = model->templates();
 
 	if (EXECUTION_TYPE == "test") {
 		WickTerm wick;
 		wick.multiplicity = 1;
-		wick.temporary_operators = { c_minus_k_Q, c_k_Q, c_k_Q_dagger, c_k };
+		wick.temporary_operators = { Hubbard::c_minus_k_Q, Hubbard::c_k_Q,
+			Hubbard::c_k_Q_dagger, StandardOperators::c_k };
 		auto wick_results = identifyWickOperators(wick, templates);
 		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
 		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
@@ -73,108 +39,16 @@ int main(int argc, char** argv) {
 	const bool debug = EXECUTION_TYPE == "debug";
 	std::vector<term_vec> basis;
 	if (EXECUTION_TYPE == "XP") {
-		basis = {
-			// 0: f + f^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k, c_k })),
-				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-			}),
-			// 1: eta + eta^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_Q, c_k })),
-				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-			}),
-			// 2/3: g_up/down +
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q })),
-				Term(1, std::vector<Operator>({ c_k_Q_dagger, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-				Term(1, std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-			}),
-			// 4: transversal magnon, hermitian
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q_down })),
-				Term(1, std::vector<Operator>({ c_k_Q_down_dagger, c_k }))
-			}),
-			// 5/6: n_up/down
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
-			}),
-			// 7: f - f^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k, c_k })),
-				Term(-1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-			}),
-			// 8: eta - eta^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_Q, c_k })),
-				Term(-1, std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-			}),
-			// 9/10: g_up/down -
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q })),
-				Term(-1, std::vector<Operator>({ c_k_Q_dagger, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q })),
-				Term(-1, std::vector<Operator>({ c_minus_k_Q_dagger, c_minus_k }))
-			}),
-			// 11: transversal magnon, antihermitian
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q_down })),
-				Term(-1, std::vector<Operator>({ c_k_Q_down_dagger, c_k }))
-			})
-		};
+		basis = model->XP_basis();
 	}
 	else if (EXECUTION_TYPE == "STD") {
-		basis = {
-			// f, f^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-			}),
-			// n_up/down
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
-			}),
-			// g_up/down
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
-			}),
-			// eta, eta^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_minus_k_Q, c_k }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
-			}),
-			// transversal magnon
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q_down }))
-			}),
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_Q_down_dagger, c_k }))
-			}),
-		};
+		basis = model->STD_basis();
 	}
 	else if (debug) {
 		basis = {
 			// 0: f + f^+
 			std::vector<Term>({
-				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), c_k}))
+				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), StandardOperators::c_k}))
 			})
 		};
 	}

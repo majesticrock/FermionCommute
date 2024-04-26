@@ -153,7 +153,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				coeff.momenta.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
 			for (auto& delta2 : delta_momenta) {
 				if (delta2 == delta) continue;
@@ -235,7 +235,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(replaceWhat, replaceWith);
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(replaceWhat, replaceWith);
+				coeff.momenta.replaceOccurances(replaceWhat, replaceWith);
 			}
 			for (auto it = delta_momenta.begin(); it != delta_momenta.end();) {
 				it->first.replaceOccurances(replaceWhat, replaceWith);
@@ -287,38 +287,28 @@ namespace SymbolicOperators {
 
 	void Term::discardZeroMomenta() {
 		for (auto& op : operators) {
-			for (auto it = op.momentum.momentum_list.begin(); it != op.momentum.momentum_list.end();) {
-				if (it->first == 0) {
-					it = op.momentum.momentum_list.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
+			op.momentum.remove_zeros();
 		}
 		for (auto& coeff : coefficients) {
-			for (auto it = coeff.momentum.momentum_list.begin(); it != coeff.momentum.momentum_list.end();) {
-				if (it->first == 0) {
-					it = coeff.momentum.momentum_list.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
+			coeff.momenta.remove_zeros();
 		}
 	}
 
 	void Term::sort()
 	{
 		for (auto& coeff : coefficients) {
-			if (coeff.translationalInvariance && coeff.momentum.momentum_list.size() > 0) {
-				if (coeff.momentum.momentum_list[0].first < 0) {
-					coeff.momentum.flipMomentum();
+			for (auto& momentum : coeff.momenta) {
+				momentum.sort();
+
+				if (coeff.translationalInvariance && !momentum.momentum_list.empty()) {
+					if (momentum.momentum_list[0].first < 0) {
+						momentum.flipMomentum();
+					}
 				}
-			}
-			if (coeff.Q_changes_sign && coeff.momentum.add_Q) {
-				coeff.momentum.add_Q = false;
-				flipSign();
+				if (coeff.Q_changes_sign && momentum.add_Q) {
+					momentum.add_Q = false;
+					flipSign();
+				}
 			}
 		}
 
@@ -377,9 +367,12 @@ namespace SymbolicOperators {
 		}
 
 		// check whether we can swap the sign of each momentum in the coefficients
+		// 26.04.2024, I have no idea what I did here, nor do I know why I did what I did
 		for (const auto& coeff : coefficients) {
 			if (!(coeff.translationalInvariance)) return;
-			if (coeff.momentum.momentum_list.size() > 1) return;
+			if (std::any_of(coeff.momenta.begin(), coeff.momenta.end(), [](Momentum const& momentum) {
+				return momentum.momentum_list.size() > 1U;
+				})) return;
 		}
 
 		for (const auto& sum_mom : sums.momenta) {
@@ -417,7 +410,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
+				coeff.momenta.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
 			}
 			sums.momenta[i] = name_list[i];
 		}
@@ -428,7 +421,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
+				coeff.momenta.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
 			}
 		}
 

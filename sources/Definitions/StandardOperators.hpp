@@ -2,13 +2,23 @@
 
 #include "../Momentum.hpp"
 #include "../Operator.hpp"
+#include "../Term.hpp"
+#include "../WickOperatorTemplate.hpp"
 
-namespace SymbolicOperators{
-    inline const Momentum base_k(momentum_pairs{ {1, 'k'} }, false);
+namespace SymbolicOperators {
+	struct StandardOperators {
+		static const Momentum base_k;
+		static const Momentum base_x;
 
-	inline const Operator c_k(base_k, SpinUp, false);
-	inline const consttexpr Operator c_minus_k(-base_k, SpinDown, false);
+		static const Operator c_k; // c_{k up}
+		static const Operator c_minus_k; // c_{-k down}
 
-    inline const Operator c_k_dagger(base_k, SpinUp, true);
-	inline const Operator c_minus_k_dagger(-base_k, SpinDown, true);
+		static const Operator c_k_dagger; // c_{k up}^+
+		static const Operator c_minus_k_dagger; // c_{-k down}^+
+
+		virtual std::vector<Term> hamiltonian() const = 0;
+		virtual std::vector<WickOperatorTemplate> templates() const = 0;
+		virtual std::vector<std::vector<Term>> XP_basis() const = 0;
+		virtual std::vector<std::vector<Term>> STD_basis() const = 0;
+	};
 }

@@ -16,7 +16,18 @@ namespace SymbolicOperators {
 
 		inline void hermitianConjugate() {
 			this->isDaggered = !(this->isDaggered);
-		}
+		};
+		inline Operator with_momentum(Momentum const& new_momentum) const {
+			Operator ret{ *this };
+			ret.momentum = new_momentum;
+			return ret;
+		};
+		inline Operator with_momentum(char new_momentum) const {
+			assert(this->momentum.momentum_list.size() == 1);
+			Operator ret{ *this };
+			ret.momentum.momentum_list.front().second = new_momentum;
+			return ret;
+		};
 	};
 
 	inline bool operator==(const Operator& lhs, const Operator& rhs) {

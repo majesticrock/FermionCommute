@@ -18,9 +18,11 @@ namespace SymbolicOperators {
 			ar& add_Q;
 		}
 
-		Momentum();
-		explicit Momentum(const char value, int plus_minus = 1, bool Q = false);
-		explicit Momentum(const momentum_pairs& _momenta, bool Q = false);
+		Momentum() : momentum_list(), add_Q(false) {};
+		explicit Momentum(const char value, int plus_minus = 1, bool Q = false)
+			: momentum_list(1, std::make_pair(plus_minus, value)), add_Q(Q) {};
+		explicit Momentum(const momentum_pairs& _momenta, bool Q = false)
+			: momentum_list(_momenta), add_Q(Q) {};
 
 		void sort();
 
@@ -40,7 +42,7 @@ namespace SymbolicOperators {
 			(*this) *= factor;
 		};
 		inline void flipMomentum() {
-			multiplyMomentum(-1);
+			(*this) *= -1;
 		};
 		// Returns the position in the momentum_list array of the momentum given in <value>
 		// Return -1 if the value is not contained in momentum_list
@@ -58,6 +60,11 @@ namespace SymbolicOperators {
 
 		void addInPlace(const Momentum& rhs);
 		void replaceOccurances(const char replaceWhat, const Momentum& replaceWith);
+
+		// removes entries within the momentum_list that have a 0 prefactor
+		void remove_zeros();
+		// replaces 'momentum' with -'momentum' if it exists within momentum_list
+		void flip_single(char momentum);
 
 		inline bool operator==(const Momentum& rhs) const {
 			if (this->add_Q != rhs.add_Q) return false;

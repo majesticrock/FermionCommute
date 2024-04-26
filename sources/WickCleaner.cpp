@@ -139,7 +139,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				coeff.momenta.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 			}
 			for (auto& delta2 : delta_momenta) {
 				if (delta2 == delta) continue;
@@ -262,7 +262,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(replaceWhat, replaceWith);
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(replaceWhat, replaceWith);
+				coeff.momenta.replaceOccurances(replaceWhat, replaceWith);
 			}
 			for (auto it = delta_momenta.begin(); it != delta_momenta.end();) {
 				it->first.replaceOccurances(replaceWhat, replaceWith);
@@ -313,24 +313,10 @@ namespace SymbolicOperators {
 	void WickTerm::discardZeroMomenta()
 	{
 		for (auto& op : operators) {
-			for (auto it = op.momentum.momentum_list.begin(); it != op.momentum.momentum_list.end();) {
-				if (it->first == 0) {
-					it = op.momentum.momentum_list.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
+			op.momentum.remove_zeros();
 		}
 		for (auto& coeff : coefficients) {
-			for (auto it = coeff.momentum.momentum_list.begin(); it != coeff.momentum.momentum_list.end();) {
-				if (it->first == 0) {
-					it = coeff.momentum.momentum_list.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
+			coeff.momenta.remove_zeros();
 		}
 	}
 
@@ -349,7 +335,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
+				coeff.momenta.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
 			}
 			sums.momenta[i] = name_list[i];
 		}
@@ -360,7 +346,7 @@ namespace SymbolicOperators {
 				op.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
 			}
 			for (auto& coeff : coefficients) {
-				coeff.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
+				coeff.momenta.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
 			}
 		}
 
@@ -381,8 +367,8 @@ namespace SymbolicOperators {
 					op2.momentum.replaceOccurances(buffer_list[0], Momentum(sum));
 				}
 				for (auto& coeff : coefficients) {
-					coeff.momentum.replaceOccurances(sum, buffer);
-					coeff.momentum.replaceOccurances(buffer_list[0], Momentum(sum));
+					coeff.momenta.replaceOccurances(sum, buffer);
+					coeff.momenta.replaceOccurances(buffer_list[0], Momentum(sum));
 				}
 			}
 		}
@@ -410,7 +396,7 @@ namespace SymbolicOperators {
 					op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 				}
 				for (auto& coeff : coefficients) {
-					coeff.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+					coeff.momenta.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
 				}
 			}
 		}
@@ -422,9 +408,9 @@ namespace SymbolicOperators {
 			}
 		}
 
-		for (int i = 0; i < operators.size(); i++)
+		for (int i = 0U; i < operators.size(); ++i)
 		{
-			for (int j = i + 1; j < operators.size(); j++)
+			for (int j = i + 1U; j < operators.size(); ++j)
 			{
 				if (operators[i].type > operators[j].type) {
 					std::swap(operators[i], operators[j]);
@@ -443,32 +429,33 @@ namespace SymbolicOperators {
 		}
 
 		for (auto& coeff : coefficients) {
-			coeff.momentum.sort();
-			if (coeff.translationalInvariance && coeff.momentum.momentum_list.size() > 0) {
-				if (coeff.momentum.momentum_list[0].first < 0) {
-					coeff.momentum.flipMomentum();
+			for (auto& momentum : coeff.momenta) {
+				momentum.sort();
+
+				if (coeff.translationalInvariance && !momentum.momentum_list.empty()) {
+					if (momentum.momentum_list[0].first < 0) {
+						momentum.flipMomentum();
+					}
+				}
+				if (coeff.Q_changes_sign && momentum.add_Q) {
+					momentum.add_Q = false;
+					this->multiplicity *= -1;
 				}
 			}
-			if (coeff.Q_changes_sign && coeff.momentum.add_Q) {
-				coeff.momentum.add_Q = false;
-				this->multiplicity *= -1;
-			}
+		}
 
-			for (const auto& sum : sums.momenta) {
-				int idx = coeff.momentum.isUsed(sum);
-				if (idx < 0) continue;
+		for (auto& coeff : coefficients) {
+			for (auto& momentum : coeff.momenta) {
+				for (const auto& sum : sums.momenta) {
+					int idx = momentum.isUsed(sum);
+					if (idx < 0) continue;
 
-				if (coeff.momentum.momentum_list[idx].first < 0) {
-					for (auto& op : operators) {
-						for (auto& mom : op.momentum.momentum_list)
-						{
-							if (mom.second == sum) mom.first *= -1;
+					if (momentum.momentum_list[idx].first < 0) {
+						for (auto& op : operators) {
+							op.momentum.flip_single(sum);
 						}
-					}
-					for (auto& coeff2 : coefficients) {
-						for (auto& mom : coeff2.momentum.momentum_list)
-						{
-							if (mom.second == sum) mom.first *= -1;
+						for (auto& coeff2 : coefficients) {
+							coeff2.momenta.flip_single(sum);
 						}
 					}
 				}
