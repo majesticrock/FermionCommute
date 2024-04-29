@@ -18,15 +18,13 @@ SRCS=$(PART_SRCS) $(DEF_SRCS) FermionCommute.cpp
 
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
 
-all: build build/main ../commutators
-	./build/main XP
-	./build/main std
+all: build build/main ../commutators XP std
 
 XP: build build/main ../commutators
-	./build/main XP
+	./build/main XP hubbard
 
 std: build build/main ../commutators
-	./build/main std
+	./build/main std hubbard
 
 test: build build/main
 	./build/main test

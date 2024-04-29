@@ -2,31 +2,41 @@
 #include <sstream>
 #include "../../Utility/sources/LaTeXOutput.hpp"
 #include "Definitions/Hubbard.hpp"
+#include "Definitions/Continuum.hpp"
 #include "WickTerm.hpp"
 #include <memory>
+#include <filesystem>
 
 using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 
+std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
+	if (model_type == "hubbard") {
+		return std::make_unique<Hubbard>();
+	}
+	else if (model_type == "continuum") {
+		return std::make_unique<Continuum>();
+	}
+	else {
+		throw std::invalid_argument("Model not recognized! " + model_type);
+	}
+}
+
 int main(int argc, char** argv) {
-	if (argc < 2) {
-		std::cerr << "Which basis?" << std::endl;
+	if (argc < 3) {
+		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
 	}
 	const std::string EXECUTION_TYPE = argv[1];
-
-	const std::unique_ptr<StandardOperators> model = std::make_unique<Hubbard>();
-
-	const term_vec H = model->hamiltonian();
-	const std::vector<WickOperatorTemplate> templates = model->templates();
+	const std::string MODEL_TYPE = argv[2];
 
 	if (EXECUTION_TYPE == "test") {
 		WickTerm wick;
 		wick.multiplicity = 1;
 		wick.temporary_operators = { Hubbard::c_minus_k_Q, Hubbard::c_k_Q,
 			Hubbard::c_k_Q_dagger, StandardOperators::c_k };
-		auto wick_results = identifyWickOperators(wick, templates);
+		auto wick_results = identifyWickOperators(wick, Hubbard().templates());
 		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
 		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
 		cleanWicks(wick_results);
@@ -37,6 +47,15 @@ int main(int argc, char** argv) {
 
 	const std::string name_prefix = EXECUTION_TYPE == "XP" ? "XP_" : "";
 	const bool debug = EXECUTION_TYPE == "debug";
+
+	const std::unique_ptr<StandardOperators> model = get_model(MODEL_TYPE);
+	const std::string sub_folder = model->get_subfolder();
+	if(!debug)
+		std::filesystem::create_directories("../commutators/" + sub_folder);
+
+	const term_vec H = model->hamiltonian();
+	const std::vector<WickOperatorTemplate> templates = model->templates();
+
 	std::vector<term_vec> basis;
 	if (EXECUTION_TYPE == "XP") {
 		basis = model->XP_basis();
@@ -92,7 +111,7 @@ int main(int argc, char** argv) {
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/" + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
+				std::ofstream ofs("../commutators/" + sub_folder + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
@@ -111,7 +130,7 @@ int main(int argc, char** argv) {
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs("../commutators/" + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
+				std::ofstream ofs("../commutators/" + sub_folder + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
 				boost::archive::text_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
@@ -119,26 +138,27 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	/* Output code if needed
-	*
-	Term right(1, Coefficient(), op_vec({
-		c_minus_k, c_k
-		}));
-	Term left(1, Coefficient(), op_vec({
-		c_l_dagger, c_minus_l_dagger
-		}));
-
-	std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", " << right.toStringWithoutPrefactor() << "] \\rangle = " << wicks << "\\end{align*}" << std::endl;
-	std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", [ H, " << right.toStringWithoutPrefactor() << "] ] \\rangle = " << wicks << "\\end{align*}" << std::endl;
-	*/
-
-	/* Example of how to to read the output
-	// create an input file stream and a text archive to deserialize the vector
-	std::ifstream ifs("wick_terms.txt");
-	boost::archive::text_iarchive ia(ifs);
-	WickTermCollector deserialized_terms;
-	ia >> deserialized_terms;
-	ifs.close();
-	*/
 	return 0;
 }
+
+/* Output code if needed
+*
+Term right(1, Coefficient(), op_vec({
+	c_minus_k, c_k
+	}));
+Term left(1, Coefficient(), op_vec({
+	c_l_dagger, c_minus_l_dagger
+	}));
+
+std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", " << right.toStringWithoutPrefactor() << "] \\rangle = " << wicks << "\\end{align*}" << std::endl;
+std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", [ H, " << right.toStringWithoutPrefactor() << "] ] \\rangle = " << wicks << "\\end{align*}" << std::endl;
+*/
+
+/* Example of how to to read the output
+// create an input file stream and a text archive to deserialize the vector
+std::ifstream ifs("wick_terms.txt");
+boost::archive::text_iarchive ia(ifs);
+WickTermCollector deserialized_terms;
+ia >> deserialized_terms;
+ifs.close();
+*/

@@ -12,7 +12,7 @@ namespace SymbolicOperators {
 
 	std::vector<Term> Hubbard::hamiltonian() const
 	{
-		const Term H_T(1, Coefficient("\\epsilon_0", 'q'), SumContainer{ MomentumSum({ 'q' }), Sigma },
+		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Sigma },
 			std::vector<Operator>({
 				Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
 				}));
@@ -140,7 +140,11 @@ namespace SymbolicOperators {
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_Q_down_dagger, c_k }))
-			}),
+			})
 		};
+	}
+	std::string Hubbard::get_subfolder() const
+	{
+		return "hubbard/";
 	}
 }

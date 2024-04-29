@@ -16,14 +16,18 @@ namespace SymbolicOperators {
 		};
 
 		MomentumList() : _parent() {};
-		explicit MomentumList(const char value, int plus_minus = 1, bool Q = false)
-			: _parent{ Momentum(value, plus_minus, Q) } {};
-		explicit MomentumList(const momentum_pairs& _momenta, bool Q = false)
-			: _parent{ Momentum(_momenta, Q) } {};
-		MomentumList(const Momentum& momentum)
+		explicit MomentumList(const Momentum& momentum)
 			: _parent{ momentum } {};
 		MomentumList(const Momentum& first, const Momentum& second)
 			: _parent{ first, second } {};
+		MomentumList(std::initializer_list<char> const& init)
+			: _parent{ std::vector<Momentum>(init.size()) }
+		{
+			for (size_t i = 0U; i < init.size(); i++)
+			{
+				this->_vector[i] = Momentum(init.begin()[i]);
+			}
+		};
 
 		inline MomentumList& operator*=(const int rhs) {
 			for (auto& mom : _vector) {

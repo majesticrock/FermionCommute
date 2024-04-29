@@ -28,9 +28,8 @@ namespace SymbolicOperators {
 		Coefficient();
 		explicit Coefficient(std::string _name);
 		Coefficient(std::string _name, const Momentum& _momentum, const IndexWrapper& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
-		Coefficient(std::string _name, char _momentum, bool add_Q, const IndexWrapper& _indizes, bool _Q_changes_sign = false, bool _isDaggered = false);
 		Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign = false, bool _isDaggered = false);
-		Coefficient(std::string _name, char _momentum, bool add_Q = false, bool _Q_changes_sign = false, bool _isDaggered = false);
+		Coefficient(std::string _name, const MomentumList& _momenta, const IndexWrapper& _indizes = IndexWrapper{}, bool _Q_changes_sign = false, bool _isDaggered = false);
 
 		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& idx : indizes) {
