@@ -20,7 +20,7 @@ namespace SymbolicOperators {
 		virtual std::vector<WickOperatorTemplate> templates() const = 0;
 		virtual std::vector<std::vector<Term>> XP_basis() const = 0;
 		virtual std::vector<std::vector<Term>> STD_basis() const = 0;
-		
+
 		virtual std::string get_subfolder() const = 0;
 	};
 }

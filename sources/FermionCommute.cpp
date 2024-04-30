@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 
 	const std::unique_ptr<StandardOperators> model = get_model(MODEL_TYPE);
 	const std::string sub_folder = model->get_subfolder();
-	if(!debug)
+	if (!debug)
 		std::filesystem::create_directories("../commutators/" + sub_folder);
 
 	const term_vec H = model->hamiltonian();

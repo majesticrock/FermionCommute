@@ -19,7 +19,7 @@ namespace SymbolicOperators {
 	{
 		return {
 			WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false } 
+			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false }
 		};
 	}
 	std::vector<std::vector<Term>> Continuum::XP_basis() const
