@@ -24,6 +24,7 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 }
 
 int main(int argc, char** argv) {
+	bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
@@ -91,6 +92,9 @@ int main(int argc, char** argv) {
 
 		for (size_t j = 0U; j < basis.size(); ++j)
 		{
+			if(print){
+				std::cout << "\\subsection{" << i << "." << j << "}" << std::endl;
+			}
 			term_vec terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
 			cleanUp(terms);
@@ -103,7 +107,7 @@ int main(int argc, char** argv) {
 			wicks_theorem(terms, templates, wicks);
 			cleanWicks(wicks);
 
-			if (debug) {
+			if (debug || print) {
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
 					<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << wicks << "\\end{align*}" << std::endl;
 			}
@@ -124,7 +128,7 @@ int main(int argc, char** argv) {
 			wicks_theorem(terms, templates, wicks);
 			cleanWicks(wicks);
 
-			if (debug)
+			if (debug || print)
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
 				<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization

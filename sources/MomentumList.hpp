@@ -45,6 +45,9 @@ namespace SymbolicOperators {
 		void replaceOccurances(const char replaceWhat, const Momentum& replaceWith);
 		void remove_zeros();
 		void flip_single(char momentum);
+		inline void sort() {
+			std::sort(this->begin(), this->end());
+		};
 	};
 
 	std::ostream& operator<<(std::ostream& os, const MomentumList& momenta);

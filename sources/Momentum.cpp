@@ -138,4 +138,19 @@ namespace SymbolicOperators {
 		}
 		return os;
 	}
+
+	bool operator>(const Momentum& lhs, const Momentum& rhs)
+	{
+		if(lhs.momentum_list == rhs.momentum_list) return false;
+		if(rhs.momentum_list.empty()) return true;
+		if(lhs.momentum_list.empty()) return false;
+		return lhs.momentum_list.front() > rhs.momentum_list.front();
+	}
+	bool operator<(const Momentum& lhs, const Momentum& rhs)
+	{
+		if(lhs.momentum_list == rhs.momentum_list) return false;
+		if(lhs.momentum_list.empty()) return true;
+		if(rhs.momentum_list.empty()) return false;
+		return lhs.momentum_list.front() < rhs.momentum_list.front();
+	}
 }

@@ -32,8 +32,8 @@ namespace SymbolicOperators {
 				delta.second.momentum_list[index].first = remainder;
 				it = delta.first.momentum_list.erase(it);
 			}
-			if (delta.first.momentum_list.size() == 0) {
-				if (delta.second.momentum_list.size() == 0) continue;
+			if (delta.first.momentum_list.empty()) {
+				if (delta.second.momentum_list.empty()) continue;
 				std::swap(delta.first, delta.second);
 			}
 			if (delta.first.add_Q) {
@@ -44,7 +44,7 @@ namespace SymbolicOperators {
 				delta.first.flipMomentum();
 				delta.second.flipMomentum();
 			}
-			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() == 0) {
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.empty()) {
 				delta.second.momentum_list.push_back(delta.first.momentum_list[1]);
 				delta.second.flipMomentum();
 				delta.first.momentum_list.erase(delta.first.momentum_list.begin() + 1);
@@ -53,7 +53,7 @@ namespace SymbolicOperators {
 
 		for (auto it = delta_momenta.begin(); it != delta_momenta.end(); )
 		{
-			if (it->first.momentum_list.size() == 0 && it->second.momentum_list.size() == 0) {
+			if (it->first.momentum_list.empty() && it->second.momentum_list.empty()) {
 				// 0 = Q can never be achieved
 				if (it->first.add_Q != it->second.add_Q) return false;
 				it = delta_momenta.erase(it);
@@ -79,8 +79,8 @@ namespace SymbolicOperators {
 				}
 			}
 
-			if (delta.first.momentum_list.size() == 0) {
-				if (delta.second.momentum_list.size() == 0) continue;
+			if (delta.first.momentum_list.empty()) {
+				if (delta.second.momentum_list.empty()) continue;
 				if (delta.second.momentum_list.size() == 1) {
 					std::swap(delta.first, delta.second);
 				}
@@ -560,6 +560,10 @@ namespace SymbolicOperators {
 					jt = it->sums.spins.erase(jt);
 				}
 			}
+			// sort momentum lists in coefficients
+			for(auto& coeff : it->coefficients){
+				coeff.momenta.sort();
+			}
 			++it;
 		}
 		// remove duplicates
@@ -590,13 +594,14 @@ namespace SymbolicOperators {
 		coeff_map["\\epsilon_0"] = 0;
 		coeff_map["\\frac{U}{N}"] = 1;
 		coeff_map["\\tilde{V}"] = 2;
+		coeff_map["U"] = 3;
 
 		// Sort terms
 		for (size_t i = 0; i < terms.size(); i++)
 		{
 			for (size_t j = i + 1; j < terms.size(); j++)
 			{
-				if (terms[i].delta_momenta.size() == 0 && terms[j].delta_momenta.size() > 0) {
+				if (terms[i].delta_momenta.empty() && terms[j].delta_momenta.size() > 0) {
 					std::swap(terms[i], terms[j]);
 				}
 				if (terms[i].delta_momenta.size() > 0 && terms[j].delta_momenta.size() > 0) {
@@ -614,7 +619,7 @@ namespace SymbolicOperators {
 						}
 					}
 				}
-				else if (terms[i].delta_momenta.size() == 0 && terms[j].delta_momenta.size() == 0) {
+				else if (terms[i].delta_momenta.empty() && terms[j].delta_momenta.empty()) {
 					if (terms[i].coefficients.size() > 0) {
 						if (coeff_map.find(terms[j].coefficients[0].name)->second < coeff_map.find(terms[i].coefficients[0].name)->second) {
 							std::swap(terms[i], terms[j]);

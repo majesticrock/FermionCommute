@@ -22,9 +22,14 @@ all: build build/main ../commutators XP std
 
 XP: build build/main ../commutators
 	./build/main XP hubbard
+	./build/main XP continuum
 
 std: build build/main ../commutators
 	./build/main std hubbard
+	./build/main std continuum
+
+continuum_xp: build build/main ../commutators
+	./build/main XP continuum
 
 test: build build/main
 	./build/main test

@@ -111,5 +111,8 @@ namespace SymbolicOperators {
 		return rhs;
 	}
 
+	bool operator>(const Momentum& lhs, const Momentum& rhs);
+	bool operator<(const Momentum& lhs, const Momentum& rhs);
+
 	std::ostream& operator<<(std::ostream& os, const Momentum& momentum);
 }
