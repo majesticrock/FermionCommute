@@ -24,7 +24,7 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 }
 
 int main(int argc, char** argv) {
-	bool print = true;
+	bool print = false;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
