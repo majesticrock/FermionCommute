@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 	if (EXECUTION_TYPE == "XP") {
 		basis = model->XP_basis();
 	}
-	else if (EXECUTION_TYPE == "STD") {
+	else if (EXECUTION_TYPE == "std") {
 		basis = model->STD_basis();
 	}
 	else if (debug) {
