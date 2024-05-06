@@ -467,7 +467,7 @@ namespace SymbolicOperators {
 	{
 		// Expectation values for spin up and down are the same
 		for (auto& op : operators) {
-			if (op.indizes.size() > 0) {
+			if (!op.indizes.empty()) {
 				op.indizes[0] = SpinUp;
 			}
 		}
@@ -545,7 +545,7 @@ namespace SymbolicOperators {
 			it->sort();
 
 			//it->applyPhaseSymmetry();
-			//it->applySpinSymmetry();
+			it->applySpinSymmetry();
 			it->applyTranslationalSymmetry();
 
 			for (auto jt = it->sums.spins.begin(); jt != it->sums.spins.end();)
