@@ -18,12 +18,13 @@ namespace SymbolicOperators {
 			this->isDaggered = !(this->isDaggered);
 		};
 		inline Operator with_momentum(Momentum const& new_momentum) const {
+			assert(this->momentum.momentum_list.size() == 1U);
 			Operator ret{ *this };
-			ret.momentum = new_momentum;
+			ret.momentum = this->momentum.momentum_list.front().first * new_momentum;
 			return ret;
 		};
 		inline Operator with_momentum(char new_momentum) const {
-			assert(this->momentum.momentum_list.size() == 1);
+			assert(this->momentum.momentum_list.size() == 1U);
 			Operator ret{ *this };
 			ret.momentum.momentum_list.front().second = new_momentum;
 			return ret;

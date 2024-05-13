@@ -1,6 +1,37 @@
 #include "Momentum.hpp"
 
 namespace SymbolicOperators {
+	inline momentum_pairs::value_type identify_subexpression(const std::string& sub) {
+		if (sub.front() == '+')
+			return identify_subexpression(std::string(sub.begin() + 1, sub.end()));
+		if (sub.front() == '-') {
+			momentum_pairs::value_type ret = identify_subexpression(std::string(sub.begin() + 1, sub.end()));
+			ret.first *= -1;
+			return ret;
+		}
+		if (!std::isdigit(sub.front())) 
+			return std::make_pair(1, sub.front());
+		
+
+		auto it = std::find_if(sub.begin(), sub.end(), [](const char c) {
+			return !std::isdigit(c);
+			});
+
+		return std::make_pair(std::stoi(std::string(sub.begin(), it)), sub.back());
+	}
+
+
+	Momentum::Momentum(const std::string& expression)
+	{
+		size_t last = 0U;
+		size_t current = expression.find_first_of("+-", expression.front() == '+' || expression.front() == '-' ? 1U : 0U);
+		do {
+			current = expression.find_first_of("+-", last + 1U);
+			this->momentum_list.push_back(identify_subexpression(expression.substr(last, current - last)));
+			last = current;
+		} while (current != std::string::npos);
+	}
+
 	void Momentum::sort()
 	{
 		for (size_t i = 0U; i < momentum_list.size(); ++i)
@@ -123,12 +154,9 @@ namespace SymbolicOperators {
 		for (momentum_pairs::const_iterator it = momentum.momentum_list.begin(); it != momentum.momentum_list.end(); ++it)
 		{
 			if (it != momentum.momentum_list.begin() && it->first > 0) {
-				os << " +";
+				os << "+";
 			}
-			else if (it->first == -1) {
-				os << " -";
-			}
-			else if (abs(it->first) != 1) {
+			if (abs(it->first) != 1) {
 				os << it->first;
 			}
 			os << it->second;
