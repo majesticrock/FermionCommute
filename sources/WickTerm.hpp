@@ -34,6 +34,8 @@ namespace SymbolicOperators {
 		WickTerm() = default;
 		WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result);
 
+		explicit WickTerm(const std::string& expression);
+
 		inline bool includesType(const OperatorType operator_type) const {
 			return std::any_of(this->operators.begin(), this->operators.end(),
 				[operator_type](const WickOperator& op) { return op.type == operator_type; });

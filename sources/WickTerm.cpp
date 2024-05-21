@@ -30,6 +30,13 @@ namespace SymbolicOperators {
 		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
 	}
 
+	WickTerm::WickTerm(const std::string& expression)
+	{
+		if(std::isdigit(expression.front())){
+			
+		}
+	}
+
 	void wick_processor(const std::vector<Operator>& remaining, WickTermCollector& reciever_list, std::variant<WickTerm, Term> buffer)
 	{
 		if (remaining.empty()) {
