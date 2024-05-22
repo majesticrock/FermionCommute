@@ -8,6 +8,9 @@ namespace SymbolicOperators {
 	class Term;
 	struct WickTerm
 	{
+	private:
+		void string_parser(std::string&& expression);
+	public:
 		int multiplicity{};
 		std::vector<Coefficient> coefficients;
 		SumContainer sums;

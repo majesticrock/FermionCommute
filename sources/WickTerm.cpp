@@ -2,8 +2,11 @@
 #include "../../Utility/sources/RangeUtility.hpp"
 #include "../../Utility/sources/Numerics/MathFunctions.hpp"
 #include "KroneckerDeltaUtility.hpp"
+#include "../../Utility/sources/StringUtility.hpp"
 #include <variant>
 #include <numeric>
+#include <cctype>
+#include <cassert>
 
 #define LEFT temporary_operators[i]
 #define RIGHT temporary_operators[i + 1]
@@ -30,10 +33,88 @@ namespace SymbolicOperators {
 		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
 	}
 
-	WickTerm::WickTerm(const std::string& expression)
+	void WickTerm::string_parser(std::string&& expression){
+		size_t forward_pos{ expression.find(' ') };
+		if(forward_pos == std::string::npos) 
+			forward_pos = expression.size();
+		
+		const std::string sub = expression.substr(0U, forward_pos);
+		const size_t sub_delimiter = sub.find(':');
+
+		if(sub_delimiter == std::string::npos)
+			throw std::invalid_argument("Did not find ':' in " + expression);
+
+		if(sub.substr(0U, sub_delimiter) == "sum"){
+			const std::string type = expression.substr(sub_delimiter + 1, expression.find('{', sub_delimiter) - sub_delimiter - 1);
+			const std::vector<std::string> argument_list = Utility::extract_elements(expression);
+
+			if(type == "index"){
+				this->sums.spins.reserve(argument_list.size());
+				for(const auto& arg : argument_list){
+					this->sums.spins.push_back(string_to_index.at(arg));
+				}
+			}
+			else if(type == "momentum"){
+				this->sums.momenta.reserve(argument_list.size());
+				for(const auto& arg : argument_list){
+					assert(arg.size() == 1U);
+					this->sums.momenta.push_back(arg.front());
+				}
+			}
+			else {
+				throw std::invalid_argument("Sum type not recognized " + type + " in expression " + expression);
+			}
+		}
+		else if(sub.substr(0U, sub_delimiter) == "delta"){
+			const std::string type = expression.substr(sub_delimiter + 1, expression.find('{', sub_delimiter) - sub_delimiter - 1);
+			const std::vector<std::string> argument_list = Utility::extract_elements(expression);
+			assert(argument_list.size() == 2U);
+
+			if(type == "index"){
+				this->delta_indizes.push_back(make_delta(string_to_index.at(argument_list[0]), string_to_index.at(argument_list[1])));
+			}
+			else if(type == "momentum"){
+				this->delta_momenta.push_back(make_delta(Momentum(argument_list[0]), Momentum(argument_list[1])));
+			} 
+			else {
+				throw std::invalid_argument("Delta type not recognized " + type + " in expression " + expression);
+			}
+		}
+		else if(sub.substr(0U, sub_delimiter) == "c"){
+			this->coefficients.push_back(Coefficient::parse_string(sub.substr(sub_delimiter + 1)));
+		} 
+		else if(sub.substr(0U, sub_delimiter) == "o"){
+			this->operators.push_back(WickOperator(sub.substr(sub_delimiter + 1)));
+		}
+		else{
+			throw std::invalid_argument("Did parse expression <" + expression + "> at <" + sub + "> with delimiter " + std::to_string(sub_delimiter));
+		}
+	}
+
+	WickTerm::WickTerm(const std::string& expression) : multiplicity(1)
 	{
-		if(std::isdigit(expression.front())){
-			
+		// Syntax
+		// [factor] [index_sum] [momentum_sum] [coefficients...] [momentum_deltas...] [index_deltas...] [operators...]
+		/* factor needs to be an integer
+		*  Sums must be "sum:index{index1,index2,...}" or "sum:momentum{momentum_name1,momentum_name2,...}"
+		*  coefficient must be "c:name{Momentum_expression1,...;index1,index2,...}"
+		*  deltas must be "delta:momentum{Momentum_expression,Momentum_expression}" or "delta:index{Index,Index}"
+		*  operators must be "o:type{Momentum_expression;index1,index2,...}(^+)"
+		*/ 
+
+		size_t pos{};
+		if(std::isdigit(expression.front()) || expression.front() == '-' || expression.front() == '+') {
+			pos = expression.find(' ');
+			if(pos != std::string::npos) {
+				this->multiplicity = std::stoi(expression.substr(0U, pos));
+			}
+		}
+		size_t new_pos{};
+		++pos;
+		while(new_pos != std::string::npos) {
+			new_pos = expression.find(' ', pos);
+			string_parser(expression.substr(pos, new_pos - pos));
+			pos = new_pos + 1;
 		}
 	}
 

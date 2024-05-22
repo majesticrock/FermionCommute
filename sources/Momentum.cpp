@@ -1,4 +1,5 @@
 #include "Momentum.hpp"
+#include <cctype>
 
 namespace SymbolicOperators {
 	inline momentum_pairs::value_type identify_subexpression(const std::string& sub) {
@@ -13,7 +14,7 @@ namespace SymbolicOperators {
 			return std::make_pair(1, sub.front());
 		
 
-		auto it = std::find_if(sub.begin(), sub.end(), [](const char c) {
+		const auto it = std::find_if(sub.begin(), sub.end(), [](const char c) {
 			return !std::isdigit(c);
 			});
 
@@ -158,6 +159,9 @@ namespace SymbolicOperators {
 			}
 			if (abs(it->first) != 1) {
 				os << it->first;
+			} 
+			else if (it->first == -1) {
+				os << "-";
 			}
 			os << it->second;
 		}

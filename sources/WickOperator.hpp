@@ -5,6 +5,9 @@
 
 namespace SymbolicOperators {
 	enum OperatorType { Number_Type = 0, CDW_Type, SC_Type, Eta_Type, Undefined_Type };
+	inline const std::map<std::string, OperatorType> string_to_wick = {
+		{"n", Number_Type}, {"g", CDW_Type}, {"f", SC_Type}, {"\\eta", Eta_Type}
+	};
 	std::ostream& operator<<(std::ostream& os, const OperatorType op);
 
 	struct WickOperator {
@@ -24,6 +27,7 @@ namespace SymbolicOperators {
 		WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const IndexWrapper& _indizes = IndexWrapper());
 		WickOperator(const OperatorType& _type, const bool _isDaggered, const Momentum& _momentum, const Index _index);
 		WickOperator();
+		WickOperator(const std::string& expression);
 
 		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& idx : this->indizes) {

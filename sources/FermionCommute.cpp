@@ -24,6 +24,9 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 }
 
 int main(int argc, char** argv) {
+	//WickTerm parse_test("1 sum:momentum{k,l} c:U{k;} o:n{k-p-3x;up} o:f{k+l;}");
+	//std::cout << parse_test << std::endl;
+
 	constexpr bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;

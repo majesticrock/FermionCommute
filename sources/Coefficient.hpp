@@ -31,6 +31,8 @@ namespace SymbolicOperators {
 		Coefficient(std::string _name, const Momentum& _momentum, bool _Q_changes_sign = false, bool _isDaggered = false);
 		Coefficient(std::string _name, const MomentumList& _momenta, const IndexWrapper& _indizes = IndexWrapper{}, bool _Q_changes_sign = false, bool _isDaggered = false);
 
+		static Coefficient parse_string(const std::string& expression);
+
 		inline bool usesIndex(const Index index) const noexcept {
 			for (const auto& idx : indizes) {
 				if (idx == index) return true;

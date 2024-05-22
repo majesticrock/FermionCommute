@@ -1,6 +1,28 @@
 #include "Coefficient.hpp"
+#include "../../Utility/sources/StringUtility.hpp"
 
 namespace SymbolicOperators {
+	Coefficient Coefficient::parse_string(const std::string& expression) 
+	{
+		// Syntax:   name{Momentum_expression,index1,index2,...}
+
+		Coefficient ret;
+		ret.name = expression.substr(0U, expression.find('{'));
+		std::vector<std::string> momentum_strings = Utility::extract_elements(expression, '{', ';');
+		std::vector<std::string> index_strings = Utility::extract_elements(expression, ';', '}');
+
+		ret.momenta.reserve(momentum_strings.size());
+		for(const auto& arg : momentum_strings){
+			ret.momenta.push_back(Momentum(arg));
+		}
+		ret.indizes.reserve(index_strings.size());
+		for(const auto& arg : index_strings) {
+			ret.indizes.push_back(string_to_index.at(arg));
+		}
+
+		return ret;
+	}
+
 	std::ostream& operator<<(std::ostream& os, const Coefficient& coeff)
 	{
 		os << coeff.name;
