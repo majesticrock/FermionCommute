@@ -8,7 +8,7 @@ namespace SymbolicOperators {
 				Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
 				}));
 
-		const Term H_U(-1, Coefficient("U", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
+		const Term H_U(-1, Coefficient("g", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
 			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
