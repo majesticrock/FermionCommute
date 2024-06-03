@@ -24,7 +24,7 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 }
 
 int main(int argc, char** argv) {
-	//WickTerm parse_test("1 sum:momentum{k,l} c:U{k;} o:n{k-p-3x;up} o:f{k+l;}");
+	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
 	//std::cout << parse_test << std::endl;
 
 	constexpr bool print = true;
@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
 			renameMomenta(t, 'x', 'y');
 		}
 	}
+	//std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
 		term_vec commute_with_H;

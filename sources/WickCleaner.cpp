@@ -544,7 +544,7 @@ namespace SymbolicOperators {
 			it->renameSums();
 			it->sort();
 
-			//it->applyPhaseSymmetry();
+			it->applyPhaseSymmetry();
 			it->applySpinSymmetry();
 			it->applyTranslationalSymmetry();
 
@@ -590,12 +590,6 @@ namespace SymbolicOperators {
 			}
 		}
 
-		std::map<std::string, int> coeff_map;
-		coeff_map["\\epsilon_0"] = 0;
-		coeff_map["\\frac{U}{N}"] = 1;
-		coeff_map["\\tilde{V}"] = 2;
-		coeff_map["U"] = 3;
-
 		// Sort terms
 		for (size_t i = 0; i < terms.size(); i++)
 		{
@@ -613,7 +607,7 @@ namespace SymbolicOperators {
 							std::swap(terms[i], terms[j]);
 						}
 						else if (terms[i].coefficients.size() > 0) {
-							if (coeff_map.find(terms[j].coefficients[0].name)->second < coeff_map.find(terms[i].coefficients[0].name)->second) {
+							if (terms[j].coefficients[0].name <terms[i].coefficients[0].name) {
 								std::swap(terms[i], terms[j]);
 							}
 						}
@@ -621,7 +615,7 @@ namespace SymbolicOperators {
 				}
 				else if (terms[i].delta_momenta.empty() && terms[j].delta_momenta.empty()) {
 					if (terms[i].coefficients.size() > 0) {
-						if (coeff_map.find(terms[j].coefficients[0].name)->second < coeff_map.find(terms[i].coefficients[0].name)->second) {
+						if (terms[j].coefficients[0].name <terms[i].coefficients[0].name) {
 							std::swap(terms[i], terms[j]);
 						}
 					}
