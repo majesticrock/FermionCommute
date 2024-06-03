@@ -4,8 +4,8 @@
 #include <filesystem>
 
 namespace SymbolicOperators {
-    void TermLoader::load(std::string const& folder, bool use_XP, int n_terms, int start_at/*=0*/){
-        M.resize(n_terms * n_terms);
+	void TermLoader::load(std::string const& folder, bool use_XP, int n_terms, int start_at/*=0*/) {
+		M.resize(n_terms * n_terms);
 		N.resize(n_terms * n_terms);
 		const int name_offset = (start_at < 0) ? 0 : start_at;
 
@@ -40,5 +40,5 @@ namespace SymbolicOperators {
 				}
 			}
 		}
-    }
+	}
 }

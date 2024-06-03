@@ -10,9 +10,8 @@ namespace SymbolicOperators {
 			ret.first *= -1;
 			return ret;
 		}
-		if (!std::isdigit(sub.front())) 
+		if (!std::isdigit(sub.front()))
 			return std::make_pair(1, sub.front());
-		
 
 		const auto it = std::find_if(sub.begin(), sub.end(), [](const char c) {
 			return !std::isdigit(c);
@@ -20,7 +19,6 @@ namespace SymbolicOperators {
 
 		return std::make_pair(std::stoi(std::string(sub.begin(), it)), sub.back());
 	}
-
 
 	Momentum::Momentum(const std::string& expression)
 	{
@@ -159,7 +157,7 @@ namespace SymbolicOperators {
 			}
 			if (abs(it->first) != 1) {
 				os << it->first;
-			} 
+			}
 			else if (it->first == -1) {
 				os << "-";
 			}
@@ -173,16 +171,16 @@ namespace SymbolicOperators {
 
 	bool operator>(const Momentum& lhs, const Momentum& rhs)
 	{
-		if(lhs.momentum_list == rhs.momentum_list) return false;
-		if(rhs.momentum_list.empty()) return true;
-		if(lhs.momentum_list.empty()) return false;
+		if (lhs.momentum_list == rhs.momentum_list) return false;
+		if (rhs.momentum_list.empty()) return true;
+		if (lhs.momentum_list.empty()) return false;
 		return lhs.momentum_list.front() > rhs.momentum_list.front();
 	}
 	bool operator<(const Momentum& lhs, const Momentum& rhs)
 	{
-		if(lhs.momentum_list == rhs.momentum_list) return false;
-		if(lhs.momentum_list.empty()) return true;
-		if(rhs.momentum_list.empty()) return false;
+		if (lhs.momentum_list == rhs.momentum_list) return false;
+		if (lhs.momentum_list.empty()) return true;
+		if (rhs.momentum_list.empty()) return false;
 		return lhs.momentum_list.front() < rhs.momentum_list.front();
 	}
 }

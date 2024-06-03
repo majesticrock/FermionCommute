@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 
 		for (size_t j = 0U; j < basis.size(); ++j)
 		{
-			if(print){
+			if (print) {
 				std::cout << "\\subsection{" << i << "." << j << "}" << std::endl;
 			}
 			term_vec terms;

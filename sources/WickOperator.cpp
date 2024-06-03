@@ -22,7 +22,7 @@ namespace SymbolicOperators {
 		this->momentum = Momentum(momentum_strings.front());
 
 		this->indizes.reserve(index_strings.size());
-		for(const auto& arg : index_strings) {
+		for (const auto& arg : index_strings) {
 			this->indizes.push_back(string_to_index.at(arg));
 		}
 

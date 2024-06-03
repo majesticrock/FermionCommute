@@ -561,7 +561,7 @@ namespace SymbolicOperators {
 				}
 			}
 			// sort momentum lists in coefficients
-			for(auto& coeff : it->coefficients){
+			for (auto& coeff : it->coefficients) {
 				coeff.momenta.sort();
 			}
 			++it;
