@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Utility/sources/VectorWrapper.hpp"
+#include <Utility/VectorWrapper.hpp>
+#include <Utility/RangeUtility.hpp>
 #include "IndexWrapper.hpp"
-#include "../../Utility/sources/RangeUtility.hpp"
 
 namespace SymbolicOperators {
 	template<class SumIndex>

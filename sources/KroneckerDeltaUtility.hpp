@@ -2,7 +2,7 @@
 #include "KroneckerDelta.hpp"
 #include "Momentum.hpp"
 #include "IndexWrapper.hpp"
-#include "../../Utility/sources/defines_arithmetic_operators.hpp"
+#include <Utility/defines_arithmetic_operators.hpp>
 
 namespace SymbolicOperators {
 	template <class T>

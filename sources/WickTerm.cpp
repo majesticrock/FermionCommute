@@ -1,8 +1,8 @@
 #include "WickTerm.hpp"
-#include "../../Utility/sources/RangeUtility.hpp"
-#include "../../Utility/sources/Numerics/MathFunctions.hpp"
+#include <Utility/RangeUtility.hpp>
+#include <Utility/Numerics/MathFunctions.hpp>
+#include <Utility/StringUtility.hpp>
 #include "KroneckerDeltaUtility.hpp"
-#include "../../Utility/sources/StringUtility.hpp"
 #include <variant>
 #include <numeric>
 #include <cctype>

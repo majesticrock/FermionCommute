@@ -1,6 +1,6 @@
 #include <fstream>
 #include <sstream>
-#include "../../Utility/sources/LaTeXOutput.hpp"
+#include <Utility/LaTeXOutput.hpp>
 #include "Definitions/Hubbard.hpp"
 #include "Definitions/Continuum.hpp"
 #include "WickTerm.hpp"

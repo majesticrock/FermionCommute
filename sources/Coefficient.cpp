@@ -1,5 +1,5 @@
 #include "Coefficient.hpp"
-#include "../../Utility/sources/StringUtility.hpp"
+#include <Utility/StringUtility.hpp>
 
 namespace SymbolicOperators {
 	Coefficient Coefficient::parse_string(const std::string& expression)

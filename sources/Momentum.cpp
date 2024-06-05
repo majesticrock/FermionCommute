@@ -20,7 +20,7 @@ namespace SymbolicOperators {
 		return std::make_pair(std::stoi(std::string(sub.begin(), it)), sub.back());
 	}
 
-	Momentum::Momentum(const std::string& expression)
+	Momentum::Momentum(const std::string& expression, bool Q/* = false*/) : add_Q(Q)
 	{
 		size_t last = 0U;
 		size_t current = expression.find_first_of("+-", expression.front() == '+' || expression.front() == '-' ? 1U : 0U);

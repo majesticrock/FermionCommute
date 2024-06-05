@@ -1,6 +1,6 @@
 #pragma once
 #include "Momentum.hpp"
-#include "../../Utility/sources/VectorWrapper.hpp"
+#include <Utility/VectorWrapper.hpp>
 #include <algorithm>
 
 namespace SymbolicOperators {

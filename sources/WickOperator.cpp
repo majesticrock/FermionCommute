@@ -1,5 +1,5 @@
 #include "WickOperator.hpp"
-#include "../../Utility/sources/StringUtility.hpp"
+#include <Utility/StringUtility.hpp>
 #include <cassert>
 
 namespace SymbolicOperators {
