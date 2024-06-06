@@ -26,7 +26,6 @@ namespace SymbolicOperators
                 auto equals_op = [&op](OperatorType comp){
                     return op.type == comp;
                     };
-
                 if ( (equals_op(operators) || ...) )
                 {
                     op.isDaggered = false;
