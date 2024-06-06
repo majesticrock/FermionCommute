@@ -5,10 +5,10 @@
 If there is no namespace specified in this file, we imply the namespace ```SymbolicOperators```.
 Each relevent class defines and overload of ```std::ostream& operator<<```, i.e., they can easily be used as ```std::cout << class_obj```.
 The output is formated to be used within an ```align```-environment within LaTeX.
-Your code only needs to include ```WickTerm.hpp```.
+Your code only needs to include ```Wick.hpp```.
 
 ## The ```Momentum``` class
-This class represents momenta. It includes addition and substraction operators as well as a ```bool add_Q```. Q is defined as (pi, pi, ...), i.e., n * Q = 0 for all even n.
+This class represents momenta. It includes addition and substraction operators as well as a ```bool add_Q```. _Q_ is defined as _(pi, pi, ...)_, i.e., _n * Q = 0_ for all even _n_.
 Besides the normal operators in which you specify the class members, you can also pass a string to the constructor like ```"3k+l-p"``` to create that specific momentum. If you want to add Q here, you can do so by passing ```true``` to the same constructor as a second argument.
 
 ## The ```Operator``` class
@@ -76,20 +76,20 @@ In the following, the meaning of the different attributes is listed:
 Holds various ```IndexComparision```
 
 #### ```struct IndexComparison``` 
-If ```any_identical``` is ```true```, any two identical indizes are considered valid. An example would be in the number operator c_(k, sigma)^+ c_(k, sigma'): No matter what sigma is, as long as sigma = sigma' the expectation value will be finite.
-If ```any_identical``` is ```false```, the members ```base``` and ```other``` become relevant: They define what the indizes need to be, e.g., for a pair annihlation operator c_(-k down) c_(k up) one would set ```base``` to down and ```other``` to up.
+If ```any_identical``` is ```true```, any two identical indizes are considered valid. An example would be in the number operator *c_(k, sigma)^+ c_(k, sigma')*: No matter what sigma is, as long as sigma = sigma' the expectation value will be finite.
+If ```any_identical``` is ```false```, the members ```base``` and ```other``` become relevant: They define what the indizes need to be, e.g., for a pair annihlation operator *c_(-k down) c_(k up)* one would set ```base``` to _down_ and ```other``` to _up_.
 
 Note, once one operator is set as a template, it is not necessary to set its Hermitian conjugate.
 
 ### ```Momentum momentum_difference```
 Defines the allowed difference in momentum, e.g., for a number operator, this would be 0.
-Note, this also applies to a standard pair creation/annihilation operator, because in total, these operators create/annihilate a particle with -k and one with k, resulting in 0 net momentum.
+Note, this also applies to a standard pair creation/annihilation operator, because in total, these operators create/annihilate a particle with *-k* and one with *k*, resulting in 0 net momentum.
 
 ### ```OperatorType type```
 Specifies what kind of WickOperator will be the result, see ```enum OperatorType``` in ```WickOperator.hpp```.
 
 ### ```bool is_sc_type```
-Specifies whether the operator is a pair creation/annihilation operator or a standard c^+ c type term.
+Specifies whether the operator is a pair creation/annihilation operator or a standard *c^+ c* type term.
 
 
 ## Apply Wick's theorem
@@ -99,6 +99,26 @@ Create an instance of ```WickTermCollector```. Then simply call
 wicks_theorem(terms, templates, wicks);
 cleanWicks(wicks);
 ```
+
+## Applying symmetries to the result
+There may be some symmetries that simplify your results, e.g. <O^+> = <O>.
+These symmetries can be implemented by inheriting from the  ```WickSymmetry``` class and defining the member function ```virtual void apply_to(WickTerm& term) const```.
+Then create a ```std::vector<std::unique_ptr<WickSymmetry>> symmetries``` and make use of polymorphism by calling ```cleanWicks(wicks, symmetries)```
+There are the following predefined symmetry operations:
+
+#### ```SpinSymmetry```
+Changes all spins of the operators in ```term``` to _up_.
+
+#### ```TranslationalSymmetry```
+Flips the momenta in such a way, that the first momentum in a term is always positive, i.e., _-k+l_ is changed to _k-l_ while _k-l_ would stay unmodified.
+
+#### ```PhaseSymmetry```
+Takes a list of ```OperatorType``` as template arguments.
+Removes any dagger from all operators with a type from the list.
+Example:
+```PhaseSymmetry<SC_Type, CDW_Type>``` removes the dagger from ```SC_Type``` and ```CDW_Type``` operators.
+
+## Output and use the result
 
 You can print the the result to the console or utilize boost's serialization to load it later (or within another program).
 Serialization can be achieved via this code

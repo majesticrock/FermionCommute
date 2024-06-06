@@ -97,9 +97,6 @@ namespace SymbolicOperators {
 		void discardZeroMomenta();
 		void renameSums();
 		void sort();
-		void applySpinSymmetry();
-		void applyTranslationalSymmetry();
-		void applyPhaseSymmetry();
 		void includeTemplateResult(const TemplateResult::SingleResult& result);
 	};
 
@@ -141,15 +138,6 @@ namespace SymbolicOperators {
 	inline WickTermCollector operator-(const WickTerm& lhs, WickTermCollector rhs) { rhs -= lhs; return rhs; };
 	inline WickTermCollector operator+(WickTermCollector lhs, const WickTermCollector& rhs) { lhs += rhs; return lhs; };
 	inline WickTermCollector operator-(WickTermCollector lhs, const WickTermCollector& rhs) { lhs -= rhs; return lhs; };
-
-	// Sorts the operators in 'term' according to Wick's theorem within 'temporary_operators'
-	// Afterwards, these can be rewritten in terms of 'WickOperator's.
-	WickTermCollector prepare_wick(const std::vector<Term>& terms);
-	WickTermCollector identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates);
-	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever);
-
-	void clearEtas(WickTermCollector& terms);
-	void cleanWicks(WickTermCollector& terms);
 
 	std::ostream& operator<<(std::ostream& os, const WickTerm& term);
 	std::ostream& operator<<(std::ostream& os, const WickTermCollector& terms);

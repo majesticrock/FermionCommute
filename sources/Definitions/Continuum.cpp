@@ -18,12 +18,6 @@ namespace SymbolicOperators {
 			c_minus_k.with_momentum(Momentum("q+p")), c_k.with_momentum(Momentum("q+p"))
 			}));
 
-		//const Term H_U(-1, Coefficient("U", MomentumList({ 'r', 'q' })), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
-		//	Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
-		//	Operator(Momentum("r+p-q"), SpinDown, false),
-		//	Operator(momentum_pairs({ std::make_pair(1, 'q') }), SpinUp, false),
-		//	}));
-
 		return { H_T, H_U, H_EM };
 	}
 	std::vector<WickOperatorTemplate> Continuum::templates() const
@@ -73,6 +67,14 @@ namespace SymbolicOperators {
 				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 			})
 		};
+	}
+	std::vector<std::unique_ptr<WickSymmetry>> Continuum::symmetries() const
+	{
+		std::vector<std::unique_ptr<WickSymmetry>> ret;
+		ret.reserve(2);
+		ret.push_back(std::make_unique<SpinSymmetry>());
+		ret.push_back(std::make_unique<TranslationalSymmetry>());
+		return ret;
 	}
 	std::string Continuum::get_subfolder() const
 	{

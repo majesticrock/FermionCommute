@@ -3,7 +3,7 @@
 #include <Utility/LaTeXOutput.hpp>
 #include "Definitions/Hubbard.hpp"
 #include "Definitions/Continuum.hpp"
-#include "WickTerm.hpp"
+#include "Wick.hpp"
 #include <memory>
 #include <filesystem>
 
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 		auto wick_results = identifyWickOperators(wick, Hubbard().templates());
 		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
 		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
-		cleanWicks(wick_results);
+		cleanWicks(wick_results, Hubbard().symmetries());
 		std::cout << "Post clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
 
 		return 0;
@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
 			})
 		};
 	}
+	const auto symmetries = model->symmetries();
 
 	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
@@ -109,7 +110,8 @@ int main(int argc, char** argv) {
 
 			WickTermCollector wicks;
 			wicks_theorem(terms, templates, wicks);
-			cleanWicks(wicks);
+			clearEtas(wicks);
+			cleanWicks(wicks, symmetries);
 
 			if (debug || print) {
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
@@ -130,7 +132,8 @@ int main(int argc, char** argv) {
 			commutator(terms, basis_daggered[j], basis[i]);
 			cleanUp(terms);
 			wicks_theorem(terms, templates, wicks);
-			cleanWicks(wicks);
+			clearEtas(wicks);
+			cleanWicks(wicks, symmetries);
 
 			if (debug || print)
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])

@@ -1,10 +1,6 @@
 #include "WickTerm.hpp"
-#include <Utility/RangeUtility.hpp>
-#include <Utility/Numerics/MathFunctions.hpp>
 #include <Utility/StringUtility.hpp>
 #include "KroneckerDeltaUtility.hpp"
-#include <variant>
-#include <numeric>
 #include <cctype>
 #include <cassert>
 
@@ -14,6 +10,7 @@
 #define R_SPIN temporary_operators[i + 1].indizes[0]
 
 namespace SymbolicOperators {
+	// Constructors
 	WickTerm::WickTerm(const Term* base)
 		: multiplicity(base->multiplicity), coefficients(base->coefficients), sums(base->sums), operators(),
 		delta_momenta(base->delta_momenta), delta_indizes(base->delta_indizes), temporary_operators()
@@ -24,7 +21,6 @@ namespace SymbolicOperators {
 		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
 	{
 	}
-
 	WickTerm::WickTerm(const WickTerm& base, const TemplateResult::SingleResult& result)
 		: multiplicity(result.factor* base.multiplicity), coefficients(base.coefficients), sums(base.sums), operators(base.operators),
 		delta_momenta(base.delta_momenta), delta_indizes(base.delta_indizes), temporary_operators()
@@ -32,7 +28,34 @@ namespace SymbolicOperators {
 		this->operators.push_back(result.op);
 		this->delta_indizes.insert(this->delta_indizes.end(), result.index_deltas.begin(), result.index_deltas.end());
 	}
+	WickTerm::WickTerm(const std::string& expression) : multiplicity(1)
+	{
+		// Syntax
+		// [factor] [index_sum] [momentum_sum] [coefficients...] [momentum_deltas...] [index_deltas...] [operators...]
+		/* factor needs to be an integer
+		*  Sums must be "sum:index{index1,index2,...}" or "sum:momentum{momentum_name1,momentum_name2,...}"
+		*  coefficient must be "c:name{Momentum_expression1,...;index1,index2,...}"
+		*  deltas must be "delta:momentum{Momentum_expression,Momentum_expression}" or "delta:index{Index,Index}"
+		*  operators must be "o:type{Momentum_expression;index1,index2,...}(^+)"
+		*/
 
+		size_t pos{};
+		if (std::isdigit(expression.front()) || expression.front() == '-' || expression.front() == '+') {
+			pos = expression.find(' ');
+			if (pos != std::string::npos) {
+				this->multiplicity = std::stoi(expression.substr(0U, pos));
+			}
+		}
+		size_t new_pos{};
+		++pos;
+		while (new_pos != std::string::npos) {
+			new_pos = expression.find(' ', pos);
+			string_parser(expression.substr(pos, new_pos - pos));
+			pos = new_pos + 1;
+		}
+	}
+
+	// Member functions
 	void WickTerm::string_parser(std::string&& expression) {
 		size_t forward_pos{ expression.find(' ') };
 		if (forward_pos == std::string::npos)
@@ -91,94 +114,463 @@ namespace SymbolicOperators {
 		}
 	}
 
-	WickTerm::WickTerm(const std::string& expression) : multiplicity(1)
+	bool WickTerm::setDeltas()
 	{
-		// Syntax
-		// [factor] [index_sum] [momentum_sum] [coefficients...] [momentum_deltas...] [index_deltas...] [operators...]
-		/* factor needs to be an integer
-		*  Sums must be "sum:index{index1,index2,...}" or "sum:momentum{momentum_name1,momentum_name2,...}"
-		*  coefficient must be "c:name{Momentum_expression1,...;index1,index2,...}"
-		*  deltas must be "delta:momentum{Momentum_expression,Momentum_expression}" or "delta:index{Index,Index}"
-		*  operators must be "o:type{Momentum_expression;index1,index2,...}(^+)"
-		*/
+		//remove_delta_squared(this->delta_indizes);
+		//remove_delta_squared(this->delta_momenta);
 
-		size_t pos{};
-		if (std::isdigit(expression.front()) || expression.front() == '-' || expression.front() == '+') {
-			pos = expression.find(' ');
-			if (pos != std::string::npos) {
-				this->multiplicity = std::stoi(expression.substr(0U, pos));
-			}
-		}
-		size_t new_pos{};
-		++pos;
-		while (new_pos != std::string::npos) {
-			new_pos = expression.find(' ', pos);
-			string_parser(expression.substr(pos, new_pos - pos));
-			pos = new_pos + 1;
-		}
-	}
+		// Erase delta_k,k etc
+		remove_delta_is_one(this->delta_indizes);
+		remove_delta_is_one(this->delta_momenta);
 
-	void wick_processor(const std::vector<Operator>& remaining, WickTermCollector& reciever_list, std::variant<WickTerm, Term> buffer)
-	{
-		if (remaining.empty()) {
-			reciever_list.push_back(std::get<WickTerm>(buffer));
-			return;
-		}
-		for (size_t i = 1U; i < remaining.size(); ++i)
+		for (auto& delta : delta_momenta)
 		{
-			if (std::holds_alternative<Term>(buffer)) {
-				WickTerm temp(std::get<Term>(buffer));
-				buffer = temp;
-			}
-			if ((i % 2) == 0) {
-				std::get<WickTerm>(buffer).multiplicity *= -1;
-			}
-			std::get<WickTerm>(buffer).temporary_operators.reserve(std::get<WickTerm>(buffer).temporary_operators.size() + 2);
-			std::get<WickTerm>(buffer).temporary_operators.push_back(remaining[0]);
-			std::get<WickTerm>(buffer).temporary_operators.push_back(remaining[i]);
+			for (auto it = delta.first.momentum_list.begin(); it != delta.first.momentum_list.end(); )
+			{
+				int index = delta.second.isUsed(it->second);
+				if (index < 0) {
+					++it;
+					continue;
+				}
 
-			std::vector<Operator> copy_operators = remaining;
-			copy_operators.erase(copy_operators.begin() + i);
-			copy_operators.erase(copy_operators.begin());
-			wick_processor(copy_operators, reciever_list, buffer);
+				int remainder = delta.second.momentum_list[index].first - it->first;
+				if (remainder == 0) {
+					delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
+					it = delta.first.momentum_list.erase(it);
+					continue;
+				}
 
-			// delete last two elements, as they are to be updated in the next iteration
-			std::get<WickTerm>(buffer).temporary_operators.pop_back();
-			std::get<WickTerm>(buffer).temporary_operators.pop_back();
-			if ((i % 2) == 0) {
-				std::get<WickTerm>(buffer).multiplicity *= -1;
+				delta.second.momentum_list[index].first = remainder;
+				it = delta.first.momentum_list.erase(it);
+			}
+			if (delta.first.momentum_list.empty()) {
+				if (delta.second.momentum_list.empty()) continue;
+				std::swap(delta.first, delta.second);
+			}
+			if (delta.first.add_Q) {
+				delta.first.add_Q = false;
+				delta.second.add_Q = !(delta.second.add_Q);
+			}
+			if (delta.first.momentum_list.front().first < 0) {
+				delta.first.flipMomentum();
+				delta.second.flipMomentum();
+			}
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.empty()) {
+				delta.second.momentum_list.push_back(delta.first.momentum_list[1]);
+				delta.second.flipMomentum();
+				delta.first.momentum_list.erase(delta.first.momentum_list.begin() + 1);
 			}
 		}
-	}
 
-	WickTermCollector prepare_wick(const std::vector<Term>& terms)
-	{
-		WickTermCollector prepared_wick;
-		const size_t estimated_size = std::accumulate(terms.begin(), terms.end(), size_t{}, [](size_t current, const Term& term) {
-			return current + Utility::Numerics::double_factorial(term.getOperators().size());
-			});
-
-		prepared_wick.reserve(estimated_size);
-		for (const auto& term : terms) {
-			if (term.isIdentity()) {
-				prepared_wick.push_back(WickTerm(term));
+		for (auto it = delta_momenta.begin(); it != delta_momenta.end(); )
+		{
+			if (it->first.momentum_list.empty() && it->second.momentum_list.empty()) {
+				// 0 = Q can never be achieved
+				if (it->first.add_Q != it->second.add_Q) return false;
+				it = delta_momenta.erase(it);
 			}
 			else {
-				wick_processor(term.getOperators(), prepared_wick, term);
+				++it;
 			}
 		}
 
-		return prepared_wick;
+		// Set all deltas up to the same notation
+		for (auto& delta : delta_momenta) {
+			for (auto& delta2 : delta_momenta) {
+				for (auto it = delta2.first.momentum_list.begin(); it != delta2.first.momentum_list.end();) {
+					int pos = delta2.second.isUsed(it->second);
+					if (pos < 0) { ++it; continue; }
+					it->first -= delta2.second.momentum_list[pos].first;
+					if (it->first == 0) {
+						it = delta2.first.momentum_list.erase(it);
+						delta2.second.momentum_list.erase(delta2.second.momentum_list.begin() + pos);
+						continue;
+					}
+					++it;
+				}
+			}
+
+			if (delta.first.momentum_list.empty()) {
+				if (delta.second.momentum_list.empty()) continue;
+				if (delta.second.momentum_list.size() == 1) {
+					std::swap(delta.first, delta.second);
+				}
+				else {
+					delta.first.momentum_list.push_back(delta.second.momentum_list.back());
+					if (delta.first.momentum_list.front().first > 0) {
+						delta.second.flipMomentum();
+					}
+					else {
+						delta.first.flipMomentum();
+					}
+					delta.second.momentum_list.pop_back();
+				}
+			}
+			if (delta.second.momentum_list.size() == 1 && delta.first.momentum_list.size() > 1) {
+				std::swap(delta.first, delta.second);
+			}
+			if (delta.first.momentum_list.size() > 1 && delta.second.momentum_list.size() > 1) {
+				bool foundCandidate = false;
+				int index = 0;
+				delta.second -= delta.first;
+				delta.first.momentum_list.clear();
+
+				for (auto m : sums.momenta)
+				{
+					index = delta.second.isUsed(m);
+					if (index >= 0) {
+						foundCandidate = true;
+						if (abs(delta.second.momentum_list[index].first) == 1) {
+							break;
+						}
+					}
+				}
+				if (!foundCandidate) index = 0;
+
+				if (delta.second.momentum_list[index].first > 0) {
+					delta.second.flipMomentum();
+				}
+				delta.first.momentum_list.push_back(delta.second.momentum_list[index]);
+				delta.first.flipMomentum();
+				if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
+				delta.second.momentum_list.erase(delta.second.momentum_list.begin() + index);
+			}
+
+			if (delta.first.momentum_list.size() == 1 && delta.first.momentum_list[0].first < 0) {
+				delta.first.flipMomentum();
+				delta.second.flipMomentum();
+			}
+			if (delta.first.add_Q) {
+				delta.first.add_Q = false;
+				delta.second.add_Q = !(delta.second.add_Q);
+			}
+
+			if (abs(delta.first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta.first << std::endl;
+			for (auto& op : operators) {
+				op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+			}
+			for (auto& coeff : coefficients) {
+				coeff.momenta.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+			}
+			for (auto& delta2 : delta_momenta) {
+				if (delta2 == delta) continue;
+				delta2.first.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				delta2.second.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+			}
+		}
+		for (auto& delta : delta_indizes) {
+			for (auto& op : operators) {
+				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
+				{
+					if (delta.first == SpinUp || delta.first == SpinDown) {
+						if (*it == delta.second) {
+							*it = delta.first;
+						}
+					}
+					else {
+						if (*it == delta.first) {
+							*it = delta.second;
+						}
+					}
+				}
+			}
+		}
+
+		//remove_delta_squared(this->delta_indizes);
+		//remove_delta_squared(this->delta_momenta);
+		// Remove delta^2
+		for (int i = 0; i < delta_momenta.size(); i++)
+		{
+			for (int j = i + 1; j < delta_momenta.size(); j++)
+			{
+				if (delta_momenta[i] == delta_momenta[j]) {
+					delta_momenta.erase(delta_momenta.begin() + j);
+					--i;
+					break;
+				}
+
+				auto delta_buffer = delta_momenta[j];
+				delta_buffer.first.flipMomentum();
+				delta_buffer.second.flipMomentum();
+				if (delta_momenta[i] == delta_buffer) {
+					delta_momenta.erase(delta_momenta.begin() + j);
+					--i;
+					break;
+				}
+			}
+		}
+		for (int i = 0; i < delta_indizes.size(); i++)
+		{
+			for (int j = i + 1; j < delta_indizes.size(); j++)
+			{
+				if (delta_indizes[i] == delta_indizes[j]) {
+					delta_indizes.erase(delta_indizes.begin() + j);
+					--i;
+					break;
+				}
+			}
+		}
+
+		// Erase delta_k,k etc
+		remove_delta_is_one(this->delta_indizes);
+		remove_delta_is_one(this->delta_momenta);
+
+		return !(is_always_zero(this->delta_indizes) || is_always_zero(this->delta_momenta));
 	}
 
-	void wicks_theorem(const std::vector<Term>& terms, const std::vector<WickOperatorTemplate>& operator_templates, WickTermCollector& reciever)
+	bool WickTerm::computeSums()
 	{
-		WickTermCollector prepared_wick = prepare_wick(terms);
+		auto changeAllIndizes = [&](const Index replaceWhat, const Index replaceWith) {
+			for (auto& op : operators) {
+				for (auto it = op.indizes.begin(); it != op.indizes.end(); ++it)
+				{
+					if (*it == replaceWhat) {
+						*it = replaceWith;
+					}
+				}
+			}
+			for (auto& coeff : coefficients) {
+				for (auto it = coeff.indizes.begin(); it != coeff.indizes.end(); ++it)
+				{
+					if (*it == replaceWhat) {
+						*it = replaceWith;
+					}
+				}
+			}
+			for (auto& delta : delta_indizes) {
+				if (delta.first == replaceWhat) {
+					delta.first = replaceWith;
+				}
+				if (delta.second == replaceWhat) {
+					delta.second = replaceWith;
+				}
+			}
+			};
 
-		for (auto& w_term : prepared_wick) {
-			Utility::append_if(reciever, identifyWickOperators(w_term, operator_templates), [](const WickTerm& wick) {
-				return !(is_always_zero(wick.delta_indizes) || is_always_zero(wick.delta_momenta));
-				});
+		for (int i = 0; i < sums.spins.size(); i++)
+		{
+			for (int j = 0; j < delta_indizes.size(); j++)
+			{
+				if (delta_indizes[j].first == sums.spins[i]) {
+					changeAllIndizes(sums.spins[i], delta_indizes[j].second);
+					sums.spins.erase(sums.spins.begin() + i);
+					delta_indizes.erase(delta_indizes.begin() + j);
+					--i;
+					break;
+				}
+				else if (delta_indizes[j].second == sums.spins[i]) {
+					changeAllIndizes(sums.spins[i], delta_indizes[j].first);
+					sums.spins.erase(sums.spins.begin() + i);
+					delta_indizes.erase(delta_indizes.begin() + j);
+					--i;
+					break;
+				}
+			}
+		}
+
+		auto changeAllMomenta = [&](const char replaceWhat, const Momentum replaceWith) {
+			for (auto& op : operators) {
+				op.momentum.replaceOccurances(replaceWhat, replaceWith);
+			}
+			for (auto& coeff : coefficients) {
+				coeff.momenta.replaceOccurances(replaceWhat, replaceWith);
+			}
+			for (auto it = delta_momenta.begin(); it != delta_momenta.end();) {
+				it->first.replaceOccurances(replaceWhat, replaceWith);
+				it->second.replaceOccurances(replaceWhat, replaceWith);
+				++it;
+			}
+			};
+
+		for (int i = 0; i < sums.momenta.size(); i++)
+		{
+			for (int j = 0; j < delta_momenta.size(); j++)
+			{
+				if (delta_momenta[j].first.momentum_list[0].second == sums.momenta[i]) {
+					if (abs(delta_momenta[j].first.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << delta_momenta[j].first << std::endl;
+					changeAllMomenta(sums.momenta[i], delta_momenta[j].second);
+
+					sums.momenta.erase(sums.momenta.begin() + i);
+					delta_momenta.erase(delta_momenta.begin() + j);
+					--i;
+					if (!(setDeltas())) return false;
+					break;
+				}
+				else {
+					int index = delta_momenta[j].second.isUsed(sums.momenta[i]);
+					if (index < 0) continue;
+
+					Momentum buffer(delta_momenta[j].second.momentum_list[index].second, delta_momenta[j].second.momentum_list[index].first);
+					if (abs(buffer.momentum_list[0].first) != 1) std::cerr << "Not yet implemented! " << buffer << std::endl;
+					delta_momenta[j].second.momentum_list.erase(delta_momenta[j].second.momentum_list.begin() + index);
+					delta_momenta[j].second -= delta_momenta[j].first;
+
+					if (buffer.momentum_list[0].first > 0) {
+						delta_momenta[j].second.flipMomentum();
+					}
+					changeAllMomenta(sums.momenta[i], delta_momenta[j].second);
+
+					sums.momenta.erase(sums.momenta.begin() + i);
+					delta_momenta.erase(delta_momenta.begin() + j);
+					--i;
+					if (!(setDeltas())) return false;
+					break;
+				}
+			}
+		}
+		return true;
+	}
+
+	void WickTerm::discardZeroMomenta()
+	{
+		for (auto& op : operators) {
+			op.momentum.remove_zeros();
+		}
+		for (auto& coeff : coefficients) {
+			coeff.momenta.remove_zeros();
+		}
+	}
+
+	void WickTerm::renameSums()
+	{
+		constexpr char name_list[3] = { 'q', 'p', 'r' };
+		constexpr char buffer_list[3] = { ':', ';', '|' };
+		for (int i = 0; i < sums.momenta.size(); i++)
+		{
+			if (i >= 3) {
+				throw std::invalid_argument("More than 3 momenta, time to implement this...");
+			}
+			if (sums.momenta[i] == name_list[i]) continue;
+
+			for (auto& op : operators) {
+				op.momentum.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
+			}
+			for (auto& coeff : coefficients) {
+				coeff.momenta.replaceOccurances(sums.momenta[i], Momentum(buffer_list[i]));
+			}
+			sums.momenta[i] = name_list[i];
+		}
+
+		for (int i = 0; i < sums.momenta.size(); i++)
+		{
+			for (auto& op : operators) {
+				op.momentum.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
+			}
+			for (auto& coeff : coefficients) {
+				coeff.momenta.replaceOccurances(buffer_list[i], Momentum(name_list[i]));
+			}
+		}
+
+		for (const auto& sum : sums.momenta)
+		{
+			for (auto& op : operators) {
+				int index = op.momentum.isUsed(sum);
+				if (index < 0) continue;
+				if (op.momentum.momentum_list.size() == 1) break;
+
+				Momentum buffer = op.momentum;
+				if (buffer.momentum_list[index].first > 0) buffer.flipMomentum();
+				buffer.momentum_list[index].first *= -1;
+				buffer.momentum_list[index].second = buffer_list[0];
+
+				for (auto& op2 : operators) {
+					op2.momentum.replaceOccurances(sum, buffer);
+					op2.momentum.replaceOccurances(buffer_list[0], Momentum(sum));
+				}
+				for (auto& coeff : coefficients) {
+					coeff.momenta.replaceOccurances(sum, buffer);
+					coeff.momenta.replaceOccurances(buffer_list[0], Momentum(sum));
+				}
+			}
+		}
+		discardZeroMomenta();
+	}
+
+	void WickTerm::sort()
+	{
+		for (auto& delta : delta_momenta) {
+			if (delta.first.momentum_list.size() == 1 && delta.second.momentum_list.size() == 1) {
+				// This comparison is well defined because we save the momentum as char i.e. byte
+				// which is easily comparable
+				if (delta.first.momentum_list[0].second < delta.second.momentum_list[0].second) {
+					std::swap(delta.first, delta.second);
+					if (delta.first.momentum_list[0].first < 0) {
+						delta.first.flipMomentum();
+						delta.second.flipMomentum();
+					}
+					if (delta.first.add_Q) {
+						delta.first.add_Q = false;
+						delta.second.add_Q = !(delta.second.add_Q);
+					}
+				}
+				for (auto& op : operators) {
+					op.momentum.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				}
+				for (auto& coeff : coefficients) {
+					coeff.momenta.replaceOccurances(delta.first.momentum_list[0].second, delta.second);
+				}
+			}
+		}
+
+		for (auto& op : operators) {
+			if (op.type == CDW_Type && op.momentum.add_Q) {
+				op.momentum.add_Q = false;
+				op.isDaggered = !(op.isDaggered);
+			}
+		}
+
+		for (int i = 0U; i < operators.size(); ++i)
+		{
+			for (int j = i + 1U; j < operators.size(); ++j)
+			{
+				if (operators[i].type > operators[j].type) {
+					std::swap(operators[i], operators[j]);
+				}
+				else if (operators[i].type == operators[j].type) {
+					if (operators[i].momentum.momentum_list[0].second > operators[j].momentum.momentum_list[0].second) {
+						std::swap(operators[i], operators[j]);
+					}
+					else if (operators[i].momentum.momentum_list[0].second == operators[j].momentum.momentum_list[0].second) {
+						if (operators[i].momentum.add_Q && !(operators[j].momentum.add_Q)) {
+							std::swap(operators[i], operators[j]);
+						}
+					}
+				}
+			}
+		}
+
+		for (auto& coeff : coefficients) {
+			for (auto& momentum : coeff.momenta) {
+				momentum.sort();
+
+				if (coeff.translationalInvariance && !momentum.momentum_list.empty()) {
+					if (momentum.momentum_list[0].first < 0) {
+						momentum.flipMomentum();
+					}
+				}
+				if (coeff.Q_changes_sign && momentum.add_Q) {
+					momentum.add_Q = false;
+					this->multiplicity *= -1;
+				}
+			}
+		}
+
+		for (auto& coeff : coefficients) {
+			for (auto& momentum : coeff.momenta) {
+				for (const auto& sum : sums.momenta) {
+					int idx = momentum.isUsed(sum);
+					if (idx < 0) continue;
+
+					if (momentum.momentum_list[idx].first < 0) {
+						for (auto& op : operators) {
+							op.momentum.flip_single(sum);
+						}
+						for (auto& coeff2 : coefficients) {
+							coeff2.momenta.flip_single(sum);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -187,50 +579,8 @@ namespace SymbolicOperators {
 		this->operators.push_back(result.op);
 		this->multiplicity *= result.factor;
 	}
-
-	WickTermCollector identifyWickOperators(const WickTerm& source, const std::vector<WickOperatorTemplate>& operator_templates)
-	{
-		WickTermCollector ret;
-		ret.push_back(source);
-		ret.front().temporary_operators.clear();
-
-		for (size_t i = 0U; i < source.temporary_operators.size(); i += 2U)
-		{
-			std::vector<TemplateResult> template_results;
-			for (const auto& operator_template : operator_templates) {
-				auto template_result = operator_template.createFromOperators(source.temporary_operators[i], source.temporary_operators[i + 1U]);
-				if (template_result)
-					template_results.push_back(std::move(template_result));
-			}
-
-			const size_t current_size = ret.size();
-			const size_t number_additional_elements = std::accumulate(template_results.begin(), template_results.end(), size_t{}, [](size_t current, const TemplateResult& tr) {
-				return current + tr.results.size();
-				});
-			if (number_additional_elements > 1U) {
-				Utility::duplicate_n_inplace(ret, number_additional_elements - 1U);
-			}
-
-			size_t template_result_it{};
-			size_t old_it{};
-			for (const auto& tr : template_results) {
-				old_it = template_result_it;
-				for (const auto& tr_result : tr.results) {
-					for (auto it = ret.begin(); it != ret.begin() + current_size; ++it) {
-						(it + template_result_it * current_size)->includeTemplateResult(tr_result);
-					}
-					++template_result_it;
-				}
-				std::for_each(ret.begin() + old_it * current_size, ret.begin() + current_size * template_result_it, [&tr](WickTerm& ret_element) {
-					if (!tr.momentum_delta.isOne())
-						ret_element.delta_momenta.push_back(tr.momentum_delta);
-					});
-			}
-		}
-
-		return ret;
-	}
-
+	
+	// Operator overloads
 	std::ostream& operator<<(std::ostream& os, const WickTerm& term)
 	{
 		if (term.multiplicity > 0) {
@@ -293,7 +643,6 @@ namespace SymbolicOperators {
 		lhs.push_back(rhs);
 		return lhs;
 	}
-
 	WickTermCollector& operator+=(WickTermCollector& lhs, const WickTermCollector& rhs)
 	{
 		for (const auto& term : rhs) {

@@ -13,7 +13,7 @@ WARNINGS = -Wall -Wno-sign-compare
 OPT = -march=native -O3
 
 DEF_SRCS=Definitions/Hubbard.cpp Definitions/Continuum.cpp Definitions/StandardOperators.cpp
-PART_SRCS=Coefficient.cpp IndexWrapper.cpp Momentum.cpp MomentumList.cpp Operator.cpp Term.cpp WickCleaner.cpp WickOperator.cpp WickOperatorTemplate.cpp WickTerm.cpp 
+PART_SRCS=Coefficient.cpp IndexWrapper.cpp Momentum.cpp MomentumList.cpp Operator.cpp Term.cpp OperatorType.cpp WickOperator.cpp WickOperatorTemplate.cpp WickTerm.cpp WickSymmetry.cpp Wick.cpp
 SRCS=$(PART_SRCS) $(DEF_SRCS) FermionCommute.cpp
 
 OBJS=$(addprefix build/, $(subst .cpp,.o,$(SRCS)))
