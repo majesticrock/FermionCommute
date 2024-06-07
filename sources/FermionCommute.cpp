@@ -2,6 +2,7 @@
 #include <sstream>
 #include <Utility/LaTeXOutput.hpp>
 #include "Definitions/Hubbard.hpp"
+#include "Definitions/HubbardDispersions.hpp"
 #include "Definitions/Continuum.hpp"
 #include "Wick.hpp"
 #include <memory>
@@ -18,6 +19,9 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 	else if (model_type == "continuum") {
 		return std::make_unique<Continuum>();
 	}
+	else if (model_type == "hubbard_dispersions") {
+		return std::make_unique<HubbardDispersions>();
+	}
 	else {
 		throw std::invalid_argument("Model not recognized! " + model_type);
 	}
@@ -27,7 +31,7 @@ int main(int argc, char** argv) {
 	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
 	//std::cout << parse_test << std::endl;
 
-	constexpr bool print = true;
+	constexpr bool print = false;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;

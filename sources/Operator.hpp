@@ -29,6 +29,16 @@ namespace SymbolicOperators {
 			ret.momentum.momentum_list.front().second = new_momentum;
 			return ret;
 		};
+		inline Operator add_momentum(Momentum const& to_add) const {
+			Operator ret{ *this };
+			ret.momentum += to_add;
+			return ret;
+		}
+		inline Operator add_momentum(char to_add) const {
+			Operator ret{ *this };
+			ret.momentum += Momentum(to_add);
+			return ret;
+		}
 	};
 
 	inline bool operator==(const Operator& lhs, const Operator& rhs) {

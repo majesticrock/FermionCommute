@@ -5,7 +5,7 @@
 
 namespace SymbolicOperators {
 	class Term {
-	private:
+	public:
 		std::vector<Coefficient> coefficients;
 		SumContainer sums;
 		std::vector<Operator> operators;
@@ -13,7 +13,6 @@ namespace SymbolicOperators {
 		std::vector<KroneckerDelta<Index>> delta_indizes;
 
 		friend struct WickTerm;
-	public:
 		int multiplicity;
 		Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums,
 			const std::vector<Operator>& _operators = std::vector<Operator>());

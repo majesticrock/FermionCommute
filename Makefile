@@ -12,7 +12,7 @@ WARNINGS = -Wall -Wno-sign-compare
 
 OPT = -march=native -O3
 
-DEF_SRCS=Definitions/Hubbard.cpp Definitions/Continuum.cpp Definitions/StandardOperators.cpp
+DEF_SRCS=Definitions/Hubbard.cpp Definitions/HubbardDispersions.cpp Definitions/Continuum.cpp Definitions/StandardOperators.cpp
 PART_SRCS=Coefficient.cpp IndexWrapper.cpp Momentum.cpp MomentumList.cpp Operator.cpp Term.cpp OperatorType.cpp WickOperator.cpp WickOperatorTemplate.cpp WickTerm.cpp WickSymmetry.cpp Wick.cpp
 SRCS=$(PART_SRCS) $(DEF_SRCS) FermionCommute.cpp
 
@@ -22,10 +22,12 @@ all: build build/main ../commutators XP std
 
 XP: build build/main ../commutators
 	./build/main XP hubbard
+	./build/main XP hubbard_dispersions
 	./build/main XP continuum
 
 std: build build/main ../commutators
 	./build/main std hubbard
+	./build/main XP hubbard_dispersions
 	./build/main std continuum
 
 continuum_xp: build build/main ../commutators
