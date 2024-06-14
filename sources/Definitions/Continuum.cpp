@@ -13,12 +13,21 @@ namespace SymbolicOperators {
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
 		
-		const Term H_EM(-1, Coefficient("V", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
-			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
-			c_minus_k.with_momentum(Momentum("q+p")), c_k.with_momentum(Momentum("q+p"))
-			}));
+		const Term H_EM(1, Coefficient("V", Momentum('q'), true),
+			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
+			std::vector<Operator>({
+				Operator('r', 1, false, Sigma, true),
+				Operator('p', 1, false, SigmaPrime, true),
+				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SigmaPrime, false),
+				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
+				}));
 
-		return { H_T, H_U, H_EM };
+		const Term H_BG(-2, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Sigma },
+			std::vector<Operator>({
+				Operator(Momentum("q"), Sigma, true), Operator('q', 1, false, Sigma, false)
+				}));
+
+		return { H_T, H_U, H_EM, H_BG };
 	}
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{

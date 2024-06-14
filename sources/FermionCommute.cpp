@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
 	//std::cout << parse_test << std::endl;
 
-	constexpr bool print = false;
+	constexpr bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 			renameMomenta(t, 'x', 'y');
 		}
 	}
-	//std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
+	std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
 		term_vec commute_with_H;
@@ -116,6 +116,15 @@ int main(int argc, char** argv) {
 			wicks_theorem(terms, templates, wicks);
 			clearEtas(wicks);
 			cleanWicks(wicks, symmetries);
+
+			for(auto& wickterm : wicks){
+				if(wickterm.coefficients.front().name == "\\rho"){
+					WickTerm replacer(
+						std::to_string(wickterm.multiplicity) + "sum:index{sigma'} sum:momentum{r} c:V{;} o:n{r;sigma'}"
+					);
+					
+				}
+			}
 
 			if (debug || print) {
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
