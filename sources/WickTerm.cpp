@@ -484,6 +484,24 @@ namespace SymbolicOperators {
 			}
 		}
 		discardZeroMomenta();
+
+		if(sums.spins.size() == 1U && sums.spins.front() == SigmaPrime) {
+			for(auto& coeff : coefficients){
+				for(auto& index : coeff.indizes){
+					if(index == SigmaPrime) index = Sigma;
+				}
+			}
+			for(auto& op : operators){
+				for(auto& index : op.indizes){
+					if(index == SigmaPrime) index = Sigma;
+				}
+			}
+			for(auto& delta_index : delta_indizes){
+				if(delta_index.first == SigmaPrime) delta_index.first = Sigma;
+				if(delta_index.second == SigmaPrime) delta_index.second = Sigma;
+			}
+			sums.spins.front() = Sigma;
+		}
 	}
 
 	void WickTerm::sort()

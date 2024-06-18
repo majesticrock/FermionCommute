@@ -119,12 +119,13 @@ int main(int argc, char** argv) {
 
 			for(auto& wickterm : wicks){
 				if(wickterm.coefficients.front().name == "\\rho"){
-					WickTerm replacer(
-						std::to_string(wickterm.multiplicity) + "sum:index{sigma'} sum:momentum{r} c:V{;} o:n{r;sigma'}"
-					);
-					
+					wickterm.sums.push_back(Index::SigmaPrime);
+					wickterm.sums.push_back('r');
+					wickterm.coefficients.front() = Coefficient::parse_string("V{0;}");
+					wickterm.operators.push_back(WickOperator("n{r;sigma'}"));
 				}
 			}
+			cleanWicks(wicks, symmetries);
 
 			if (debug || print) {
 				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])

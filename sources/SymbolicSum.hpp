@@ -50,6 +50,20 @@ namespace SymbolicOperators {
 			Utility::append_vector(this->spins, other.spins);
 			return *this;
 		}
+		inline SumContainer& append(const MomentumSum& other) {
+			Utility::append_vector(this->momenta, other);
+			return *this;
+		}
+		inline SumContainer& append(const IndexSum& other) {
+			Utility::append_vector(this->spins, other);
+			return *this;
+		}
+		inline void push_back(const char momentum) {
+			this->momenta.push_back(momentum);
+		}
+		inline void push_back(const Index spin) {
+			this->spins.push_back(spin);
+		}
 	};
 
 	inline bool operator==(const SumContainer& lhs, const SumContainer& rhs) {

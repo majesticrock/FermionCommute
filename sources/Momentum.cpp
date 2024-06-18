@@ -22,13 +22,15 @@ namespace SymbolicOperators {
 
 	Momentum::Momentum(const std::string& expression, bool Q/* = false*/) : add_Q(Q)
 	{
-		size_t last = 0U;
-		size_t current = expression.find_first_of("+-", expression.front() == '+' || expression.front() == '-' ? 1U : 0U);
-		do {
-			current = expression.find_first_of("+-", last + 1U);
-			this->momentum_list.push_back(identify_subexpression(expression.substr(last, current - last)));
-			last = current;
-		} while (current != std::string::npos);
+		if(expression != "0") {
+			size_t last = 0U;
+			size_t current = expression.find_first_of("+-", expression.front() == '+' || expression.front() == '-' ? 1U : 0U);
+			do {
+				current = expression.find_first_of("+-", last + 1U);
+				this->momentum_list.push_back(identify_subexpression(expression.substr(last, current - last)));
+				last = current;
+			} while (current != std::string::npos);
+		}
 	}
 
 	void Momentum::sort()
@@ -137,6 +139,25 @@ namespace SymbolicOperators {
 				momentum_pair.first *= -1;
 			}
 		}
+	}
+
+	bool Momentum::operator==(const Momentum& rhs) const {
+		if (this->add_Q != rhs.add_Q) return false;
+		if (this->momentum_list.size() != rhs.momentum_list.size()) return false;
+		bool foundOne = true;
+		for (size_t i = 0U; i < this->momentum_list.size(); ++i)
+		{
+			foundOne = false;
+			for (size_t j = 0U; j < rhs.momentum_list.size(); ++j)
+			{
+				if (this->momentum_list[i] == rhs.momentum_list[j]) {
+					foundOne = true;
+					break;
+				}
+			}
+			if (!foundOne) return false;
+		}
+		return true;
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Momentum& momentum)

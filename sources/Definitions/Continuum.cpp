@@ -83,6 +83,7 @@ namespace SymbolicOperators {
 		ret.reserve(2);
 		ret.push_back(std::make_unique<SpinSymmetry>());
 		ret.push_back(std::make_unique<TranslationalSymmetry>());
+		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type>>());
 		return ret;
 	}
 	std::string Continuum::get_subfolder() const

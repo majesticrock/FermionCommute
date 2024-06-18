@@ -4,7 +4,7 @@
 namespace SymbolicOperators {
 	Coefficient Coefficient::parse_string(const std::string& expression)
 	{
-		// Syntax:   name{Momentum_expression,index1,index2,...}
+		// Syntax:   name{Momentum_expression1,Momentum_expression1;index1,index2,...}
 
 		Coefficient ret;
 		ret.name = expression.substr(0U, expression.find('{'));

@@ -68,24 +68,7 @@ namespace SymbolicOperators {
 		// replaces 'momentum' with -'momentum' if it exists within momentum_list
 		void flip_single(char momentum);
 
-		inline bool operator==(const Momentum& rhs) const {
-			if (this->add_Q != rhs.add_Q) return false;
-			if (this->momentum_list.size() != rhs.momentum_list.size()) return false;
-			bool foundOne = true;
-			for (size_t i = 0U; i < this->momentum_list.size(); ++i)
-			{
-				foundOne = false;
-				for (size_t j = 0U; j < rhs.momentum_list.size(); ++j)
-				{
-					if (this->momentum_list[i] == rhs.momentum_list[j]) {
-						foundOne = true;
-						break;
-					}
-				}
-				if (!foundOne) return false;
-			}
-			return true;
-		};
+		bool operator==(const Momentum& rhs) const;
 		inline bool operator!=(const Momentum& rhs) const {
 			return !(*this == rhs);
 		};
