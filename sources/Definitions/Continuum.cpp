@@ -13,7 +13,7 @@ namespace SymbolicOperators {
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
 		
-		const Term H_EM(1, Coefficient("V", Momentum('q'), true),
+		const Term H_EM(IntFractional(1, 2), Coefficient("V", Momentum('q'), true),
 			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
 			std::vector<Operator>({
 				Operator('r', 1, false, Sigma, true),
@@ -22,7 +22,7 @@ namespace SymbolicOperators {
 				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 				}));
 
-		const Term H_BG(-2, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Sigma },
+		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Sigma },
 			std::vector<Operator>({
 				Operator(Momentum("q"), Sigma, true), Operator('q', 1, false, Sigma, false)
 				}));

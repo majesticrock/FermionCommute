@@ -4,21 +4,21 @@
 #include <sstream>
 
 namespace SymbolicOperators {
-	Term::Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, Coefficient _coefficient, const SumContainer& _sums, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sums(_sums), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sums{ _sum_momenta, {} }, operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, Coefficient _coefficient, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), sums{ {}, _sum_indizes }, operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, Coefficient _coefficient, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, Coefficient _coefficient, const std::vector<Operator>& _operators)
 		: coefficients(1, _coefficient), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const SumContainer& _sums, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, const SumContainer& _sums, const std::vector<Operator>& _operators)
 		: coefficients(), sums(_sums), operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, const MomentumSum& _sum_momenta, const std::vector<Operator>& _operators)
 		: coefficients(), sums{ _sum_momenta, {} }, operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, const IndexSum& _sum_indizes, const std::vector<Operator>& _operators)
 		: coefficients(), sums{ {}, _sum_indizes }, operators(_operators), multiplicity(_multiplicity) {}
-	Term::Term(int _multiplicity, const std::vector<Operator>& _operators)
+	Term::Term(IntFractional _multiplicity, const std::vector<Operator>& _operators)
 		: coefficients(), operators(_operators), multiplicity(_multiplicity) {}
 
 	void Term::print() const {

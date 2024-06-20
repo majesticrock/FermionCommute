@@ -3,6 +3,7 @@
 #include "WickOperator.hpp"
 #include "WickOperatorTemplate.hpp"
 #include <algorithm>
+#include <Utility/Fractional.hpp>
 
 namespace SymbolicOperators {
 	class Term;
@@ -11,7 +12,7 @@ namespace SymbolicOperators {
 	private:
 		void string_parser(std::string&& expression);
 	public:
-		int multiplicity{};
+		IntFractional multiplicity{};
 		std::vector<Coefficient> coefficients;
 		SumContainer sums;
 		std::vector<WickOperator> operators;

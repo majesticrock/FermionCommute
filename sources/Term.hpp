@@ -2,8 +2,11 @@
 #include "KroneckerDelta.hpp"
 #include "Coefficient.hpp"
 #include "SymbolicSum.hpp"
+#include <Utility/Fractional.hpp>
 
 namespace SymbolicOperators {
+	using IntFractional = Utility::Fractional<int>;
+
 	class Term {
 	public:
 		std::vector<Coefficient> coefficients;
@@ -11,24 +14,24 @@ namespace SymbolicOperators {
 		std::vector<Operator> operators;
 		std::vector<KroneckerDelta<Momentum>> delta_momenta;
 		std::vector<KroneckerDelta<Index>> delta_indizes;
+		IntFractional multiplicity;
 
 		friend struct WickTerm;
-		int multiplicity;
-		Term(int _multiplicity, Coefficient _coefficient, const SumContainer& _sums,
+		Term(IntFractional _multiplicity, Coefficient _coefficient, const SumContainer& _sums,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
+		Term(IntFractional _multiplicity, Coefficient _coefficient, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient, const IndexSum& _sum_spins,
+		Term(IntFractional _multiplicity, Coefficient _coefficient, const IndexSum& _sum_spins,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, Coefficient _coefficient,
+		Term(IntFractional _multiplicity, Coefficient _coefficient,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const SumContainer& _sums,
+		Term(IntFractional _multiplicity, const SumContainer& _sums,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const MomentumSum& _sum_momenta,
+		Term(IntFractional _multiplicity, const MomentumSum& _sum_momenta,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		Term(int _multiplicity, const IndexSum& _sum_spins,
+		Term(IntFractional _multiplicity, const IndexSum& _sum_spins,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
-		explicit Term(int _multiplicity,
+		explicit Term(IntFractional _multiplicity,
 			const std::vector<Operator>& _operators = std::vector<Operator>());
 		Term() = default;
 
