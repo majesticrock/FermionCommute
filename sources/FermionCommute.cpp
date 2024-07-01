@@ -7,6 +7,7 @@
 #include <SymbolicOperators/Wick.hpp>
 #include <memory>
 #include <filesystem>
+#include <boost/archive/binary_oarchive.hpp>
 
 using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
@@ -32,7 +33,7 @@ int main(int argc, char** argv) {
 	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
 	//std::cout << parse_test << std::endl;
 
-	constexpr bool print = true;
+	constexpr bool print = false;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
@@ -90,7 +91,9 @@ int main(int argc, char** argv) {
 			renameMomenta(t, 'x', 'y');
 		}
 	}
-	std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
+
+	if(print) std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
+	
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
 		term_vec commute_with_H;
@@ -136,8 +139,8 @@ int main(int argc, char** argv) {
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs(save_folder + sub_folder + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
-				boost::archive::text_oarchive oa(ofs);
+				std::ofstream ofs(save_folder + sub_folder + name_prefix + "wick_M_" + std::to_string(j) + "_" + std::to_string(i) + ".bin", std::ios::binary);
+				boost::archive::binary_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
 			}
@@ -156,8 +159,8 @@ int main(int argc, char** argv) {
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
-				std::ofstream ofs(save_folder + sub_folder + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".txt");
-				boost::archive::text_oarchive oa(ofs);
+				std::ofstream ofs(save_folder + sub_folder + name_prefix + "wick_N_" + std::to_string(j) + "_" + std::to_string(i) + ".bin", std::ios::binary);
+				boost::archive::binary_oarchive oa(ofs);
 				oa << wicks;
 				ofs.close();
 			}

@@ -1,8 +1,13 @@
-all: build/FermionCommute ../commutators XP std
+BUILD_DIR = build
 
-build/FermionCommute: build
-	cmake -B build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ .
-	cmake --build build
+all: XP std
+
+build/FermionCommute: $(BUILD_DIR)/Makefile
+	@$(MAKE) -C $(BUILD_DIR)
+
+$(BUILD_DIR)/Makefile: CMakeLists.txt
+	@mkdir -p $(BUILD_DIR)
+	@cd $(BUILD_DIR) && cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
 
 XP: build/FermionCommute ../commutators
 	./build/FermionCommute XP hubbard
@@ -23,12 +28,9 @@ test: build/FermionCommute
 debug: build/FermionCommute
 	./build/FermionCommute debug
 
-build:
-	mkdir -p build
-
 ../commutators:
 	mkdir -p ../commutators
 
 clean:
-	rm -rf build
+	rm -rf $(BUILD_DIR)
 	rm -rf ../commutators/*
