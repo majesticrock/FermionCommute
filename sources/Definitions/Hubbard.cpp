@@ -146,8 +146,8 @@ namespace SymbolicOperators {
 	std::vector<std::unique_ptr<WickSymmetry>> Hubbard::symmetries() const
 	{
 		std::vector<std::unique_ptr<WickSymmetry>> ret;
-		ret.reserve(3);
-		ret.push_back(std::make_unique<SpinSymmetry>());
+		ret.reserve(2);
+		//ret.push_back(std::make_unique<SpinSymmetry>());
 		ret.push_back(std::make_unique<TranslationalSymmetry>());
 		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type, CDW_Type>>());
 		return ret;
