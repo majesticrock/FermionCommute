@@ -1,35 +1,36 @@
 BUILD_DIR = build
 
-all: XP std
+all: $(BUILD_DIR)/Makefile XP std
+	@$(MAKE) -C $(BUILD_DIR)
 
-build/FermionCommute: $(BUILD_DIR)/Makefile
+$(BUILD_DIR)/FermionCommute: $(BUILD_DIR)/Makefile
 	@$(MAKE) -C $(BUILD_DIR)
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
 
-XP: build/FermionCommute ../commutators
-	./build/FermionCommute XP hubbard
-	./build/FermionCommute XP hubbard_dispersions
-	./build/FermionCommute XP continuum
+XP: $(BUILD_DIR)/FermionCommute ../commutators
+	./$(BUILD_DIR)/FermionCommute XP hubbard
+	./$(BUILD_DIR)/FermionCommute XP hubbard_dispersions
+	./$(BUILD_DIR)/FermionCommute XP continuum
 
-std: build/FermionCommute ../commutators
-	./build/FermionCommute std hubbard
-	./build/FermionCommute std hubbard_dispersions
-	./build/FermionCommute std continuum
+std: $(BUILD_DIR)/FermionCommute ../commutators
+	./$(BUILD_DIR)/FermionCommute std hubbard
+	./$(BUILD_DIR)/FermionCommute std hubbard_dispersions
+	./$(BUILD_DIR)/FermionCommute std continuum
 
-continuum_xp: build/FermionCommute ../commutators
-	./build/FermionCommute XP continuum
+continuum_xp: $(BUILD_DIR)/FermionCommute ../commutators
+	./$(BUILD_DIR)/FermionCommute XP continuum
 
-hubbard_xp: build/FermionCommute ../commutators
-	./build/FermionCommute XP hubbard
+hubbard_xp: $(BUILD_DIR)/FermionCommute ../commutators
+	./$(BUILD_DIR)/FermionCommute XP hubbard
 
-test: build/FermionCommute
-	./build/FermionCommute test
+test: $(BUILD_DIR)/FermionCommute
+	./$(BUILD_DIR)/FermionCommute test
 
-debug: build/FermionCommute
-	./build/FermionCommute debug
+debug: $(BUILD_DIR)/FermionCommute
+	./$(BUILD_DIR)/FermionCommute debug
 
 ../commutators:
 	mkdir -p ../commutators

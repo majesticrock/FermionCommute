@@ -28,6 +28,12 @@ namespace SymbolicOperators {
 				}));
 
 		return { H_T, H_U, H_EM, H_BG };
+
+		/* const Term H_EM(1, Coefficient("V", Momentum("q-p"), true), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
+			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
+			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
+			}));
+		return { H_T, H_U, H_EM }; */
 	}
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{
@@ -80,10 +86,9 @@ namespace SymbolicOperators {
 	std::vector<std::unique_ptr<WickSymmetry>> Continuum::symmetries() const
 	{
 		std::vector<std::unique_ptr<WickSymmetry>> ret;
-		ret.reserve(2);
 		ret.push_back(std::make_unique<SpinSymmetry>());
 		ret.push_back(std::make_unique<TranslationalSymmetry>());
-		//ret.push_back(std::make_unique<PhaseSymmetry<SC_Type>>());
+		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type>>());
 		return ret;
 	}
 	std::string Continuum::get_subfolder() const
