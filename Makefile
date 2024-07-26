@@ -22,6 +22,9 @@ std: build/FermionCommute ../commutators
 continuum_xp: build/FermionCommute ../commutators
 	./build/FermionCommute XP continuum
 
+hubbard_xp: build/FermionCommute ../commutators
+	./build/FermionCommute XP hubbard
+
 test: build/FermionCommute
 	./build/FermionCommute test
 

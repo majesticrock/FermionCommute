@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
 	//std::cout << parse_test << std::endl;
 
-	constexpr bool print = false;
+	constexpr bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
@@ -80,6 +80,9 @@ int main(int argc, char** argv) {
 				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), StandardOperators::c_k}))
 			})
 		};
+	} else {
+		std::cerr << "Execution type not recognized! Accepted are: 'XP' and 'std'" << std::endl;
+		return 1;
 	}
 	const auto symmetries = model->symmetries();
 
