@@ -12,7 +12,7 @@ namespace SymbolicOperators {
 			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
-		
+
 		const Term H_EM(IntFractional(1, 2), Coefficient("V", Momentum('q'), true),
 			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
 			std::vector<Operator>({

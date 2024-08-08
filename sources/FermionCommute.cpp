@@ -80,7 +80,8 @@ int main(int argc, char** argv) {
 				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), StandardOperators::c_k}))
 			})
 		};
-	} else {
+	}
+	else {
 		std::cerr << "Execution type not recognized! Accepted are: 'XP' and 'std'" << std::endl;
 		return 1;
 	}
@@ -95,8 +96,8 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	if(print) std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
-	
+	if (print) std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
+
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
 		term_vec commute_with_H;
@@ -124,8 +125,8 @@ int main(int argc, char** argv) {
 			clearEtas(wicks);
 			cleanWicks(wicks, symmetries);
 
-			for(auto& wickterm : wicks){
-				if(wickterm.coefficients.front().name == "\\rho"){
+			for (auto& wickterm : wicks) {
+				if (wickterm.coefficients.front().name == "\\rho") {
 					wickterm.sums.push_back(Index::SigmaPrime);
 					wickterm.sums.push_back('r');
 					wickterm.coefficients.front() = Coefficient::parse_string("V{0;}");
