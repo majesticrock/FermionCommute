@@ -50,14 +50,12 @@ namespace SymbolicOperators {
 				Term(1, std::vector<Operator>({ c_minus_k, c_k })),
 				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 				}),
-			// 1/2: n_up/down
+			// 1: n_up + down
 			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k }))
-				}),
-			std::vector<Term>({
+				Term(1, std::vector<Operator>({ c_k_dagger, c_k })),
 				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 				}),
-			// 3: f - f^+
+			// 2: f - f^+
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k, c_k })),
 				Term(-1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
@@ -71,12 +69,10 @@ namespace SymbolicOperators {
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k, c_k }))
 			}),
+			// n_up + down
 			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
-			}),
-			// n_up/down
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k }))
+				Term(1, std::vector<Operator>({ c_k_dagger, c_k })),
+				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
