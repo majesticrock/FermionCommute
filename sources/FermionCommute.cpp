@@ -30,9 +30,9 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 
 int main(int argc, char** argv) {
 	const std::string save_folder = "../commutators/";
-	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
-	//std::cout << parse_test << std::endl;
-
+	/* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
+	std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
+	return 0; */
 	constexpr bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
