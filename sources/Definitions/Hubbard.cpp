@@ -1,15 +1,6 @@
 #include "Hubbard.hpp"
 
 namespace SymbolicOperators {
-	const Momentum Hubbard::base_k_Q{ momentum_pairs{ {1, 'k'} }, true };
-
-	const Operator Hubbard::c_k_Q{ base_k_Q, SpinUp, false };
-	const Operator Hubbard::c_minus_k_Q{ -base_k_Q, SpinDown, false };
-	const Operator Hubbard::c_k_Q_dagger{ base_k_Q, SpinUp, true };
-	const Operator Hubbard::c_minus_k_Q_dagger{ -base_k_Q, SpinDown, true };
-	const Operator Hubbard::c_k_Q_down_dagger{ base_k_Q, SpinDown, true };
-	const Operator Hubbard::c_k_Q_down{ base_k_Q, SpinDown, false };
-
 	std::vector<Term> Hubbard::hamiltonian() const
 	{
 		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Sigma },
@@ -46,6 +37,11 @@ namespace SymbolicOperators {
 	std::vector<std::vector<Term>> Hubbard::XP_basis() const
 	{
 		return {
+			// 0: phi + phi^+
+			std::vector<Term>({
+				Term(1, std::vector<Operator>({ c_k_down_dagger, c_k })),
+				Term(1, std::vector<Operator>({ c_k_dagger, c_k_down }))
+				}),
 			// 0: f + f^+
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k, c_k })),

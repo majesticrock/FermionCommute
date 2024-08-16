@@ -1,8 +1,8 @@
 #pragma once
-#include "StandardOperators.hpp"
+#include "DefinitionsBase.hpp"
 
 namespace SymbolicOperators {
-	class Continuum : public StandardOperators
+	class Continuum : public DefinitionsBase
 	{
 		virtual std::vector<Term> hamiltonian() const override;
 		virtual std::vector<WickOperatorTemplate> templates() const override;
