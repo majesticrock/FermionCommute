@@ -2,7 +2,7 @@ set(DEF_SOURCES
     Continuum.cpp
     Hubbard.cpp
     HubbardDispersions.cpp
-    StandardOperators.cpp
+    DefinitionsBase.cpp
 )
 
 add_library(Definitions STATIC ${DEF_SOURCES})

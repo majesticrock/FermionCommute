@@ -13,7 +13,7 @@ using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 
-std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
+std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
 	if (model_type == "hubbard") {
 		return std::make_unique<Hubbard>();
 	}
@@ -30,9 +30,9 @@ std::unique_ptr<StandardOperators> get_model(std::string const& model_type) {
 
 int main(int argc, char** argv) {
 	const std::string save_folder = "../commutators/";
-	//WickTerm parse_test("1 sum:momentum{p,q} c:V{p;q} o:n{k-p-3x;up} o:f{k+l;}");
-	//std::cout << parse_test << std::endl;
-
+	/* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
+	std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
+	return 0; */
 	constexpr bool print = true;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 	if (EXECUTION_TYPE == "test") {
 		WickTerm wick;
 		wick.multiplicity = 1;
-		wick.temporary_operators = { Hubbard::c_minus_k_Q, Hubbard::c_k_Q,
-			Hubbard::c_k_Q_dagger, StandardOperators::c_k };
+		wick.temporary_operators = { c_minus_k_Q, c_k_Q,
+			c_k_Q_dagger, c_k };
 		auto wick_results = identifyWickOperators(wick, Hubbard().templates());
 		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
 		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 	const std::string name_prefix = EXECUTION_TYPE == "XP" ? "XP_" : "";
 	const bool debug = EXECUTION_TYPE == "debug";
 
-	const std::unique_ptr<StandardOperators> model = get_model(MODEL_TYPE);
+	const std::unique_ptr<DefinitionsBase> model = get_model(MODEL_TYPE);
 	const std::string sub_folder = model->get_subfolder();
 	if (!debug)
 		std::filesystem::create_directories(save_folder + sub_folder);
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 		basis = {
 			// 0: f + f^+
 			std::vector<Term>({
-				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), StandardOperators::c_k}))
+				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), c_k}))
 			})
 		};
 	}
