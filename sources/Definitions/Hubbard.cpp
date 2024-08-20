@@ -38,10 +38,10 @@ namespace SymbolicOperators {
 	{
 		return {
 			// 0: phi + phi^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ c_k_down_dagger, c_k })),
-				Term(1, std::vector<Operator>({ c_k_dagger, c_k_down }))
-				}),
+			//std::vector<Term>({
+			//	Term(1, std::vector<Operator>({ c_k_down_dagger, c_k })),
+			//	Term(1, std::vector<Operator>({ c_k_dagger, c_k_down }))
+			//	}),
 			// 0: f + f^+
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k, c_k })),
