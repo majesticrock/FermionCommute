@@ -23,6 +23,10 @@ continuum_xp: $(BUILD_DIR)/Makefile ../commutators
 	@$(MAKE) -C $(BUILD_DIR)
 	./$(BUILD_DIR)/FermionCommute XP continuum
 
+continuum_std: $(BUILD_DIR)/Makefile ../commutators
+	@$(MAKE) -C $(BUILD_DIR)
+	./$(BUILD_DIR)/FermionCommute std continuum
+
 hubbard_xp: $(BUILD_DIR)/Makefile ../commutators
 	@$(MAKE) -C $(BUILD_DIR)
 	./$(BUILD_DIR)/FermionCommute XP hubbard
