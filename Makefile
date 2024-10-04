@@ -10,8 +10,8 @@ $(BUILD_DIR)/Makefile: CMakeLists.txt
 XP: $(BUILD_DIR)/Makefile ../commutators
 	@$(MAKE) -C $(BUILD_DIR)
 	./$(BUILD_DIR)/FermionCommute XP hubbard
-	./$(BUILD_DIR)/FermionCommute XP hubbard_dispersions
 	./$(BUILD_DIR)/FermionCommute XP continuum
+#	./$(BUILD_DIR)/FermionCommute XP hubbard_dispersions # Does not work
 
 std: $(BUILD_DIR)/Makefile ../commutators
 	@$(MAKE) -C $(BUILD_DIR)
