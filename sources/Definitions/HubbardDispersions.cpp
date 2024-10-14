@@ -5,13 +5,13 @@ namespace SymbolicOperators {
 	{
 		std::vector<std::vector<Term>> basis = Hubbard::XP_basis();
 		for (auto& basis_term : basis) {
-			if(basis_term.front().operators.front().isDaggered) {
+			if (basis_term.front().operators.front().isDaggered) {
 				basis_term.front().operators.front().momentum += Momentum('x');
 			}
 			else {
 				basis_term.front().operators.front().momentum += Momentum('x', -1);
 			}
-			if(basis_term.size() == 2U) {
+			if (basis_term.size() == 2U) {
 				basis_term[1] = basis_term.front();
 			}
 			else {
