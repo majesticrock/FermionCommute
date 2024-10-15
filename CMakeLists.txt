@@ -37,12 +37,6 @@ else()
     message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}. Only GCC is supported.")
 endif()
 
-
-# Find Boost libraries
 find_package(Boost REQUIRED COMPONENTS serialization)
-if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost libraries not found")
-endif()
 target_include_directories(FermionCommute PRIVATE ${Boost_INCLUDE_DIRS})
-
 target_link_libraries(FermionCommute PRIVATE Definitions ${Boost_LIBRARIES})
