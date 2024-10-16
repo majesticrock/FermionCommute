@@ -13,6 +13,27 @@ using namespace SymbolicOperators;
 using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 
+void remove_all_x(term_vec& terms) {
+	for (auto& term : terms) {
+		term.remove_momentum_contribution('x');
+	}
+}
+void remove_all_x(WickTermCollector& terms) {
+	for (auto& term : terms) {
+		term.remove_momentum_contribution('x');
+	}
+}
+
+template <typename T>
+std::vector<T> joinVectors(const std::vector<T>& vec1, const std::vector<T>& vec2) {
+	std::vector<T> result;
+	result.reserve(vec1.size() + vec2.size());
+	result.insert(result.end(), vec1.begin(), vec1.end());
+	result.insert(result.end(), vec2.begin(), vec2.end());
+	return result;
+}
+
+
 std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
 	if (model_type == "hubbard") {
 		return std::make_unique<Hubbard>();
@@ -42,16 +63,83 @@ int main(int argc, char** argv) {
 	const std::string MODEL_TYPE = argv[2];
 
 	if (EXECUTION_TYPE == "test") {
-		WickTerm wick;
-		wick.multiplicity = 1;
-		wick.temporary_operators = { c_minus_k_Q, c_k_Q,
-			c_k_Q_dagger, c_k };
-		auto wick_results = identifyWickOperators(wick, Hubbard().templates());
-		std::cout << "Testing on: $" << wick.temporary_operators << "$\n\n";
-		std::cout << "Pre clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
-		cleanWicks(wick_results, Hubbard().symmetries());
-		std::cout << "Post clean:\n\n" << Utility::as_LaTeX(wick_results, "align*") << std::endl;
+		Hubbard hubbard;
 
+		std::vector<std::vector<Term>> base = hubbard.STD_basis();
+		std::vector<std::vector<Term>> disp = base;
+		for (auto& _v : disp) {
+			for (auto& v : _v) {
+				if (v.operators.front().isDaggered) {
+					v.operators.front().momentum += Momentum('x');
+				}
+				else {
+					v.operators.front().momentum += Momentum('x', -1);
+				}
+			}
+		}
+
+		std::vector<std::vector<Term>> base_daggered(base);
+		std::vector<std::vector<Term>> disp_daggered(disp);
+		for (auto& vec : base_daggered) {
+			hermitianConjugate(vec);
+			renameMomenta(vec, 'k', 'l');
+		}
+		for (auto& vec : disp_daggered) {
+			hermitianConjugate(vec);
+			renameMomenta(vec, 'k', 'l');
+		}
+
+
+		const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
+			Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
+			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SpinDown, false),
+			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), SpinUp, false),
+			}));
+		const std::vector<Term> H = { H_U };
+		const int inner_idx = 0;
+		const int outer_idx = static_cast<int>(!inner_idx);
+
+		term_vec commute_with_H_base;
+		commutator(commute_with_H_base, H, base[inner_idx]);
+		cleanUp(commute_with_H_base);
+
+		term_vec commute_with_H_disp;
+		commutator(commute_with_H_disp, disp[inner_idx], H);
+		cleanUp(commute_with_H_disp);
+		
+		if (true){
+			term_vec joined = joinVectors(commute_with_H_base, commute_with_H_disp);
+			remove_all_x(joined);
+			cleanUp(joined);
+
+			std::cout << "Single commutator:\n" << joined << std::endl; // Up to here, everything works
+		}
+
+		{
+			term_vec base_double;
+			commutator(base_double, base_daggered[outer_idx], commute_with_H_base);
+			cleanUp(base_double);
+
+			term_vec disp_double;
+			commutator(disp_double, disp_daggered[outer_idx], commute_with_H_disp);
+			cleanUp(disp_double);
+			
+			term_vec joined = joinVectors(base_double, disp_double);
+			cleanUp(joined);
+			//std::cout << "joined:\n" << joined << std::endl;
+
+			auto templates = hubbard.templates();
+			auto symmetries = hubbard.symmetries();
+
+			WickTermCollector wicks;
+			wicks_theorem(joined, templates, wicks);
+			clearEtas(wicks);
+			cleanWicks(wicks, symmetries);
+			remove_all_x(wicks);
+			cleanWicks(wicks, symmetries);
+
+			std::cout << "Double commutator:\n" << wicks << std::endl;
+		}
 		return 0;
 	}
 
@@ -74,12 +162,7 @@ int main(int argc, char** argv) {
 		basis = model->STD_basis();
 	}
 	else if (debug) {
-		basis = {
-			// 0: f + f^+
-			std::vector<Term>({
-				Term(1, std::vector<Operator>({ Operator(Momentum({{-1, 'k'}, {-1, 'x'}}), SpinDown, false), c_k}))
-			})
-		};
+		basis = model->STD_basis();
 	}
 	else {
 		std::cerr << "Execution type not recognized! Accepted are: 'XP' and 'std'" << std::endl;
@@ -91,9 +174,9 @@ int main(int argc, char** argv) {
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
 		renameMomenta(t, 'k', 'l');
-		if (debug) {
-			renameMomenta(t, 'x', 'y');
-		}
+		//if (debug) {
+		//	renameMomenta(t, 'x', 'y');
+		//}
 	}
 
 	if (print) std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;

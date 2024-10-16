@@ -23,7 +23,7 @@ namespace SymbolicOperators {
 				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 				}));
 
-		return { H_T, H_U, H_V };
+		return { H_T, H_U };//, H_V
 	}
 	std::vector<WickOperatorTemplate> Hubbard::templates() const
 	{
@@ -102,35 +102,35 @@ namespace SymbolicOperators {
 	std::vector<std::vector<Term>> Hubbard::STD_basis() const
 	{
 		return {
-			// f, f^+
+			// 0/1: f, f^+
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k, c_k }))
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_dagger }))
 			}),
-			// n_up/down
+			// 2/3: n_up/down
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_dagger, c_k }))
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k }))
 			}),
-			// g_up/down
+			// 4/5: g_up/down
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q }))
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k_dagger, c_minus_k_Q }))
 			}),
-			// eta, eta^+
+			// 6/7: eta, eta^+
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_minus_k_Q, c_k }))
 			}),
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_dagger, c_minus_k_Q_dagger }))
 			}),
-			// transversal magnon
+			// 8/9: transversal magnon
 			std::vector<Term>({
 				Term(1, std::vector<Operator>({ c_k_dagger, c_k_Q_down }))
 			}),
