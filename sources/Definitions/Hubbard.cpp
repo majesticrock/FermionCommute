@@ -23,7 +23,7 @@ namespace SymbolicOperators {
 				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
 				}));
 
-		return { H_T, H_U };//, H_V
+		return { H_T, H_U, H_V };//
 	}
 	std::vector<WickOperatorTemplate> Hubbard::templates() const
 	{
