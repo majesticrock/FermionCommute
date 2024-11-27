@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 		std::vector<std::vector<Term>> disp = base;
 		for (auto& _v : disp) {
 			for (auto& v : _v) {
-				if (v.operators.front().isDaggered) {
+				if (v.operators.front().is_daggered) {
 					v.operators.front().momentum += Momentum('x');
 				}
 				else {
@@ -91,9 +91,9 @@ int main(int argc, char** argv) {
 
 
 		const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
-			Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SpinDown, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), SpinUp, false),
+			Operator('r', 1, false, Index::SpinUp, true), Operator('p', 1, false, Index::SpinDown, true),
+			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
+			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::SpinUp, false),
 			}));
 		const std::vector<Term> H = { H_U };
 		const int inner_idx = 0;
@@ -207,7 +207,7 @@ int main(int argc, char** argv) {
 			wicks_theorem(terms, templates, wicks);
 			clearEtas(wicks);
 			cleanWicks(wicks, symmetries);
-
+			
 			for (auto& wickterm : wicks) {
 				if (wickterm.coefficients.front().name == "\\rho") {
 					wickterm.sums.push_back(Index::SigmaPrime);

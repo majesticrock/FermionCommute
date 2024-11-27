@@ -5,7 +5,7 @@ namespace SymbolicOperators {
 	{
 		std::vector<std::vector<Term>> basis = Hubbard::XP_basis();
 		for (auto& basis_term : basis) {
-			if (basis_term.front().operators.front().isDaggered) {
+			if (basis_term.front().operators.front().is_daggered) {
 				basis_term.front().operators.front().momentum += Momentum('x');
 			}
 			else {
@@ -26,7 +26,7 @@ namespace SymbolicOperators {
 		std::vector<std::vector<Term>> ret = Hubbard::STD_basis();
 		for (auto& _v : ret) {
 			for (auto& v : _v) {
-				if (v.operators.front().isDaggered) {
+				if (v.operators.front().is_daggered) {
 					v.operators.front().momentum += Momentum('x');
 				}
 				else {

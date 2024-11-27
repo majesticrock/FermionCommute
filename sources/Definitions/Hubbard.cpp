@@ -3,24 +3,24 @@
 namespace SymbolicOperators {
 	std::vector<Term> Hubbard::hamiltonian() const
 	{
-		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Sigma },
+		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
-				Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
+				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
 				}));
 
 		const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
-			Operator('r', 1, false, SpinUp, true), Operator('p', 1, false, SpinDown, true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SpinDown, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), SpinUp, false),
+			Operator('r', 1, false, Index::SpinUp, true), Operator('p', 1, false, Index::SpinDown, true),
+			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
+			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::SpinUp, false),
 			}));
 
 		const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true),
-			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
+			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
 			std::vector<Operator>({
-				Operator('r', 1, false, Sigma, true),
-				Operator('p', 1, false, SigmaPrime, true),
-				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SigmaPrime, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
+				Operator('r', 1, false, Index::Sigma, true),
+				Operator('p', 1, false, Index::SigmaPrime, true),
+				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SigmaPrime, false),
+				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false),
 				}));
 
 		return { H_T, H_U, H_V };//
@@ -28,8 +28,8 @@ namespace SymbolicOperators {
 	std::vector<WickOperatorTemplate> Hubbard::templates() const
 	{
 		return {
-			WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(momentum_pairs(), true), Eta_Type, true },
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), SC_Type, true },
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(momentum_pairs(), true), Eta_Type, true },
 			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false },
 			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_pairs(), true), CDW_Type, false }
 		};
@@ -143,7 +143,7 @@ namespace SymbolicOperators {
 	{
 		std::vector<std::unique_ptr<WickSymmetry>> ret;
 		ret.reserve(2);
-		//ret.push_back(std::make_unique<SpinSymmetry>());
+		//ret.push_back(std::make_unique<Index::SpinSymmetry>());
 		ret.push_back(std::make_unique<TranslationalSymmetry>());
 		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type, CDW_Type>>());
 		return ret;

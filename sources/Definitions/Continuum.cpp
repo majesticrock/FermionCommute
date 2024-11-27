@@ -3,31 +3,31 @@
 namespace SymbolicOperators {
 	std::vector<Term> Continuum::hamiltonian() const
 	{
-		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Sigma },
+		const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
-				Operator('q', 1, false, Sigma, true), Operator('q', 1, false, Sigma, false)
+				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
 				}));
 
-		const Term H_U(-1, Coefficient("g", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
+		const Term H_Ph(-1, Coefficient("g", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
 			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
 
-		const Term H_EM(IntFractional(1, 2), Coefficient("V", Momentum('q'), true),
-			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Sigma, SigmaPrime }) },
+		const Term H_C(IntFractional(1, 2), Coefficient("V", Momentum('q')),
+			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
 			std::vector<Operator>({
-				Operator('r', 1, false, Sigma, true),
-				Operator('p', 1, false, SigmaPrime, true),
-				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), SigmaPrime, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Sigma, false),
+				Operator('r', 1, false, Index::Sigma, true),
+				Operator('p', 1, false, Index::SigmaPrime, true),
+				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SigmaPrime, false),
+				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false),
 				}));
 
-		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Sigma },
+		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
-				Operator(Momentum("q"), Sigma, true), Operator('q', 1, false, Sigma, false)
+				Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
 				}));
 
-		return { H_T, H_U, H_EM, H_BG };
+		return { H_Kin, H_Ph, H_C, H_BG };
 
 		/* const Term H_EM(1, Coefficient("V", Momentum("q-p"), true), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
 			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
@@ -38,7 +38,7 @@ namespace SymbolicOperators {
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{
 		return {
-			WickOperatorTemplate{ {IndexComparison{false, SpinDown, SpinUp}}, Momentum(), SC_Type, true },
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), SC_Type, true },
 			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false }
 		};
 	}
