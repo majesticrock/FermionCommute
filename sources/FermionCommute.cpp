@@ -82,11 +82,11 @@ int main(int argc, char** argv) {
 		std::vector<std::vector<Term>> disp_daggered(disp);
 		for (auto& vec : base_daggered) {
 			hermitianConjugate(vec);
-			renameMomenta(vec, 'k', 'l');
+			rename_momenta(vec, 'k', 'l');
 		}
 		for (auto& vec : disp_daggered) {
 			hermitianConjugate(vec);
-			renameMomenta(vec, 'k', 'l');
+			rename_momenta(vec, 'k', 'l');
 		}
 
 
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
 		commutator(commute_with_H_disp, disp[inner_idx], H);
 		cleanUp(commute_with_H_disp);
 		
-		if (true){
+		if (true) {
 			term_vec joined = joinVectors(commute_with_H_base, commute_with_H_disp);
 			remove_all_x(joined);
 			cleanUp(joined);
@@ -173,9 +173,9 @@ int main(int argc, char** argv) {
 	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
 		hermitianConjugate(t);
-		renameMomenta(t, 'k', 'l');
+		rename_momenta(t, 'k', 'l');
 		//if (debug) {
-		//	renameMomenta(t, 'x', 'y');
+		//	rename_momenta(t, 'x', 'y');
 		//}
 	}
 

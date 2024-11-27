@@ -49,7 +49,7 @@ This can be achieved via
 ```
 for (auto& t : basis_daggered) {
 	hermitianConjugate(t);
-	renameMomenta(t, 'k', 'l');
+	rename_momenta(t, 'k', 'l');
 }
 ```
 
