@@ -1,5 +1,7 @@
 #include "Continuum.hpp"
 
+#define _ONLY_SC_CHANNEL
+
 namespace SymbolicOperators {
 	std::vector<Term> Continuum::hamiltonian() const
 	{
@@ -13,6 +15,7 @@ namespace SymbolicOperators {
 			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
 			}));
 
+#ifndef _ONLY_SC_CHANNEL
 		const Term H_C(IntFractional(1, 2), Coefficient("V", Momentum('q')),
 			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
 			std::vector<Operator>({
@@ -22,7 +25,13 @@ namespace SymbolicOperators {
 				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false),
 				}));
 
-		/* SC channel only
+		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+			std::vector<Operator>({
+				Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
+				}));
+		
+		return { H_Kin, H_Ph, H_C, H_BG };
+#else
 		const Term H_C(IntFractional(1, 1), Coefficient("V", Momentum('q')),
 			SumContainer{ MomentumSum({ 'p', 'q' }) },
 			std::vector<Operator>({
@@ -31,14 +40,8 @@ namespace SymbolicOperators {
 				Operator(momentum_pairs({ std::make_pair(-1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
 				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(1, 'q') }), Index::SpinUp, false),
 				}));
-		*/
-
-		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
-			std::vector<Operator>({
-				Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
-				}));
-
-		return { H_Kin, H_Ph, H_C, H_BG };
+		return { H_Kin, H_Ph, H_C };
+#endif
 	}
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{
