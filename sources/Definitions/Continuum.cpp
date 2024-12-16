@@ -1,6 +1,6 @@
 #include "Continuum.hpp"
 
-#define _ONLY_SC_CHANNEL
+//#define _ONLY_SC_CHANNEL
 
 namespace SymbolicOperators {
 	std::vector<Term> Continuum::hamiltonian() const
