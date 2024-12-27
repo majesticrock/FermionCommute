@@ -1,7 +1,7 @@
 #pragma once
 #include "DefinitionsBase.hpp"
 
-namespace SymbolicOperators {
+namespace mrock::SymbolicOperators {
 	struct Hubbard : public DefinitionsBase {
 		virtual std::vector<Term> hamiltonian() const override;
 		virtual std::vector<WickOperatorTemplate> templates() const override;

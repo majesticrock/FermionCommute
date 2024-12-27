@@ -1,6 +1,6 @@
 #include "HubbardDispersions.hpp"
 
-namespace SymbolicOperators {
+namespace mrock::SymbolicOperators {
 	std::vector<std::vector<Term>> HubbardDispersions::XP_basis() const
 	{
 		std::vector<std::vector<Term>> basis = Hubbard::XP_basis();

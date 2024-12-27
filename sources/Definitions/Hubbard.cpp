@@ -1,6 +1,6 @@
 #include "Hubbard.hpp"
 
-namespace SymbolicOperators {
+namespace mrock::SymbolicOperators {
 	std::vector<Term> Hubbard::hamiltonian() const
 	{
 		const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },

@@ -1,7 +1,7 @@
 #pragma once
 #include "DefinitionsBase.hpp"
 
-namespace SymbolicOperators {
+namespace mrock::SymbolicOperators {
 	class Continuum : public DefinitionsBase
 	{
 		virtual std::vector<Term> hamiltonian() const override;

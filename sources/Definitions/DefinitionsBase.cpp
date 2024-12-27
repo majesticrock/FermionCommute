@@ -1,6 +1,6 @@
 #include "DefinitionsBase.hpp"
 
-namespace SymbolicOperators {
+namespace mrock::SymbolicOperators {
 	const Momentum base_k = Momentum('k');
 	const Momentum base_x = Momentum('x');
 	const Momentum base_k_Q{ momentum_pairs{ {1, 'k'} }, true };
