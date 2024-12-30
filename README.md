@@ -2,7 +2,7 @@
 
 ## Preface
 
-If there is no namespace specified in this file, we imply the namespace ```SymbolicOperators```.
+If there is no namespace specified in this file, we imply the namespace ```symbolic_operators```.
 Each relevent class defines and overload of ```std::ostream& operator<<```, i.e., they can easily be used as ```std::cout << class_obj```.
 The output is formated to be used within an ```align```-environment within LaTeX.
 Your code only needs to include ```Wick.hpp```.

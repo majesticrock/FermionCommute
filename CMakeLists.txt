@@ -23,7 +23,7 @@ add_executable(FermionCommute
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # Check GCC version
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0)
-        message(FATAL_ERROR "GCC version ${CMAKE_CXX_COMPILER_VERSION} is not supported. GCC 12.1 or newer is required for C++20 support.")
+        message(FATAL_ERROR "GCC version ${CMAKE_CXX_COMPILER_VERSION} is not supported. GCC 11.0 or newer is required for C++20 support.")
     endif()
     # Use the appropriate flag for GCC
     target_compile_options(FermionCommute PRIVATE

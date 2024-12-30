@@ -1,15 +1,15 @@
 #include <fstream>
 #include <sstream>
-#include <mrock/Utility/LaTeXOutput.hpp>
+#include <mrock/utility/LaTeXOutput.hpp>
 #include "Definitions/Hubbard.hpp"
 #include "Definitions/HubbardDispersions.hpp"
 #include "Definitions/Continuum.hpp"
-#include <mrock/SymbolicOperators/Wick.hpp>
+#include <mrock/symbolic_operators/Wick.hpp>
 #include <memory>
 #include <filesystem>
 #include <boost/archive/binary_oarchive.hpp>
 
-using namespace mrock::SymbolicOperators;
+using namespace mrock::symbolic_operators;
 using term_vec = std::vector<Term>;
 using op_vec = std::vector<Operator>;
 

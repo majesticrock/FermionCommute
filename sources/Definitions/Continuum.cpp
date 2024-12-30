@@ -2,7 +2,7 @@
 
 //#define _ONLY_SC_CHANNEL
 
-namespace mrock::SymbolicOperators {
+namespace mrock::symbolic_operators {
 	std::vector<Term> Continuum::hamiltonian() const
 	{
 		const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mrock/SymbolicOperators/Momentum.hpp>
-#include <mrock/SymbolicOperators/Operator.hpp>
-#include <mrock/SymbolicOperators/Term.hpp>
-#include <mrock/SymbolicOperators/WickOperatorTemplate.hpp>
-#include <mrock/SymbolicOperators/WickSymmetry.hpp>
+#include <mrock/symbolic_operators/Momentum.hpp>
+#include <mrock/symbolic_operators/Operator.hpp>
+#include <mrock/symbolic_operators/Term.hpp>
+#include <mrock/symbolic_operators/WickOperatorTemplate.hpp>
+#include <mrock/symbolic_operators/WickSymmetry.hpp>
 
-namespace mrock::SymbolicOperators {
+namespace mrock::symbolic_operators {
 	extern const Momentum base_k;
 	extern const Momentum base_x;
 	extern const Momentum base_k_Q;
