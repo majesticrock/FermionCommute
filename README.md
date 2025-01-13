@@ -39,7 +39,7 @@ After you have created a basis, you can obtain the Hermitian conjugate of your b
 ```
 std::vector<term_vec> basis_daggered(basis);
 for (auto& t : basis_daggered) {
-    hermitianConjugate(t);
+    hermitian_conjugate(t);
 }
 ```
 
@@ -48,7 +48,7 @@ This can be achieved via
 
 ```
 for (auto& t : basis_daggered) {
-	hermitianConjugate(t);
+	hermitian_conjugate(t);
 	rename_momenta(t, 'k', 'l');
 }
 ```
@@ -56,7 +56,7 @@ for (auto& t : basis_daggered) {
 # How to commute
 
 First, create an ```std::vector<Term>``` that will hold your result.
-Then, you can simply call ```commutator(result, left, right)``` to computed [left, right]. Afterwards, it is recommended to call ```cleanUp(result)``` which will remove unnecessary terms, e.g., those that will be 0 anyways.
+Then, you can simply call ```commutator(result, left, right)``` to computed [left, right]. Afterwards, it is recommended to call ```clean_up(result)``` which will remove unnecessary terms, e.g., those that will be 0 anyways.
 Additionally, this function groups identical terms.
 
 A double commutator is equally simple:
@@ -97,19 +97,19 @@ Create an instance of ```WickTermCollector```. Then simply call
 
 ```
 wicks_theorem(terms, templates, wicks);
-cleanWicks(wicks);
+clean_wicks(wicks);
 ```
 
 ## Applying symmetries to the result
 There may be some symmetries that simplify your results, e.g. <O^+> = <O>.
 These symmetries can be implemented by inheriting from the  ```WickSymmetry``` class and defining the member function ```virtual void apply_to(WickTerm& term) const```.
-Then create a ```std::vector<std::unique_ptr<WickSymmetry>> symmetries``` and make use of polymorphism by calling ```cleanWicks(wicks, symmetries)```
+Then create a ```std::vector<std::unique_ptr<WickSymmetry>> symmetries``` and make use of polymorphism by calling ```clean_wicks(wicks, symmetries)```
 There are the following predefined symmetry operations:
 
 #### ```SpinSymmetry```
 Changes all spins of the operators in ```term``` to _up_.
 
-#### ```TranslationalSymmetry```
+#### ```InversionSymmetry```
 Flips the momenta in such a way, that the first momentum in a term is always positive, i.e., _-k+l_ is changed to _k-l_ while _k-l_ would stay unmodified.
 
 #### ```PhaseSymmetry```

@@ -17,7 +17,7 @@ namespace mrock::symbolic_operators {
 			else {
 				basis_term.push_back(basis_term.front());
 			}
-			basis_term[1].hermitianConjugate();
+			basis_term[1].hermitian_conjugate();
 		}
 		return basis;
 	}

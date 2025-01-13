@@ -1,6 +1,7 @@
 #include "Continuum.hpp"
 
-//#define _ONLY_SC_CHANNEL
+//#define COULOMB_ONLY_SC_CHANNEL
+#define PHONON_ONLY_SC_CHANNEL
 
 namespace mrock::symbolic_operators {
 	std::vector<Term> Continuum::hamiltonian() const
@@ -10,20 +11,33 @@ namespace mrock::symbolic_operators {
 				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
 				}));
 
-		const Term H_Ph(-1, Coefficient("g", MomentumList({ 'q', 'p' })), SumContainer{ MomentumSum({'q', 'p'}) }, std::vector<Operator>({
-			c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
-			c_minus_k.with_momentum('p'), c_k.with_momentum('p')
-			}));
+#ifndef PHONON_ONLY_SC_CHANNEL
+		const Term H_Ph(1, Coefficient::RealInteraction("g", MomentumList({ 'r', 'p', 'q' })),
+			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
+			std::vector<Operator>({
+				Operator(Momentum("r+q"), Index::Sigma, true),
+				Operator(Momentum("p-q"), Index::SigmaPrime, true),
+				Operator(Momentum('p'), Index::SigmaPrime, false),
+				Operator(Momentum('r'), Index::Sigma, false) })
+			);
+#else
+		const Term H_Ph(-1, Coefficient::RealInversionSymmetric("g", MomentumList({ 'q', 'p' }), std::function<void(Coefficient&)>([](Coefficient& coeff){ coeff.momenta.sort(); })),
+			SumContainer{ MomentumSum({ 'p', 'q' }) },
+			std::vector<Operator>({
+				c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
+				c_minus_k.with_momentum('p'), c_k.with_momentum('p') })
+			);
+#endif
 
-#ifndef _ONLY_SC_CHANNEL
+#ifndef COULOMB_ONLY_SC_CHANNEL
 		const Term H_C(IntFractional(1, 2), Coefficient("V", Momentum('q')),
 			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
 			std::vector<Operator>({
 				Operator('r', 1, false, Index::Sigma, true),
 				Operator('p', 1, false, Index::SigmaPrime, true),
 				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SigmaPrime, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false),
-				}));
+				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false) })
+			);
 
 		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
@@ -91,7 +105,7 @@ namespace mrock::symbolic_operators {
 	{
 		std::vector<std::unique_ptr<WickSymmetry>> ret;
 		ret.push_back(std::make_unique<SpinSymmetry>());
-		ret.push_back(std::make_unique<TranslationalSymmetry>());
+		ret.push_back(std::make_unique<InversionSymmetry>());
 		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type>>());
 		return ret;
 	}

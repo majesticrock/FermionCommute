@@ -54,7 +54,8 @@ int main(int argc, char** argv) {
 	/* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
 	std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
 	return 0; */
-	constexpr bool print = false;
+	constexpr bool print = true;
+	constexpr bool print_terms = false;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
 		return 1;
@@ -81,11 +82,11 @@ int main(int argc, char** argv) {
 		std::vector<std::vector<Term>> base_daggered(base);
 		std::vector<std::vector<Term>> disp_daggered(disp);
 		for (auto& vec : base_daggered) {
-			hermitianConjugate(vec);
+			hermitian_conjugate(vec);
 			rename_momenta(vec, 'k', 'l');
 		}
 		for (auto& vec : disp_daggered) {
-			hermitianConjugate(vec);
+			hermitian_conjugate(vec);
 			rename_momenta(vec, 'k', 'l');
 		}
 
@@ -101,16 +102,16 @@ int main(int argc, char** argv) {
 
 		term_vec commute_with_H_base;
 		commutator(commute_with_H_base, H, base[inner_idx]);
-		cleanUp(commute_with_H_base);
+		clean_up(commute_with_H_base);
 
 		term_vec commute_with_H_disp;
 		commutator(commute_with_H_disp, disp[inner_idx], H);
-		cleanUp(commute_with_H_disp);
+		clean_up(commute_with_H_disp);
 		
 		if (true) {
 			term_vec joined = joinVectors(commute_with_H_base, commute_with_H_disp);
 			remove_all_x(joined);
-			cleanUp(joined);
+			clean_up(joined);
 
 			std::cout << "Single commutator:\n" << joined << std::endl; // Up to here, everything works
 		}
@@ -118,14 +119,14 @@ int main(int argc, char** argv) {
 		{
 			term_vec base_double;
 			commutator(base_double, base_daggered[outer_idx], commute_with_H_base);
-			cleanUp(base_double);
+			clean_up(base_double);
 
 			term_vec disp_double;
 			commutator(disp_double, disp_daggered[outer_idx], commute_with_H_disp);
-			cleanUp(disp_double);
+			clean_up(disp_double);
 			
 			term_vec joined = joinVectors(base_double, disp_double);
-			cleanUp(joined);
+			clean_up(joined);
 			//std::cout << "joined:\n" << joined << std::endl;
 
 			auto templates = hubbard.templates();
@@ -133,10 +134,10 @@ int main(int argc, char** argv) {
 
 			WickTermCollector wicks;
 			wicks_theorem(joined, templates, wicks);
-			clearEtas(wicks);
-			cleanWicks(wicks, symmetries);
+			clear_etas(wicks);
+			clean_wicks(wicks, symmetries);
 			remove_all_x(wicks);
-			cleanWicks(wicks, symmetries);
+			clean_wicks(wicks, symmetries);
 
 			std::cout << "Double commutator:\n" << wicks << std::endl;
 		}
@@ -172,7 +173,7 @@ int main(int argc, char** argv) {
 
 	std::vector<term_vec> basis_daggered(basis);
 	for (auto& t : basis_daggered) {
-		hermitianConjugate(t);
+		hermitian_conjugate(t);
 		rename_momenta(t, 'k', 'l');
 		//if (debug) {
 		//	rename_momenta(t, 'x', 'y');
@@ -185,9 +186,9 @@ int main(int argc, char** argv) {
 	{
 		term_vec commute_with_H;
 		commutator(commute_with_H, H, basis[i]);
-		cleanUp(commute_with_H);
+		clean_up(commute_with_H);
 		if (debug)
-			std::cout << "\\begin{align*}\n\t[ H, " << toStringWithoutPrefactor(basis[i]) << " ] ="
+			std::cout << "\\begin{align*}\n\t[ H, " << to_string_without_prefactor(basis[i]) << " ] ="
 			<< commute_with_H << "\\end{align*}" << std::endl;
 
 		for (size_t j = 0U; j < basis.size(); ++j)
@@ -197,16 +198,16 @@ int main(int argc, char** argv) {
 			}
 			term_vec terms;
 			commutator(terms, basis_daggered[j], commute_with_H);
-			cleanUp(terms);
+			clean_up(terms);
 
-			if (debug)
-				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-				<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+			if (print_terms || debug)
+				std::cout << "\\begin{align*}\n\t[ " << to_string_without_prefactor(basis_daggered[j])
+				<< ", [H, " << to_string_without_prefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
 
 			WickTermCollector wicks;
 			wicks_theorem(terms, templates, wicks);
-			clearEtas(wicks);
-			cleanWicks(wicks, symmetries);
+			clear_etas(wicks);
+			clean_wicks(wicks, symmetries);
 			
 			for (auto& wickterm : wicks) {
 				if (wickterm.coefficients.front().name == "\\rho") {
@@ -216,11 +217,11 @@ int main(int argc, char** argv) {
 					wickterm.operators.push_back(WickOperator("n{r;sigma'}"));
 				}
 			}
-			cleanWicks(wicks, symmetries);
+			clean_wicks(wicks, symmetries);
 
 			if (debug || print) {
-				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-					<< ", [H, " << toStringWithoutPrefactor(basis[i]) << " ]] =" << wicks << "\\end{align*}" << std::endl;
+				std::cout << "\\begin{align*}\n\t\\langle [ " << to_string_without_prefactor(basis_daggered[j])
+					<< ", [H, " << to_string_without_prefactor(basis[i]) << " ]] \\rangle =" << wicks << "\\end{align*}" << std::endl;
 			}
 
 			// serialization
@@ -235,14 +236,14 @@ int main(int argc, char** argv) {
 			terms.clear();
 			wicks.clear();
 			commutator(terms, basis_daggered[j], basis[i]);
-			cleanUp(terms);
+			clean_up(terms);
 			wicks_theorem(terms, templates, wicks);
-			clearEtas(wicks);
-			cleanWicks(wicks, symmetries);
+			clear_etas(wicks);
+			clean_wicks(wicks, symmetries);
 
 			if (debug || print)
-				std::cout << "\\begin{align*}\n\t[ " << toStringWithoutPrefactor(basis_daggered[j])
-				<< ", " << toStringWithoutPrefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
+				std::cout << "\\begin{align*}\n\t[ " << to_string_without_prefactor(basis_daggered[j])
+				<< ", " << to_string_without_prefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
 			// serialization
 			if (!debug) {
 				// create an output file stream and a text archive to serialize the vector
@@ -266,8 +267,8 @@ Term left(1, Coefficient(), op_vec({
 	c_l_dagger, c_minus_l_dagger
 	}));
 
-std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", " << right.toStringWithoutPrefactor() << "] \\rangle = " << wicks << "\\end{align*}" << std::endl;
-std::cout << "\\begin{align*}\n\t\\langle [" << left.toStringWithoutPrefactor() << ", [ H, " << right.toStringWithoutPrefactor() << "] ] \\rangle = " << wicks << "\\end{align*}" << std::endl;
+std::cout << "\\begin{align*}\n\t\\langle [" << left.to_string_without_prefactor() << ", " << right.to_string_without_prefactor() << "] \\rangle = " << wicks << "\\end{align*}" << std::endl;
+std::cout << "\\begin{align*}\n\t\\langle [" << left.to_string_without_prefactor() << ", [ H, " << right.to_string_without_prefactor() << "] ] \\rangle = " << wicks << "\\end{align*}" << std::endl;
 */
 
 /* Example of how to to read the output

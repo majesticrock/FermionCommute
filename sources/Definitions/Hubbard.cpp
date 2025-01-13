@@ -144,7 +144,7 @@ namespace mrock::symbolic_operators {
 		std::vector<std::unique_ptr<WickSymmetry>> ret;
 		ret.reserve(2);
 		//ret.push_back(std::make_unique<Index::SpinSymmetry>());
-		ret.push_back(std::make_unique<TranslationalSymmetry>());
+		ret.push_back(std::make_unique<InversionSymmetry>());
 		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type, CDW_Type>>());
 		return ret;
 	}
