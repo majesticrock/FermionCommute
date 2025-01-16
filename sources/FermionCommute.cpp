@@ -281,7 +281,7 @@ int main(int argc, char** argv) {
 							current_coeff.inversion_symmetry = true;
 							current_coeff.name = "\\tilde{g}";
 						}
-					}
+					} 
 				}
 			}
 			clean_wicks(wicks, symmetries);

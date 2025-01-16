@@ -6,13 +6,13 @@
 #ifdef PHONON_ONLY_SC_CHANNEL
 #define PHONON_HAMILTONIAN H_Ph
 #else
-#define PHONON_HAMILTONIAN H_Ph//, H_Phock, H_Phartree
+#define PHONON_HAMILTONIAN H_Ph, H_Phock, H_Phartree
 #endif
 
 #ifdef COULOMB_ONLY_SC_CHANNEL
 #define COULOMB_HAMILTONIAN H_C
 #else
-#define COULOMB_HAMILTONIAN H_C, H_BG//, H_C_Fock
+#define COULOMB_HAMILTONIAN H_C, H_BG, H_C_Fock
 #endif
 
 namespace mrock::symbolic_operators {
