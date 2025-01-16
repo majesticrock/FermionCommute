@@ -10,8 +10,8 @@ namespace mrock::symbolic_operators {
 
 		const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
 			Operator('r', 1, false, Index::SpinUp, true), Operator('p', 1, false, Index::SpinDown, true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::SpinUp, false),
+			Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
+			Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
 			}));
 
 		const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true),
@@ -19,8 +19,8 @@ namespace mrock::symbolic_operators {
 			std::vector<Operator>({
 				Operator('r', 1, false, Index::Sigma, true),
 				Operator('p', 1, false, Index::SigmaPrime, true),
-				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SigmaPrime, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false),
+				Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SigmaPrime, false),
+				Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::Sigma, false),
 				}));
 
 		return { H_T, H_U, H_V };//
@@ -29,9 +29,9 @@ namespace mrock::symbolic_operators {
 	{
 		return {
 			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(momentum_pairs(), true), Eta_Type, true },
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(momentum_symbols(), true), Eta_Type, true },
 			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_pairs(), true), CDW_Type, false }
+			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(momentum_symbols(), true), CDW_Type, false }
 		};
 	}
 	std::vector<std::vector<Term>> Hubbard::XP_basis() const

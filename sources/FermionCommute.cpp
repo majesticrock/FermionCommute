@@ -33,15 +33,18 @@ std::vector<T> joinVectors(const std::vector<T>& vec1, const std::vector<T>& vec
 	return result;
 }
 
+const std::string hubbard_type = "hubbard";
+const std::string continuum_type = "continuum";
+const std::string hubbard_dispersions_type = "hubbard_dispersions";
 
 std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
-	if (model_type == "hubbard") {
+	if (model_type == hubbard_type) {
 		return std::make_unique<Hubbard>();
 	}
-	else if (model_type == "continuum") {
+	else if (model_type == continuum_type) {
 		return std::make_unique<Continuum>();
 	}
-	else if (model_type == "hubbard_dispersions") {
+	else if (model_type == hubbard_dispersions_type) {
 		return std::make_unique<HubbardDispersions>();
 	}
 	else {
@@ -93,8 +96,8 @@ int main(int argc, char** argv) {
 
 		const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({ 'r', 'p', 'q' }), std::vector<Operator>({
 			Operator('r', 1, false, Index::SpinUp, true), Operator('p', 1, false, Index::SpinDown, true),
-			Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
-			Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::SpinUp, false),
+			Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
+			Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
 			}));
 		const std::vector<Term> H = { H_U };
 		const int inner_idx = 0;
@@ -210,11 +213,75 @@ int main(int argc, char** argv) {
 			clean_wicks(wicks, symmetries);
 			
 			for (auto& wickterm : wicks) {
-				if (wickterm.coefficients.front().name == "\\rho") {
+				if (MODEL_TYPE != continuum_type) break;
+
+				Coefficient& current_coeff = wickterm.coefficients.front();
+				if (current_coeff.name == "\\rho") {
 					wickterm.sums.push_back(Index::SigmaPrime);
-					wickterm.sums.push_back('r');
-					wickterm.coefficients.front() = Coefficient::parse_string("V{0;}");
-					wickterm.operators.push_back(WickOperator("n{r;sigma'}"));
+					wickterm.sums.push_back('q');
+					current_coeff = Coefficient::parse_string("V{0;}");
+					wickterm.operators.push_back(WickOperator("n{q;sigma'}"));
+					wickterm.multiplicity *= 2;
+				}
+				if (current_coeff.name == "\\epsilon_{C.Fock}") {
+					wickterm.sums.push_back('q');
+					current_coeff = Coefficient::parse_string("V{q;}");
+					wickterm.operators.push_back(WickOperator("n{k+q;up}"));
+					wickterm.multiplicity *= -2;
+				}
+
+				if (current_coeff.name == "\\mu_{Ph}") {
+					wickterm.sums.push_back(Index::SigmaPrime);
+					wickterm.sums.push_back('q');
+					current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,q,0;}");
+					wickterm.operators.push_back(WickOperator("n{q;sigma'}"));
+					wickterm.multiplicity *= 2;
+				}
+				if (current_coeff.name == "\\epsilon_{Phock}") {
+					wickterm.sums.push_back('q');
+					current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,k+q,q;}");
+					wickterm.operators.push_back(WickOperator("n{k+q;up}"));
+					wickterm.multiplicity *= -2;
+				}
+
+				if (current_coeff.name == "U_\\mathrm{CUT}") {
+					assert(current_coeff.momenta.size() == 3U);
+					if (current_coeff.momenta[0] == -current_coeff.momenta[1]) {
+						// U_CUT (-k, k, x), i.e., BCS channel
+						Momentum _first = current_coeff.momenta[0] + current_coeff.momenta[2];
+						Momentum _second = current_coeff.momenta[1] - current_coeff.momenta[2];
+						// We expect always something like -k - (-k + l) = l
+						assert(_first.size() == 1U && _second.size() == 1U);
+						assert(_first == -_second);
+
+						current_coeff.momenta[0] = Momentum(current_coeff.momenta[2].front());
+						current_coeff.momenta[1] = Momentum(current_coeff.momenta[2].back());
+						current_coeff.momenta.pop_back();
+						current_coeff.name = "g";
+						current_coeff.inversion_symmetry = true;
+						current_coeff.custom_symmetry = std::function<void(Coefficient&)>([](Coefficient& _c) {
+								_c.momenta.sort();
+							});
+						wickterm.multiplicity *= -1;
+					}
+					else if (current_coeff.momenta.back().empty()) {
+						// U_CUT (k, l, 0) = const = -M^2 / omega_D =: -G, i.e., Hartree channel
+						current_coeff.momenta = MomentumList();
+						current_coeff.name = "G";
+						wickterm.multiplicity *= -1;
+					}
+					else {
+						Momentum _first = current_coeff.momenta[0] + current_coeff.momenta[2];
+						Momentum _second = current_coeff.momenta[1] - current_coeff.momenta[2];
+						if (_first == current_coeff.momenta[1] && _second == current_coeff.momenta[0]) {
+							// U_CUT(k, l, l - k) or U_CUT(-k, -l, k - l)
+							current_coeff.momenta.pop_back();
+							current_coeff.momenta[0] = _second;
+							current_coeff.momenta[1] = _first;
+							current_coeff.inversion_symmetry = true;
+							current_coeff.name = "\\tilde{g}";
+						}
+					}
 				}
 			}
 			clean_wicks(wicks, symmetries);

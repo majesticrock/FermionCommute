@@ -3,7 +3,7 @@
 namespace mrock::symbolic_operators {
 	const Momentum base_k = Momentum('k');
 	const Momentum base_x = Momentum('x');
-	const Momentum base_k_Q{ momentum_pairs{ {1, 'k'} }, true };
+	const Momentum base_k_Q{ momentum_symbols{ {1, 'k'} }, true };
 
 	const Operator c_k = Operator{ base_k, Index::SpinUp, false };
 	const Operator c_minus_k = Operator{ -base_k, Index::SpinDown, false };

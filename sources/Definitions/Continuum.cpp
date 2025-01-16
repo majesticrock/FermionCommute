@@ -1,7 +1,19 @@
 #include "Continuum.hpp"
 
 //#define COULOMB_ONLY_SC_CHANNEL
-#define PHONON_ONLY_SC_CHANNEL
+//#define PHONON_ONLY_SC_CHANNEL
+
+#ifdef PHONON_ONLY_SC_CHANNEL
+#define PHONON_HAMILTONIAN H_Ph
+#else
+#define PHONON_HAMILTONIAN H_Ph//, H_Phock, H_Phartree
+#endif
+
+#ifdef COULOMB_ONLY_SC_CHANNEL
+#define COULOMB_HAMILTONIAN H_C
+#else
+#define COULOMB_HAMILTONIAN H_C, H_BG//, H_C_Fock
+#endif
 
 namespace mrock::symbolic_operators {
 	std::vector<Term> Continuum::hamiltonian() const
@@ -12,7 +24,7 @@ namespace mrock::symbolic_operators {
 				}));
 
 #ifndef PHONON_ONLY_SC_CHANNEL
-		const Term H_Ph(1, Coefficient::RealInteraction("g", MomentumList({ 'r', 'p', 'q' })),
+		const Term H_Ph(IntFractional(1, 2), Coefficient::RealInteraction("U_\\mathrm{CUT}", MomentumList({ 'r', 'p', 'q' })),
 			SumContainer{ MomentumSum({ 'r', 'p', 'q' }), IndexSum({ Index::Sigma, Index::SigmaPrime }) },
 			std::vector<Operator>({
 				Operator(Momentum("r+q"), Index::Sigma, true),
@@ -20,6 +32,16 @@ namespace mrock::symbolic_operators {
 				Operator(Momentum('p'), Index::SigmaPrime, false),
 				Operator(Momentum('r'), Index::Sigma, false) })
 			);
+
+		const Term H_Phock(-IntFractional(1, 2), Coefficient("\\epsilon_{Phock}", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+			std::vector<Operator>({
+				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
+				}));
+
+		const Term H_Phartree(-IntFractional(1, 2), Coefficient("\\mu_{Ph}"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+			std::vector<Operator>({
+				Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
+				}));
 #else
 		const Term H_Ph(-1, Coefficient::RealInversionSymmetric("g", MomentumList({ 'q', 'p' }), std::function<void(Coefficient&)>([](Coefficient& coeff){ coeff.momenta.sort(); })),
 			SumContainer{ MomentumSum({ 'p', 'q' }) },
@@ -35,27 +57,31 @@ namespace mrock::symbolic_operators {
 			std::vector<Operator>({
 				Operator('r', 1, false, Index::Sigma, true),
 				Operator('p', 1, false, Index::SigmaPrime, true),
-				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(-1, 'q') }), Index::SigmaPrime, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'r'), std::make_pair(1, 'q') }), Index::Sigma, false) })
+				Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SigmaPrime, false),
+				Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::Sigma, false) })
 			);
 
-		const Term H_BG(-1, Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+		const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+			std::vector<Operator>({
+				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
+				}));
+
+		const Term H_BG(-IntFractional(1, 2), Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
 				Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
 				}));
 		
-		return { H_Kin, H_Ph, H_C, H_BG };
 #else
 		const Term H_C(IntFractional(1, 1), Coefficient("V", Momentum('q')),
 			SumContainer{ MomentumSum({ 'p', 'q' }) },
 			std::vector<Operator>({
 				Operator('p', 1, false, Index::SpinUp, true),
 				Operator('p', -1, false, Index::SpinDown, true),
-				Operator(momentum_pairs({ std::make_pair(-1, 'p'), std::make_pair(-1, 'q') }), Index::SpinDown, false),
-				Operator(momentum_pairs({ std::make_pair(1, 'p'), std::make_pair(1, 'q') }), Index::SpinUp, false),
+				Operator(momentum_symbols({ MomentumSymbol(-1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
+				Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
 				}));
-		return { H_Kin, H_Ph, H_C };
 #endif
+		return { H_Kin, PHONON_HAMILTONIAN, COULOMB_HAMILTONIAN };
 	}
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{
