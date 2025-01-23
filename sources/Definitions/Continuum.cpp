@@ -12,7 +12,7 @@
 #ifdef COULOMB_ONLY_SC_CHANNEL
 #define COULOMB_HAMILTONIAN H_C
 #else
-#define COULOMB_HAMILTONIAN H_C, H_BG, H_C_Fock
+#define COULOMB_HAMILTONIAN H_C, H_BG//, H_C_Fock
 #endif
 
 namespace mrock::symbolic_operators {
@@ -61,10 +61,10 @@ namespace mrock::symbolic_operators {
 				Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::Sigma, false) })
 			);
 
-		const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
-			std::vector<Operator>({
-				Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
-				}));
+		//const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
+		//	std::vector<Operator>({
+		//		Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)
+		//		}));
 
 		const Term H_BG(-IntFractional(1, 2), Coefficient("\\rho"), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
 			std::vector<Operator>({
