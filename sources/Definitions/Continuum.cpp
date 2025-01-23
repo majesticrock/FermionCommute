@@ -1,7 +1,7 @@
 #include "Continuum.hpp"
 
 //#define COULOMB_ONLY_SC_CHANNEL
-//#define PHONON_ONLY_SC_CHANNEL
+#define PHONON_ONLY_SC_CHANNEL
 
 #ifdef PHONON_ONLY_SC_CHANNEL
 #define PHONON_HAMILTONIAN H_Ph
@@ -72,7 +72,7 @@ namespace mrock::symbolic_operators {
 				}));
 		
 #else
-		const Term H_C(IntFractional(1, 1), Coefficient("V", Momentum('q')),
+		const Term H_C(1, Coefficient("V", Momentum('q')),
 			SumContainer{ MomentumSum({ 'p', 'q' }) },
 			std::vector<Operator>({
 				Operator('p', 1, false, Index::SpinUp, true),
