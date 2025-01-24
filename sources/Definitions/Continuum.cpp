@@ -1,6 +1,6 @@
 #include "Continuum.hpp"
 
-//#define COULOMB_ONLY_SC_CHANNEL
+#define COULOMB_ONLY_SC_CHANNEL
 #define PHONON_ONLY_SC_CHANNEL
 
 #ifdef PHONON_ONLY_SC_CHANNEL
