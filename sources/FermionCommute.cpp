@@ -52,7 +52,45 @@ std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
 	}
 }
 
+void boson_test(){
+	Term H_diag(1, Coefficient("\\lambda"), SumContainer{ MomentumSum({'k'}), Index::Sigma},
+        std::vector<Operator>({
+            Operator::Boson(Momentum('k'), Index::Sigma, true),
+            Operator::Boson(Momentum('k'), Index::Sigma, false)
+        }));
+
+	Term H_bogo(1, Coefficient::HoneyComb("\\gamma", Momentum('k'), true), SumContainer{ MomentumSum({'k'}) },
+		std::vector<Operator>({
+            Operator::Boson(Momentum('k'), Index::BosonA, false),
+            Operator::Boson(Momentum('k', -1), Index::BosonB, false)
+        }));
+
+	Term H_bogo_conjugate(1, Coefficient::HoneyComb("\\gamma", Momentum('k', -1), false), SumContainer{ MomentumSum({'k'}) },
+		std::vector<Operator>({
+            Operator::Boson(Momentum('k'), Index::BosonA, true),
+            Operator::Boson(Momentum('k', -1), Index::BosonB, true)
+        }));
+
+	term_vec H = {H_diag, H_bogo, H_bogo_conjugate};
+
+    Term input(1, std::vector<Operator>({
+        Operator::Boson(Momentum('q'), Index::BosonA, false),
+        Operator::Boson(Momentum('q', -1), Index::BosonB, false)
+    }));
+
+    term_vec commutation_result;
+    commutator(commutation_result, H, input);
+	clean_up(commutation_result);
+
+	std::cout << "H = " << H << "\\\\" << std::endl;
+    std::cout << "[ H, " << input << "] ="  << commutation_result << std::endl;
+}
+
 int main(int argc, char** argv) {
+	// Remove comment for boson test
+	//boson_test();
+	//return 0;
+
 	const std::string save_folder = "../commutators/";
 	/* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
 	std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
