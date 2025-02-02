@@ -61,25 +61,24 @@ void boson_test(){
 
 	Term H_bogo(1, Coefficient::HoneyComb("\\gamma", Momentum('k'), true), SumContainer{ MomentumSum({'k'}) },
 		std::vector<Operator>({
-            Operator::Boson(Momentum('k'), Index::BosonA, false),
-            Operator::Boson(Momentum('k', -1), Index::BosonB, false)
+            Operator::Boson(Momentum('k'), Index::TypeA, false),
+            Operator::Boson(Momentum('k', -1), Index::TypeB, false)
         }));
 
 	Term H_bogo_conjugate(1, Coefficient::HoneyComb("\\gamma", Momentum('k', -1), false), SumContainer{ MomentumSum({'k'}) },
 		std::vector<Operator>({
-            Operator::Boson(Momentum('k'), Index::BosonA, true),
-            Operator::Boson(Momentum('k', -1), Index::BosonB, true)
+            Operator::Boson(Momentum('k'), Index::TypeA, true),
+            Operator::Boson(Momentum('k', -1), Index::TypeB, true)
         }));
 
 	term_vec H = {H_diag, H_bogo, H_bogo_conjugate};
 
     Term input(1, std::vector<Operator>({
-        Operator::Boson(Momentum('q'), Index::BosonA, false),
-        Operator::Boson(Momentum('q', -1), Index::BosonB, false)
+        Operator::Boson(Momentum('q'), Index::TypeA, false),
+        Operator::Boson(Momentum('q', -1), Index::TypeB, false)
     }));
 
-    term_vec commutation_result;
-    commutator(commutation_result, H, input);
+    term_vec commutation_result = commutator(H, input);
 	clean_up(commutation_result);
 
 	std::cout << "H = " << H << "\\\\" << std::endl;
@@ -141,12 +140,10 @@ int main(int argc, char** argv) {
 		const int inner_idx = 0;
 		const int outer_idx = static_cast<int>(!inner_idx);
 
-		term_vec commute_with_H_base;
-		commutator(commute_with_H_base, H, base[inner_idx]);
+		term_vec commute_with_H_base = commutator(H, base[inner_idx]);
 		clean_up(commute_with_H_base);
 
-		term_vec commute_with_H_disp;
-		commutator(commute_with_H_disp, disp[inner_idx], H);
+		term_vec commute_with_H_disp = commutator(disp[inner_idx], H);
 		clean_up(commute_with_H_disp);
 		
 		if (true) {
@@ -158,12 +155,10 @@ int main(int argc, char** argv) {
 		}
 
 		{
-			term_vec base_double;
-			commutator(base_double, base_daggered[outer_idx], commute_with_H_base);
+			term_vec base_double = commutator(base_daggered[outer_idx], commute_with_H_base);
 			clean_up(base_double);
 
-			term_vec disp_double;
-			commutator(disp_double, disp_daggered[outer_idx], commute_with_H_disp);
+			term_vec disp_double = commutator(disp_daggered[outer_idx], commute_with_H_disp);
 			clean_up(disp_double);
 			
 			term_vec joined = joinVectors(base_double, disp_double);
@@ -225,8 +220,7 @@ int main(int argc, char** argv) {
 
 	for (size_t i = 0U; i < basis.size(); ++i)
 	{
-		term_vec commute_with_H;
-		commutator(commute_with_H, H, basis[i]);
+		term_vec commute_with_H = commutator(H, basis[i]);
 		clean_up(commute_with_H);
 		if (debug)
 			std::cout << "\\begin{align*}\n\t[ H, " << to_string_without_prefactor(basis[i]) << " ] ="
@@ -237,8 +231,7 @@ int main(int argc, char** argv) {
 			if (print) {
 				std::cout << "\\subsection{" << i << "." << j << "}" << std::endl;
 			}
-			term_vec terms;
-			commutator(terms, basis_daggered[j], commute_with_H);
+			term_vec terms = commutator(basis_daggered[j], commute_with_H);
 			clean_up(terms);
 
 			if (print_terms || debug)
@@ -340,7 +333,7 @@ int main(int argc, char** argv) {
 
 			terms.clear();
 			wicks.clear();
-			commutator(terms, basis_daggered[j], basis[i]);
+			terms = commutator(basis_daggered[j], basis[i]);
 			clean_up(terms);
 			wicks_theorem(terms, templates, wicks);
 			clear_etas(wicks);
