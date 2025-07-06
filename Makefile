@@ -6,6 +6,7 @@ all: build/FermionCommute | ../commutators
 	./$(BUILD_DIR)/FermionCommute XP hubbard
 	./$(BUILD_DIR)/FermionCommute std hubbard
 	./$(BUILD_DIR)/FermionCommute std hubbard_dispersions
+	./$(BUILD_DIR)/FermionCommute XP lattice_cut
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt
 	@mkdir -p $(BUILD_DIR)

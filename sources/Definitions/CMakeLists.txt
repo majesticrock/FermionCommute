@@ -1,4 +1,5 @@
 set(DEF_SOURCES
+    LatticeCUT.cpp
     Continuum.cpp
     Hubbard.cpp
     HubbardDispersions.cpp

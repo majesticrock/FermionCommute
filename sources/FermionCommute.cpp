@@ -4,6 +4,7 @@
 #include "Definitions/Hubbard.hpp"
 #include "Definitions/HubbardDispersions.hpp"
 #include "Definitions/Continuum.hpp"
+#include "Definitions/LatticeCUT.hpp"
 #include <mrock/symbolic_operators/Wick.hpp>
 #include <memory>
 #include <filesystem>
@@ -36,6 +37,7 @@ std::vector<T> joinVectors(const std::vector<T>& vec1, const std::vector<T>& vec
 const std::string hubbard_type = "hubbard";
 const std::string continuum_type = "continuum";
 const std::string hubbard_dispersions_type = "hubbard_dispersions";
+const std::string lattice_cut_type = "lattice_cut";
 
 std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
 	if (model_type == hubbard_type) {
@@ -46,6 +48,9 @@ std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
 	}
 	else if (model_type == hubbard_dispersions_type) {
 		return std::make_unique<HubbardDispersions>();
+	}
+	else if (model_type == lattice_cut_type) {
+		return std::make_unique<LatticeCUT>();
 	}
 	else {
 		throw std::invalid_argument("Model not recognized! " + model_type);
