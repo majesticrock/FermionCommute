@@ -16,12 +16,11 @@ namespace mrock::symbolic_operators {
 				c_minus_k.with_momentum('p'), c_k.with_momentum('p') })
 			);
 
-        const Term H_U(1, Coefficient("U"), MomentumSum({ 'r', 'p', 'q' }), 
-            std::vector<Operator>({
-			    Operator('r', 1, false, Index::SpinUp, true), Operator('p', 1, false, Index::SpinDown, true),
-			    Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
-			    Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
-			}));
+        const Term H_U(1, Coefficient("U"), SumContainer{ MomentumSum({ 'p', 'q' }) },
+			std::vector<Operator>({
+				c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
+				c_minus_k.with_momentum('p'), c_k.with_momentum('p') })
+			);
 
         return { H_Kin, H_Ph, H_U };
     }
