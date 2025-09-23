@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_PREFIX_PATH "~/usr/local")
+set(Boost_DIR /usr/lib64/openmpi/lib/cmake/Boost-1.78.0)
 
 add_subdirectory(sources/Definitions)
 include_directories(
