@@ -1,3 +1,19 @@
+# Program used to compute commutators and apply Wick's theorem
+
+This program essentially only makes use of the library provided under
+https://github.com/majesticrock/PhdUtility
+
+### Required externals
+- Boost https://www.boost.org/
+- CMake https://cmake.org/
+
+### Required internals
+
+- mrock/utility
+- mrock/symbolic_operators
+
+see https://github.com/majesticrock/PhdUtility
+
 # Basis usage of the classes
 
 ## Preface
