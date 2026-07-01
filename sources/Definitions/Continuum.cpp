@@ -57,8 +57,8 @@ namespace mrock::symbolic_operators {
 			std::vector<Operator>({
 				Operator('r', 1, false, Index::Sigma, true),
 				Operator('p', 1, false, Index::SigmaPrime, true),
-				Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SigmaPrime, false),
-				Operator(momentum_symbols({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::Sigma, false) })
+				Operator(std::vector<MomentumSymbol>({ MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q') }), Index::SigmaPrime, false),
+				Operator(std::vector<MomentumSymbol>({ MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q') }), Index::Sigma, false) })
 			);
 
 		//const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('q')), SumContainer{ MomentumSum({ 'q' }), Index::Sigma },
@@ -77,8 +77,8 @@ namespace mrock::symbolic_operators {
 			std::vector<Operator>({
 				Operator('p', 1, false, Index::SpinUp, true),
 				Operator('p', -1, false, Index::SpinDown, true),
-				Operator(momentum_symbols({ MomentumSymbol(-1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
-				Operator(momentum_symbols({ MomentumSymbol(1, 'p'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
+				Operator(std::vector<MomentumSymbol>({ MomentumSymbol(-1, 'p'), MomentumSymbol(-1, 'q') }), Index::SpinDown, false),
+				Operator(std::vector<MomentumSymbol>({ MomentumSymbol(1, 'p'), MomentumSymbol(1, 'q') }), Index::SpinUp, false),
 				}));
 #endif
 		return { H_Kin, PHONON_HAMILTONIAN, COULOMB_HAMILTONIAN };
