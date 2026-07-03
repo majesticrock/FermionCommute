@@ -28,8 +28,8 @@ namespace mrock::symbolic_operators {
     std::vector<WickOperatorTemplate> LatticeCUT::templates() const
     {
         return {
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false }
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), OperatorType::SC },
+			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), OperatorType::Number }
 		};
     }
 
@@ -77,7 +77,7 @@ namespace mrock::symbolic_operators {
         std::vector<std::unique_ptr<WickSymmetry>> ret;
 		ret.push_back(std::make_unique<SpinSymmetry>());
 		ret.push_back(std::make_unique<InversionSymmetry>());
-		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type>>());
+		ret.push_back(std::make_unique<PhaseSymmetry<OperatorType::SC>>());
 		return ret;
     }
 

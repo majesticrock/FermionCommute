@@ -28,10 +28,10 @@ namespace mrock::symbolic_operators {
 	std::vector<WickOperatorTemplate> Hubbard::templates() const
 	{
 		return {
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), SC_Type, true },
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(std::vector<MomentumSymbol>(), true), Eta_Type, true },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), Number_Type, false },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(std::vector<MomentumSymbol>(), true), CDW_Type, false }
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), OperatorType::SC },
+			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::Eta },
+			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), OperatorType::Number },
+			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::CDW }
 		};
 	}
 	std::vector<std::vector<Term>> Hubbard::XP_basis() const
@@ -145,7 +145,7 @@ namespace mrock::symbolic_operators {
 		ret.reserve(2);
 		//ret.push_back(std::make_unique<Index::SpinSymmetry>());
 		ret.push_back(std::make_unique<InversionSymmetry>());
-		ret.push_back(std::make_unique<PhaseSymmetry<SC_Type, CDW_Type>>());
+		ret.push_back(std::make_unique<PhaseSymmetry<OperatorType::SC, OperatorType::CDW>>());
 		return ret;
 	}
 	std::string Hubbard::get_subfolder() const
