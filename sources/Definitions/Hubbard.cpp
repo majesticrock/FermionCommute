@@ -28,10 +28,10 @@ namespace mrock::symbolic_operators {
 	std::vector<WickOperatorTemplate> Hubbard::templates() const
 	{
 		return {
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), OperatorType::SC },
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::Eta },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), OperatorType::Number },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::CDW }
+			WickOperatorTemplate{ {SC_Comparison}, Momentum(), OperatorType::SC },
+			WickOperatorTemplate{ {SC_Comparison}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::Eta },
+			WickOperatorTemplate{ {Num_Comparison}, Momentum(), OperatorType::Number },
+			WickOperatorTemplate{ {Num_Comparison}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::CDW }
 		};
 	}
 	std::vector<std::vector<Term>> Hubbard::XP_basis() const

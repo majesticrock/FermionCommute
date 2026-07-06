@@ -86,8 +86,8 @@ namespace mrock::symbolic_operators {
 	std::vector<WickOperatorTemplate> Continuum::templates() const
 	{
 		return {
-			WickOperatorTemplate{ {IndexComparison{false, Index::SpinDown, Index::SpinUp}}, Momentum(), OperatorType::SC },
-			WickOperatorTemplate{ {IndexComparison{true}}, Momentum(), OperatorType::Number }
+			WickOperatorTemplate{ {SC_Comparison}, Momentum(), OperatorType::SC },
+			WickOperatorTemplate{ {Num_Comparison}, Momentum(), OperatorType::Number }
 		};
 	}
 	std::vector<std::vector<Term>> Continuum::XP_basis() const
