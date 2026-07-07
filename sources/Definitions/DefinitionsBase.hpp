@@ -5,6 +5,7 @@
 #include <mrock/symbolic_operators/Term.hpp>
 #include <mrock/symbolic_operators/WickOperatorTemplate.hpp>
 #include <mrock/symbolic_operators/WickSymmetry.hpp>
+#include <memory>
 
 namespace mrock::symbolic_operators {
 	extern const Momentum base_k;
