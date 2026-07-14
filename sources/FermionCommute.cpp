@@ -224,7 +224,7 @@ int main(int argc, char** argv) {
 
 	if (print) std::cout << "\\begin{align*}\n\t H =" << H << "\\end{align*}" << std::endl;
 
-	for (size_t i = 0U; i < basis.size(); ++i)
+	for (std::size_t i = 0U; i < basis.size(); ++i)
 	{
 		term_vec commute_with_H = commutator(H, basis[i]);
 		clean_up(commute_with_H);
@@ -232,7 +232,7 @@ int main(int argc, char** argv) {
 			std::cout << "\\begin{align*}\n\t[ H, " << to_string_without_prefactor(basis[i]) << " ] ="
 			<< commute_with_H << "\\end{align*}" << std::endl;
 
-		for (size_t j = 0U; j < basis.size(); ++j)
+		for (std::size_t j = 0U; j < basis.size(); ++j)
 		{
 			if (print) {
 				std::cout << "\\subsection{" << i << "." << j << "}" << std::endl;

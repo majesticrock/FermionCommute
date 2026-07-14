@@ -19,21 +19,16 @@ add_executable(FermionCommute
 )
 
 # Check if using GCC and adjust C++ standard flag if necessary
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # Check GCC version
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0)
-        message(FATAL_ERROR "GCC version ${CMAKE_CXX_COMPILER_VERSION} is not supported. GCC 11.0 or newer is required for C++20 support.")
-    endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Use the appropriate flag for GCC
     target_compile_options(FermionCommute PRIVATE
         -Wall
         -Wno-sign-compare
-        -fopenmp
         -march=native
         -O3
     )
 else()
-    message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}. Only GCC is supported.")
+    message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}. Only GCC|Clang is supported.")
 endif()
 
 find_package(Boost REQUIRED COMPONENTS serialization)
