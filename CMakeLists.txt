@@ -8,13 +8,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Custome package install location
 list(APPEND CMAKE_PREFIX_PATH "~/usr/local")
 set(Boost_DIR /usr/lib64/openmpi/lib/cmake/Boost-1.78.0)
 
 add_subdirectory(sources/Definitions)
-include_directories(
-    $ENV{HOME}/usr/local/include
-)
 
 add_executable(FermionCommute 
     sources/FermionCommute.cpp
@@ -39,5 +37,4 @@ else()
 endif()
 
 find_package(Boost REQUIRED COMPONENTS serialization)
-target_include_directories(FermionCommute PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(FermionCommute PRIVATE Definitions ${Boost_LIBRARIES})

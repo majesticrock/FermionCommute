@@ -10,7 +10,7 @@ all: build/FermionCommute | ../commutators
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt
 	@mkdir -p $(BUILD_DIR)
-	@cd $(BUILD_DIR) && cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
+	@cd $(BUILD_DIR) && cmake -DCMAKE_CXX_COMPILER=g++ ..
 
 build/FermionCommute: $(BUILD_DIR)/Makefile
 	@$(MAKE) -C $(BUILD_DIR)

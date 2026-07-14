@@ -3,7 +3,6 @@
 #include <memory>
 #include <filesystem>
 
-#include <mrock/utility/LaTeXOutput.hpp>
 #include <mrock/symbolic_operators/Wick.hpp>
 #include <mrock/symbolic_operators/SerializationHeaders.hpp>
 
