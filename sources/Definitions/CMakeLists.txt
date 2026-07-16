@@ -1,3 +1,5 @@
+# Definitions/CMakeLists.txt
+
 set(DEF_SOURCES
     LatticeCUT.cpp
     Continuum.cpp
@@ -8,11 +10,17 @@ set(DEF_SOURCES
 
 add_library(Definitions STATIC ${DEF_SOURCES})
 
-target_include_directories(Definitions PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Definitions
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 find_package(mrock REQUIRED COMPONENTS symbolic_operators)
-target_link_libraries(
-    Definitions
+
+target_link_libraries(Definitions
     PUBLIC
         mrock::symbolic_operators
+
+    PRIVATE
+        FermionCommute_options
 )

@@ -65,13 +65,15 @@ void boson_test(){
             Operator::Boson(Momentum('k'), Index::Sigma, false)
         }));
 
-	Term H_bogo(1, Coefficient::HoneyComb("\\gamma", Momentum('k'), true), SumContainer{ MomentumSum({'k'}) },
+	Term H_bogo(1, Coefficient::HoneyComb("\\gamma", Momentum('k'), true), 
+		SumContainer{ MomentumSum({'k'}), IndexSum{} },
 		std::vector<Operator>({
             Operator::Boson(Momentum('k'), Index::TypeA, false),
             Operator::Boson(Momentum('k', -1), Index::TypeB, false)
         }));
 
-	Term H_bogo_conjugate(1, Coefficient::HoneyComb("\\gamma", Momentum('k', -1), false), SumContainer{ MomentumSum({'k'}) },
+	Term H_bogo_conjugate(1, Coefficient::HoneyComb("\\gamma", Momentum('k', -1), false), 
+		SumContainer{ MomentumSum({'k'}), IndexSum{} },
 		std::vector<Operator>({
             Operator::Boson(Momentum('k'), Index::TypeA, true),
             Operator::Boson(Momentum('k', -1), Index::TypeB, true)

@@ -10,13 +10,13 @@ namespace mrock::symbolic_operators {
             );
 
         const Term H_Ph(-1, Coefficient::RealInversionSymmetric("g", MomentumList({ 'q', 'p' }), std::function<void(Coefficient&)>([](Coefficient& coeff){ coeff.momenta.sort(); })),
-			SumContainer{ MomentumSum({ 'p', 'q' }) },
+			SumContainer{ MomentumSum({ 'p', 'q' }), IndexSum{} },
 			std::vector<Operator>({
 				c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
 				c_minus_k.with_momentum('p'), c_k.with_momentum('p') })
 			);
 
-        const Term H_U(1, Coefficient("U"), SumContainer{ MomentumSum({ 'p', 'q' }) },
+        const Term H_U(1, Coefficient("U"), SumContainer{ MomentumSum({ 'p', 'q' }), IndexSum{} },
 			std::vector<Operator>({
 				c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
 				c_minus_k.with_momentum('p'), c_k.with_momentum('p') })
