@@ -1,160 +1,111 @@
-# Program used to compute commutators and apply Wick's theorem
+# FermionCommute
 
-This program essentially only makes use of the library provided under
-https://github.com/majesticrock/PhdUtility
+## Overview
 
-### Required externals
-- Boost https://www.boost.org/
-- CMake https://cmake.org/
+FermionCommute is a small C++ program that builds on the symbolic_operators library to compute commutators and expectation-value expansions of fermionic (and bosonic) operator expressions using Wick's theorem. 
+The program supports model-specific definitions (Hamiltonians, contraction templates, operator bases and symmetries) via a `DefinitionsBase`-style interface and ships with an example implementation for the half-filled extended Hubbard model. 
 
-### Required internals
+## Features
 
-- mrock/utility
-- mrock/symbolic_operators
+- Constructs and manipulates symbolic operator Terms (creation/annihilation operators, coefficients, sums, Kronecker deltas, etc.) via the `mrock::symbolic_operators` library. 
+- Computes commutators and nested commutators (e.g. $[H, A]$ and $[B, [H, A]]$). 
+- Applies Wick's theorem to expand higher-order operator products into Wick operators using user-provided templates, and simplifies results with symmetry classes (spin, inversion, phase, ...). 
+- Serializes computed Wick-term collections to disk (binary Boost archives by default). 
 
-see https://github.com/majesticrock/PhdUtility
+## Requirements
 
-# Basis usage of the classes
+- A C++20-capable compiler (the library and examples target C++20). 
+- Boost (iostream and serialization) for saving/loading results; the program uses Boost binary archives for output by default.
+- The symbolic_operators library (must be installed to a standard CMake location or to `~/usr/local/` for plug-and-play)
+- (Recommended for plug-and-play) CMake 3.30 or newer for building and running tests. 
 
-## Preface
+## Building
 
-If there is no namespace specified in this file, we imply the namespace ```symbolic_operators```.
-Each relevent class defines and overload of ```std::ostream& operator<<```, i.e., they can easily be used as ```std::cout << class_obj```.
-The output is formated to be used within an ```align```-environment within LaTeX.
-Your code only needs to include ```Wick.hpp```.
-
-## The ```Momentum``` class
-This class represents momenta. It includes addition and substraction operators as well as a ```bool add_Q```. _Q_ is defined as _(pi, pi, ...)_, i.e., _n * Q = 0_ for all even _n_.
-Besides the normal operators in which you specify the class members, you can also pass a string to the constructor like ```"3k+l-p"``` to create that specific momentum. If you want to add Q here, you can do so by passing ```true``` to the same constructor as a second argument.
-
-## The ```Operator``` class
-This class represents the standard fermionic creation and annihilation operators. You can specify its momentum, its indizes and whether it is supposed to be daggered (a creation operator) or not (an annihilation operator).
-
-## The ```Term``` class
-This class has various kind of constructors that allow setting coefficient(s), sums, operators and deltas.
-
-### Sums
-Sums are contained within the ```SumContainer``` class. It hosts both sums of momenta and sums of spins, each one is accessible via the appropriate class member and its ```operator[]```, e.g., ```container.momenta[i]```.
-
-### Deltas
-Deltas are represented via the ```KroneckerDelta``` class template.
-The template argument specifies what kind of Delta is to be used, e.g., ```Momentum```.
-Similar to how ```std::pair<T1,T2>``` implements ```std::make_pair(T1, T2)``` a function ```make_delta(T,T)``` is provided.
-
-## Creating a Hamiltonian
-
-A Hamiltonian is characterized as ```std::vector<Term>```.
-It can consist of any number of individual terms.
-
-## Creating a basis
-A basis in this sense refers to the set of operators that need to be commuted.
-Each individual basis term can consist of multiple different summands.
-Therefore, it is to be represented by an ```std::vector<Term>```. The straightforward idea would be to represent the entire basis as ```std::vector<std::vector<Term>>```.
-After you have created a basis, you can obtain the Hermitian conjugate of your basis by means of this code
-
+If the plug-and-play requirements are fulfilled, you can simply type
 ```
-std::vector<term_vec> basis_daggered(basis);
-for (auto& t : basis_daggered) {
-    hermitian_conjugate(t);
-}
+make build/FermionCommute
 ```
 
-However, often it is advisible to rename the momenta of the conjugate basis because otherwise expressions like [b_k, b_k] will actually assume both k to be the same.
-This can be achieved via
-
+Running
 ```
-for (auto& t : basis_daggered) {
-	hermitian_conjugate(t);
-	rename_momenta(t, 'k', 'l');
-}
+make
 ```
+without any arguments will build the program and then run it for all implemented models.
 
-# How to commute
+## Running
 
-First, create an ```std::vector<Term>``` that will hold your result.
-Then, you can simply call ```commutator(result, left, right)``` to computed [left, right]. Afterwards, it is recommended to call ```clean_up(result)``` which will remove unnecessary terms, e.g., those that will be 0 anyways.
-Additionally, this function groups identical terms.
-
-A double commutator is equally simple:
-Create a buffer for the inner commutator, then perform the inner commutation (and clean up). Afterwards simply perform the outer commutation.
-
-
-# How to use Wick's theorem
-
-Prerequisite: The terms you want to apply Wick's theorem on are saved in an ```std::vector<Term>```.
-
-## Creating Wick templates
-
-Applying Wick's theorem often involves omiting certain expecation values because you know them to be 0 for symmtry reasons. Therefore the class ```WickOperatorTemplate``` exists. Here, you specify, which kind of expectation values will be finite.
-In the following, the meaning of the different attributes is listed:
-
-### ```std::vector<IndexComparison> indexComparison```
-Holds various ```IndexComparision```
-
-#### ```struct IndexComparison``` 
-If ```any_identical``` is ```true```, any two identical indizes are considered valid. An example would be in the number operator *c_(k, sigma)^+ c_(k, sigma')*: No matter what sigma is, as long as sigma = sigma' the expectation value will be finite.
-If ```any_identical``` is ```false```, the members ```base``` and ```other``` become relevant: They define what the indizes need to be, e.g., for a pair annihlation operator *c_(-k down) c_(k up)* one would set ```base``` to _down_ and ```other``` to _up_.
-
-Note, once one operator is set as a template, it is not necessary to set its Hermitian conjugate.
-
-### ```Momentum momentum_difference```
-Defines the allowed difference in momentum, e.g., for a number operator, this would be 0.
-Note, this also applies to a standard pair creation/annihilation operator, because in total, these operators create/annihilate a particle with *-k* and one with *k*, resulting in 0 net momentum.
-
-### ```OperatorType type```
-Specifies what kind of WickOperator will be the result, see ```enum OperatorType``` in ```WickOperator.hpp```.
-
-### ```bool is_sc_type```
-Specifies whether the operator is a pair creation/annihilation operator or a standard *c^+ c* type term.
-
-
-## Apply Wick's theorem
-Create an instance of ```WickTermCollector```. Then simply call 
-
+The executable expects at least two command-line arguments: an execution type and a model identifier. The documented syntax is:
 ```
-wicks_theorem(terms, templates, wicks);
-clean_wicks(wicks);
+./build/FermionCommute <XP/std> <model>
 ```
+and the program prints a usage message when arguments are missing. 
 
-## Applying symmetries to the result
-There may be some symmetries that simplify your results, e.g. <O^+> = <O>.
-These symmetries can be implemented by inheriting from the  ```WickSymmetry``` class and defining the member function ```virtual void apply_to(WickTerm& term) const```.
-Then create a ```std::vector<std::unique_ptr<WickSymmetry>> symmetries``` and make use of polymorphism by calling ```clean_wicks(wicks, symmetries)```
-There are the following predefined symmetry operations:
+- Execution types:
+  - `XP` - run with the "XP" basis (uses `XP_basis()` from the model definition).  
+  - `std` - run with the standard basis (`STD_basis()`). 
+The meaning of `XP` is laid out in the context of the iEoM, but in short, the XP basis contains only Hermitian and anti-Hermitian operators, while no such restrictions exist for the `STD` basis.
 
-#### ```SpinSymmetry```
-Changes all spins of the operators in ```term``` to _up_.
+- Model identifiers shipped with the program include: `hubbard`, `continuum`, `hubbard_dispersions`, `lattice_cut`. The model selector returns a concrete `DefinitionsBase` implementation for the chosen model. 
 
-#### ```InversionSymmetry```
-Flips the momenta in such a way, that the first momentum in a term is always positive, i.e., _-k+l_ is changed to _k-l_ while _k-l_ would stay unmodified.
-
-#### ```PhaseSymmetry```
-Takes a list of ```OperatorType``` as template arguments.
-Removes any dagger from all operators with a type from the list.
 Example:
-```PhaseSymmetry<SC_Type, CDW_Type>``` removes the dagger from ```SC_Type``` and ```CDW_Type``` operators.
-
-## Output and use the result
-
-You can print the the result to the console or utilize boost's serialization to load it later (or within another program).
-Serialization can be achieved via this code
-
 ```
-std::ofstream ofs("path/to/file.txt");
-boost::archive::text_oarchive oa(ofs);
-oa << wicks;
-ofs.close();
+./build/main XP hubbard
 ```
+This runs the code generation for the (half-filled) extended Hubbard model using the XP basis (see https://doi.org/10.1103/PhysRevB.109.205153). 
 
-To later on load the output use
+## What the program does internally (high-level workflow)
 
-```
-std::ifstream ifs("path/to/file.txt");
-boost::archive::text_iarchive ia(ifs);
-target.clear();
-ia >> target;
-ifs.close();
-```
+1. It loads the chosen model via `get_model(model_type)`, which instantiates a class like `Hubbard` that supplies Hamiltonian terms, templates and bases.   
+2. The program queries the model for its Hamiltonian (`hamiltonian()`), Wick operator templates (`templates()`), the operator basis (`XP_basis()` or `STD_basis()`), and symmetry objects (`symmetries()`).  
+3. For each pair of basis vectors the program computes the commutators $[H, \text{basis[i]}]$ and $[\text{basis}_j^\dagger, [H, \text{basis}_i]]$.  
+4. The raw results are cleaned (normal ordering, removal of trivial sums/multiplicities) and then transformed into a collection of `WickTerm` objects (representing expectation values) by `wicks_theorem(...)`, using the model-supplied Wick operator templates. 
+5. The resulting `WickTermCollector` is post-processed: specific coefficient manipulations or channel rearrangements (model-dependent) are applied, and symmetry simplifications (e.g., spin symmetry, inversion symmetry, phase symmetry) are applied via `clean_wicks(...)`. 
+6. The results are serialized to disk as binary boost archives in `../commutators/<model_subfolder>/` by default. The program constructs filenames such as `wick_M_j_i.bin` and `wick_N_j_i.bin`.
 
-or if you want to use this code of the iEoM, there is the class ```TermLoader``` for easy use.
-It loads the terms for the matrices M and N and saves same as class members.
+## Overview of the files
+
+- `FermionCommute.cpp` - main driver that orchestrates model loading, commutator evaluation, Wick expansion, cleaning and serialization.  
+- `Definitions/<model>.hpp` / `Definitions/<model>.cpp` - implementation of various models
+  - a Hamiltonian built from `Term` and `Operator` objects;   
+  - a set of Wick operator templates used to identify number, SC (superconducting), eta, and CDW operator types;   
+  - XP and STD operator bases used to generate matrices \(M\) and \(N\);   
+  - model-specific symmetries (inversion, phase symmetry for specified operator types) and a `get_subfolder()` function for output layout.   
+- `symbolic_operators` library headers - core types such as `Term`, `Operator`, `Coefficient`, `Momentum`, `WickOperator`, `WickTerm`, `WickTermCollector`, `WickOperatorTemplate`, and symmetry classes live in namespace `mrock::symbolic_operators`.
+
+## Extending / Adding a new model
+
+To add a new model, implement a class derived from the project's `DefinitionsBase` interface and provide at least the following methods, analogous to the included `Hubbard` example:
+
+- `std::vector<Term> hamiltonian() const` - return the Hamiltonian as a vector of `Term` objects.
+- `std::vector<WickOperatorTemplate> templates() const` - return templates that define how ordinary operators map to Wick operator types for your problem. 
+- `std::vector<std::vector<Term>> XP_basis() const` and `STD_basis() const` - define your operator bases used for computing matrix elements. 
+- `std::vector<std::unique_ptr<WickSymmetry>> symmetries() const` - return symmetry objects to be applied during `clean_wicks(...)`.
+- `std::string get_subfolder() const` - optional: subfolder name for serialization output.
+
+See the existing files for concrete examples of all these functions.
+
+## Output and serialization
+
+- The program serializes `WickTermCollector` objects into binary files using Boost serialization; filenames include an `M` or `N` marker plus indices derived from the basis loop.
+- By default, files are written under `../commutators/<model_subfolder>/` where `model_subfolder` is returned by the model's `get_subfolder()` method (for the Hubbard example, this is `"hubbard/"`).
+
+## Debugging and tests
+
+- Running with `test` (internally supported by the example main) triggers smaller test workflows and prints intermediate results for verification. 
+- The source contains helper functions and examples (e.g., a `boson_test()` function) that illustrate bosonic operator handling and commutator behavior.
+
+## Related publications
+
+The following implementations of models have been used in publications:
+
+- `Hubbard`: 
+	- Collective excitations in competing phases in two and three dimensions, J. Althüser & G. S. Uhrig, 
+ 		Physical Review B 109, 205153 (2024), https://doi.org/10.1103/PhysRevB.109.205153
+- `Continuum`: 
+	- Collective modes in superconductors including Coulomb repulsion, J. Althüser & G. S. Uhrig, 
+ 		SciPost Physics 19, 067 (2025) https://doi.org/10.21468/SciPostPhys.19.3.067
+- `LatticeCut`: 
+	- Enhanced Superconductivity in Proximity to Peaks in Densities of States, J. Althüser, I. M. Eremin & G. S. Uhrig,
+ 		(preprint) arXiv:2512.11451 (2025) https://doi.org/10.48550/arXiv.2512.11451
+ 	- Secondary Collective Excitations in Intermediate to Strong-Coupling Superconductors, J. Althüser & G. S. Uhrig, 
+ 		(preprint) arXiv:2605.20059 (2026) https://doi.org/10.48550/arXiv.2605.20059

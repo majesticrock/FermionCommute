@@ -3,7 +3,8 @@
 #include <memory>
 #include <filesystem>
 
-#include <mrock/symbolic_operators/Wick.hpp>
+#include <mrock/symbolic_operators/Commutation>
+#include <mrock/symbolic_operators/ExpectationValues>
 #include <mrock/symbolic_operators/SerializationHeaders.hpp>
 
 #include "Definitions/Hubbard.hpp"
@@ -102,7 +103,7 @@ int main(int argc, char** argv) {
 	/* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
 	std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
 	return 0; */
-	constexpr bool print = true;
+	constexpr bool print = false;
 	constexpr bool print_terms = false;
 	if (argc < 3) {
 		std::cerr << "Syntax: ./build/main <XP/std> <model>" << std::endl;
