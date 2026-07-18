@@ -1,6 +1,10 @@
 #pragma once
 #include "DefinitionsBase.hpp"
 
+#include <memory> 
+#include <string>
+#include <vector>
+
 namespace mrock::symbolic_operators {
 	struct Hubbard : public DefinitionsBase {
 		virtual std::vector<Term> hamiltonian() const override;
@@ -10,5 +14,7 @@ namespace mrock::symbolic_operators {
 		virtual std::vector<std::unique_ptr<WickSymmetry>> symmetries() const override;
 
 		virtual std::string get_subfolder() const override;
+
+		virtual ~Hubbard() = default;
 	};
 }

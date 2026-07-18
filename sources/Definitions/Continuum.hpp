@@ -1,6 +1,10 @@
 #pragma once
 #include "DefinitionsBase.hpp"
 
+#include <memory> 
+#include <string>
+#include <vector>
+
 namespace mrock::symbolic_operators {
 	class Continuum : public DefinitionsBase
 	{

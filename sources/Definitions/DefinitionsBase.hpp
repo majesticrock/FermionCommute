@@ -5,7 +5,10 @@
 #include <mrock/symbolic_operators/Term.hpp>
 #include <mrock/symbolic_operators/WickOperatorTemplate.hpp>
 #include <mrock/symbolic_operators/WickSymmetry.hpp>
-#include <memory>
+
+#include <memory> 
+#include <string>
+#include <vector>
 
 namespace mrock::symbolic_operators {
 	extern const Momentum base_k;
@@ -40,5 +43,7 @@ namespace mrock::symbolic_operators {
 		virtual std::vector<std::unique_ptr<WickSymmetry>> symmetries() const = 0;
 
 		virtual std::string get_subfolder() const = 0;
+
+		virtual ~DefinitionsBase() = default;
 	};
 }
