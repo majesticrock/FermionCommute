@@ -16,7 +16,7 @@ The program supports model-specific definitions (Hamiltonians, contraction templ
 
 - A C++20-capable compiler (the library and examples target C++20). 
 - Boost (iostream and serialization) for saving/loading results; the program uses Boost binary archives for output by default.
-- The symbolic_operators library (must be installed to a standard CMake location or to `~/usr/local/` for plug-and-play)
+- The symbolic_operators library (must be installed either to a standard CMake location or to `~/usr/local/` or to `../../.mrock/include/` for plug-and-play)
 - (Recommended for plug-and-play) CMake 3.30 or newer for building and running tests. 
 
 ## Building
@@ -51,13 +51,13 @@ Example:
 ```
 ./build/main XP hubbard
 ```
-This runs the code generation for the (half-filled) extended Hubbard model using the XP basis (see https://doi.org/10.1103/PhysRevB.109.205153). 
+This runs the commutations for the (half-filled) extended Hubbard model using the XP basis (see https://doi.org/10.1103/PhysRevB.109.205153). 
 
 ## What the program does internally (high-level workflow)
 
 1. It loads the chosen model via `get_model(model_type)`, which instantiates a class like `Hubbard` that supplies Hamiltonian terms, templates and bases.   
 2. The program queries the model for its Hamiltonian (`hamiltonian()`), Wick operator templates (`templates()`), the operator basis (`XP_basis()` or `STD_basis()`), and symmetry objects (`symmetries()`).  
-3. For each pair of basis vectors the program computes the commutators $[H, \text{basis[i]}]$ and $[\text{basis}_j^\dagger, [H, \text{basis}_i]]$.  
+3. For each pair of basis vectors the program computes the commutators $[H, \text{basis}_i]$ and $[\text{basis}_j^\dagger, [H, \text{basis}_i]]$.  
 4. The raw results are cleaned (normal ordering, removal of trivial sums/multiplicities) and then transformed into a collection of `WickTerm` objects (representing expectation values) by `wicks_theorem(...)`, using the model-supplied Wick operator templates. 
 5. The resulting `WickTermCollector` is post-processed: specific coefficient manipulations or channel rearrangements (model-dependent) are applied, and symmetry simplifications (e.g., spin symmetry, inversion symmetry, phase symmetry) are applied via `clean_wicks(...)`. 
 6. The results are serialized to disk as binary boost archives in `../commutators/<model_subfolder>/` by default. The program constructs filenames such as `wick_M_j_i.bin` and `wick_N_j_i.bin`.
