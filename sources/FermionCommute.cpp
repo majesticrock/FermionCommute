@@ -62,37 +62,7 @@ std::unique_ptr<DefinitionsBase> get_model(std::string const& model_type) {
     }
 }
 
-void boson_test() {
-    Term H_diag(1, Coefficient("\\lambda"), SumContainer{MomentumSum({'k'}), Index::Sigma},
-                std::vector<Operator>({Operator::Boson(Momentum('k'), Index::Sigma, true),
-                                       Operator::Boson(Momentum('k'), Index::Sigma, false)}));
-
-    Term H_bogo(1, Coefficient::HoneyComb("\\gamma", Momentum('k'), true), SumContainer{MomentumSum({'k'}), IndexSum{}},
-                std::vector<Operator>({Operator::Boson(Momentum('k'), Index::TypeA, false),
-                                       Operator::Boson(Momentum('k', -1), Index::TypeB, false)}));
-
-    Term H_bogo_conjugate(1, Coefficient::HoneyComb("\\gamma", Momentum('k', -1), false),
-                          SumContainer{MomentumSum({'k'}), IndexSum{}},
-                          std::vector<Operator>({Operator::Boson(Momentum('k'), Index::TypeA, true),
-                                                 Operator::Boson(Momentum('k', -1), Index::TypeB, true)}));
-
-    term_vec H = {H_diag, H_bogo, H_bogo_conjugate};
-
-    Term input(1, std::vector<Operator>({Operator::Boson(Momentum('q'), Index::TypeA, false),
-                                         Operator::Boson(Momentum('q', -1), Index::TypeB, false)}));
-
-    term_vec commutation_result = commutator(H, input);
-    clean_up(commutation_result);
-
-    std::cout << "H = " << H << "\\\\" << std::endl;
-    std::cout << "[ H, " << input << "] =" << commutation_result << std::endl;
-}
-
 int main(int argc, char** argv) {
-    // Remove comment for boson test
-    // boson_test();
-    // return 0;
-
     const std::string save_folder = "../commutators/";
     /* WickTerm parse_test("1 sum:momentum{p,q} c:V{p;} o:n{k-p-3x;up} o:f{k+l;}");
     std::cout << parse_test << "    " << parse_test.coefficients.size() << std::endl;
@@ -132,13 +102,13 @@ int main(int argc, char** argv) {
             rename_momenta(vec, 'k', 'l');
         }
 
-        const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({'r', 'p', 'q'}),
+        const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({'K', 'P', 'Q'}),
                        std::vector<Operator>({
-                           Operator('r', 1, false, Index::SpinUp, true),
-                           Operator('p', 1, false, Index::SpinDown, true),
-                           Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q')}),
+                           Operator('K', 1, false, Index::SpinUp, true),
+                           Operator('P', 1, false, Index::SpinDown, true),
+                           Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'P'), MomentumSymbol(-1, 'Q')}),
                                     Index::SpinDown, false),
-                           Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q')}),
+                           Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'Q')}),
                                     Index::SpinUp, false),
                        }));
         const std::vector<Term> H = {H_U};
@@ -251,29 +221,29 @@ int main(int argc, char** argv) {
                 Coefficient& current_coeff = wickterm.coefficients.front();
                 if (current_coeff.name == "\\rho") {
                     wickterm.sums.push_back(Index::SigmaPrime);
-                    wickterm.sums.push_back('q');
+                    wickterm.sums.push_back('K');
                     current_coeff = Coefficient::parse_string("V{0;}");
-                    wickterm.operators.push_back(WickOperator("n{q;sigma'}"));
+                    wickterm.operators.push_back(WickOperator("n{K;sigma'}"));
                     wickterm.multiplicity *= 2;
                 }
                 if (current_coeff.name == "\\epsilon_{C.Fock}") {
-                    wickterm.sums.push_back('q');
-                    current_coeff = Coefficient::parse_string("V{q;}");
-                    wickterm.operators.push_back(WickOperator("n{k+q;up}"));
+                    wickterm.sums.push_back('K');
+                    current_coeff = Coefficient::parse_string("V{K;}");
+                    wickterm.operators.push_back(WickOperator("n{k+K;up}"));
                     wickterm.multiplicity *= -2;
                 }
 
                 if (current_coeff.name == "\\mu_{Ph}") {
                     wickterm.sums.push_back(Index::SigmaPrime);
-                    wickterm.sums.push_back('q');
-                    current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,q,0;}");
-                    wickterm.operators.push_back(WickOperator("n{q;sigma'}"));
+                    wickterm.sums.push_back('K');
+                    current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,K,0;}");
+                    wickterm.operators.push_back(WickOperator("n{K;sigma'}"));
                     wickterm.multiplicity *= 2;
                 }
                 if (current_coeff.name == "\\epsilon_{Phock}") {
-                    wickterm.sums.push_back('q');
-                    current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,k+q,q;}");
-                    wickterm.operators.push_back(WickOperator("n{k+q;up}"));
+                    wickterm.sums.push_back('K');
+                    current_coeff = Coefficient::parse_interaction_string("U_\\\\mathrm\\{CUT\\}{k,k+K,K;}");
+                    wickterm.operators.push_back(WickOperator("n{k+K;up}"));
                     wickterm.multiplicity *= -2;
                 }
 

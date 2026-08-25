@@ -22,65 +22,65 @@
 
 namespace mrock::symbolic_operators {
 std::vector<Term> Continuum::hamiltonian() const {
-    const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{MomentumSum({'q'}), Index::Sigma},
+    const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('K')), SumContainer{MomentumSum({'K'}), Index::Sigma},
                      std::vector<Operator>(
-                         {Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)}));
+                         {Operator('K', 1, false, Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
 
 #ifndef PHONON_ONLY_SC_CHANNEL
     const Term H_Ph(
-        IntFractional(1, 2), Coefficient::RealInteraction("U_\\mathrm{CUT}", MomentumList({'r', 'p', 'q'})),
-        SumContainer{MomentumSum({'r', 'p', 'q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
+        IntFractional(1, 2), Coefficient::RealInteraction("U_\\mathrm{CUT}", MomentumList({'K', 'P', 'Q'})),
+        SumContainer{MomentumSum({'K', 'P', 'Q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
         std::vector<Operator>(
-            {Operator(Momentum("r+q"), Index::Sigma, true), Operator(Momentum("p-q"), Index::SigmaPrime, true),
-             Operator(Momentum('p'), Index::SigmaPrime, false), Operator(Momentum('r'), Index::Sigma, false)}));
+            {Operator(Momentum("K+Q"), Index::Sigma, true), Operator(Momentum("P-Q"), Index::SigmaPrime, true),
+             Operator(Momentum('P'), Index::SigmaPrime, false), Operator(Momentum('K'), Index::Sigma, false)}));
 
-    const Term H_Phock(-IntFractional(1, 2), Coefficient("\\epsilon_{Phock}", Momentum('q')),
-                       SumContainer{MomentumSum({'q'}), Index::Sigma},
-                       std::vector<Operator>({Operator('q', 1, false, Index::Sigma, true),
-                                              Operator('q', 1, false, Index::Sigma, false)}));
+    const Term H_Phock(-IntFractional(1, 2), Coefficient("\\epsilon_{Phock}", Momentum('Q')),
+                       SumContainer{MomentumSum({'Q'}), Index::Sigma},
+                       std::vector<Operator>({Operator('Q', 1, false, Index::Sigma, true),
+                                              Operator('Q', 1, false, Index::Sigma, false)}));
 
     const Term H_Phartree(-IntFractional(1, 2), Coefficient("\\mu_{Ph}"),
-                          SumContainer{MomentumSum({'q'}), Index::Sigma},
+                          SumContainer{MomentumSum({'Q'}), Index::Sigma},
                           std::vector<Operator>({Operator(Momentum("q"), Index::Sigma, true),
-                                                 Operator('q', 1, false, Index::Sigma, false)}));
+                                                 Operator('Q', 1, false, Index::Sigma, false)}));
 #else
     const Term H_Ph(-1,
                     Coefficient::RealInversionSymmetric(
-                        "g", MomentumList({'q', 'p'}),
+                        "g", MomentumList({'K', 'P'}),
                         std::function<void(Coefficient&)>([](Coefficient& coeff) { coeff.momenta.sort(); })),
-                    SumContainer{MomentumSum({'p', 'q'}), IndexSum{}},
-                    std::vector<Operator>({c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
-                                           c_minus_k.with_momentum('p'), c_k.with_momentum('p')}));
+                    SumContainer{MomentumSum({'K', 'P'}), IndexSum{}},
+                    std::vector<Operator>({c_k_dagger.with_momentum('K'), c_minus_k_dagger.with_momentum('K'),
+                                           c_minus_k.with_momentum('P'), c_k.with_momentum('P')}));
 #endif
 
 #ifndef COULOMB_ONLY_SC_CHANNEL
-    const Term H_C(IntFractional(1, 2), Coefficient("V", Momentum('q')),
-                   SumContainer{MomentumSum({'r', 'p', 'q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
+    const Term H_C(IntFractional(1, 2), Coefficient("V", Momentum('Q')),
+                   SumContainer{MomentumSum({'K', 'P', 'Q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
                    std::vector<Operator>(
-                       {Operator('r', 1, false, Index::Sigma, true), Operator('p', 1, false, Index::SigmaPrime, true),
-                        Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q')}),
+                       {Operator('K', 1, false, Index::Sigma, true), Operator('P', 1, false, Index::SigmaPrime, true),
+                        Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'P'), MomentumSymbol(-1, 'Q')}),
                                  Index::SigmaPrime, false),
-                        Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q')}),
+                        Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'Q')}),
                                  Index::Sigma, false)}));
 
-    // const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('q')), SumContainer{
-    // MomentumSum({ 'q' }), Index::Sigma }, 	std::vector<Operator>({ 		Operator('q', 1, false,
+    // const Term H_C_Fock(-IntFractional(1, 2), Coefficient("\\epsilon_{C.Fock}", Momentum('K')), SumContainer{
+    // MomentumSum({ 'K' }), Index::Sigma }, 	std::vector<Operator>({ 		Operator('K', 1, false,
     // Index::Sigma, true),
-    // Operator('q', 1, false, Index::Sigma, false)
+    // Operator('K', 1, false, Index::Sigma, false)
     //		}));
 
-    const Term H_BG(-IntFractional(1, 2), Coefficient("\\rho"), SumContainer{MomentumSum({'q'}), Index::Sigma},
+    const Term H_BG(-IntFractional(1, 2), Coefficient("\\rho"), SumContainer{MomentumSum({'K'}), Index::Sigma},
                     std::vector<Operator>(
-                        {Operator(Momentum("q"), Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)}));
+                        {Operator(Momentum('K'), Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
 
 #else
-    const Term H_C(1, Coefficient("V", Momentum('q')), SumContainer{MomentumSum({'p', 'q'}), IndexSum{}},
+    const Term H_C(1, Coefficient("V", Momentum('P')), SumContainer{MomentumSum({'K', 'P'}), IndexSum{}},
                    std::vector<Operator>({
-                       Operator('p', 1, false, Index::SpinUp, true),
-                       Operator('p', -1, false, Index::SpinDown, true),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(-1, 'p'), MomentumSymbol(-1, 'q')}),
+                       Operator('P', 1, false, Index::SpinUp, true),
+                       Operator('P', -1, false, Index::SpinDown, true),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(-1, 'K'), MomentumSymbol(-1, 'P')}),
                                 Index::SpinDown, false),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'p'), MomentumSymbol(1, 'q')}),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'P')}),
                                 Index::SpinUp, false),
                    }));
 #endif

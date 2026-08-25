@@ -7,21 +7,21 @@
 
 namespace mrock::symbolic_operators {
 std::vector<Term> LatticeCUT::hamiltonian() const {
-    const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{MomentumSum({'q'}), Index::Sigma},
+    const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('K')), SumContainer{MomentumSum({'K'}), Index::Sigma},
                      std::vector<Operator>(
-                         {Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)}));
+                         {Operator('K', 1, false, Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
 
     const Term H_Ph(-1,
                     Coefficient::RealInversionSymmetric(
-                        "g", MomentumList({'q', 'p'}),
+                        "g", MomentumList({'K', 'P'}),
                         std::function<void(Coefficient&)>([](Coefficient& coeff) { coeff.momenta.sort(); })),
-                    SumContainer{MomentumSum({'p', 'q'}), IndexSum{}},
-                    std::vector<Operator>({c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
-                                           c_minus_k.with_momentum('p'), c_k.with_momentum('p')}));
+                    SumContainer{MomentumSum({'K', 'P'}), IndexSum{}},
+                    std::vector<Operator>({c_k_dagger.with_momentum('K'), c_minus_k_dagger.with_momentum('K'),
+                                           c_minus_k.with_momentum('P'), c_k.with_momentum('P')}));
 
-    const Term H_U(1, Coefficient("U"), SumContainer{MomentumSum({'p', 'q'}), IndexSum{}},
-                   std::vector<Operator>({c_k_dagger.with_momentum('q'), c_minus_k_dagger.with_momentum('q'),
-                                          c_minus_k.with_momentum('p'), c_k.with_momentum('p')}));
+    const Term H_U(1, Coefficient("U"), SumContainer{MomentumSum({'P', 'K'}), IndexSum{}},
+                   std::vector<Operator>({c_k_dagger.with_momentum('K'), c_minus_k_dagger.with_momentum('K'),
+                                          c_minus_k.with_momentum('P'), c_k.with_momentum('P')}));
 
     return {H_Kin, H_Ph, H_U};
 }

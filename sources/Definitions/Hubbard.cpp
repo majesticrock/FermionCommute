@@ -6,28 +6,28 @@
 
 namespace mrock::symbolic_operators {
 std::vector<Term> Hubbard::hamiltonian() const {
-    const Term H_T(1, Coefficient("\\epsilon_0", Momentum('q')), SumContainer{MomentumSum({'q'}), Index::Sigma},
+    const Term H_T(1, Coefficient("\\epsilon_0", Momentum('K')), SumContainer{MomentumSum({'K'}), Index::Sigma},
                    std::vector<Operator>(
-                       {Operator('q', 1, false, Index::Sigma, true), Operator('q', 1, false, Index::Sigma, false)}));
+                       {Operator('K', 1, false, Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
 
-    const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({'r', 'p', 'q'}),
+    const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({'K', 'P', 'Q'}),
                    std::vector<Operator>({
-                       Operator('r', 1, false, Index::SpinUp, true),
-                       Operator('p', 1, false, Index::SpinDown, true),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q')}),
+                       Operator('K', 1, false, Index::SpinUp, true),
+                       Operator('P', 1, false, Index::SpinDown, true),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'P'), MomentumSymbol(-1, 'Q')}),
                                 Index::SpinDown, false),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q')}),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'Q')}),
                                 Index::SpinUp, false),
                    }));
 
-    const Term H_V(1, Coefficient("\\tilde{V}", Momentum('q'), true),
-                   SumContainer{MomentumSum({'r', 'p', 'q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
+    const Term H_V(1, Coefficient("\\tilde{V}", Momentum('Q'), true),
+                   SumContainer{MomentumSum({'K', 'P', 'Q'}), IndexSum({Index::Sigma, Index::SigmaPrime})},
                    std::vector<Operator>({
-                       Operator('r', 1, false, Index::Sigma, true),
-                       Operator('p', 1, false, Index::SigmaPrime, true),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'p'), MomentumSymbol(-1, 'q')}),
+                       Operator('K', 1, false, Index::Sigma, true),
+                       Operator('P', 1, false, Index::SigmaPrime, true),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'P'), MomentumSymbol(-1, 'Q')}),
                                 Index::SigmaPrime, false),
-                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'r'), MomentumSymbol(1, 'q')}),
+                       Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'Q')}),
                                 Index::Sigma, false),
                    }));
 
