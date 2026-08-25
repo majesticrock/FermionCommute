@@ -4,8 +4,8 @@
 #include <vector>
 
 namespace mrock::symbolic_operators {
-std::vector<std::vector<Term>> HubbardDispersions::XP_basis() const {
-    std::vector<std::vector<Term>> basis = Hubbard::XP_basis();
+std::vector<TermCollector> HubbardDispersions::XP_basis() const {
+    std::vector<TermCollector> basis = Hubbard::XP_basis();
     for (auto& basis_term : basis) {
         if (basis_term.front().operators.front().is_daggered) {
             basis_term.front().operators.front().momentum += Momentum('x');
@@ -21,8 +21,8 @@ std::vector<std::vector<Term>> HubbardDispersions::XP_basis() const {
     }
     return basis;
 }
-std::vector<std::vector<Term>> HubbardDispersions::STD_basis() const {
-    std::vector<std::vector<Term>> ret = Hubbard::STD_basis();
+std::vector<TermCollector> HubbardDispersions::STD_basis() const {
+    std::vector<TermCollector> ret = Hubbard::STD_basis();
     for (auto& _v : ret) {
         for (auto& v : _v) {
             if (v.operators.front().is_daggered) {

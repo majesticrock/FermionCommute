@@ -3,6 +3,7 @@
 #include <mrock/symbolic_operators/Momentum.hpp>
 #include <mrock/symbolic_operators/Operator.hpp>
 #include <mrock/symbolic_operators/Term.hpp>
+#include <mrock/symbolic_operators/TermCollector.hpp>
 #include <mrock/symbolic_operators/WickOperatorTemplate.hpp>
 #include <mrock/symbolic_operators/WickSymmetry.hpp>
 
@@ -36,10 +37,10 @@ namespace mrock::symbolic_operators {
 	extern const Operator c_k_down;
 
 	struct DefinitionsBase {
-		virtual std::vector<Term> hamiltonian() const = 0;
+		virtual TermCollector hamiltonian() const = 0;
 		virtual std::vector<WickOperatorTemplate> templates() const = 0;
-		virtual std::vector<std::vector<Term>> XP_basis() const = 0;
-		virtual std::vector<std::vector<Term>> STD_basis() const = 0;
+		virtual std::vector<TermCollector> XP_basis() const = 0;
+		virtual std::vector<TermCollector> STD_basis() const = 0;
 		virtual std::vector<std::unique_ptr<WickSymmetry>> symmetries() const = 0;
 
 		virtual std::string get_subfolder() const = 0;

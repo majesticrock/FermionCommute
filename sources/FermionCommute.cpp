@@ -20,7 +20,7 @@
 #include <vector>
 
 using namespace mrock::symbolic_operators;
-using term_vec = std::vector<Term>;
+using term_vec = TermCollector;
 using op_vec = std::vector<Operator>;
 
 void remove_all_x(term_vec& terms) {
@@ -35,8 +35,8 @@ void remove_all_x(WickTermCollector& terms) {
 }
 
 template <typename T>
-std::vector<T> joinVectors(const std::vector<T>& vec1, const std::vector<T>& vec2) {
-    std::vector<T> result;
+T joinVectors(const T& vec1, const T& vec2) {
+    T result;
     result.reserve(vec1.size() + vec2.size());
     result.insert(result.end(), vec1.begin(), vec1.end());
     result.insert(result.end(), vec2.begin(), vec2.end());
@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
     if (EXECUTION_TYPE == "test") {
         Hubbard hubbard;
 
-        std::vector<std::vector<Term>> base = hubbard.STD_basis();
-        std::vector<std::vector<Term>> disp = base;
+        std::vector<TermCollector> base = hubbard.STD_basis();
+        std::vector<TermCollector> disp = base;
         for (auto& _v : disp) {
             for (auto& v : _v) {
                 if (v.operators.front().is_daggered) {
@@ -91,15 +91,15 @@ int main(int argc, char** argv) {
             }
         }
 
-        std::vector<std::vector<Term>> base_daggered(base);
-        std::vector<std::vector<Term>> disp_daggered(disp);
+        std::vector<TermCollector> base_daggered(base);
+        std::vector<TermCollector> disp_daggered(disp);
         for (auto& vec : base_daggered) {
-            hermitian_conjugate(vec);
-            rename_momenta(vec, 'k', 'l');
+            vec.hermitian_conjugate();
+            vec.rename_momenta('k', 'l');
         }
         for (auto& vec : disp_daggered) {
-            hermitian_conjugate(vec);
-            rename_momenta(vec, 'k', 'l');
+            vec.hermitian_conjugate();
+            vec.rename_momenta('k', 'l');
         }
 
         const Term H_U(1, Coefficient("\\frac{U}{N}"), MomentumSum({'K', 'P', 'Q'}),
@@ -111,44 +111,43 @@ int main(int argc, char** argv) {
                            Operator(std::vector<MomentumSymbol>({MomentumSymbol(1, 'K'), MomentumSymbol(1, 'Q')}),
                                     Index::SpinUp, false),
                        }));
-        const std::vector<Term> H = {H_U};
+        const TermCollector H = {H_U};
         const int inner_idx = 0;
         const int outer_idx = static_cast<int>(!inner_idx);
 
         term_vec commute_with_H_base = commutator(H, base[inner_idx]);
-        clean_up(commute_with_H_base);
+        commute_with_H_base.clean_up();
 
         term_vec commute_with_H_disp = commutator(disp[inner_idx], H);
-        clean_up(commute_with_H_disp);
+        commute_with_H_disp.clean_up();
 
         if (true) {
             term_vec joined = joinVectors(commute_with_H_base, commute_with_H_disp);
             remove_all_x(joined);
-            clean_up(joined);
+            joined.clean_up();
 
             std::cout << "Single commutator:\n" << joined << std::endl;  // Up to here, everything works
         }
 
         {
             term_vec base_double = commutator(base_daggered[outer_idx], commute_with_H_base);
-            clean_up(base_double);
+            base_double.clean_up();
 
             term_vec disp_double = commutator(disp_daggered[outer_idx], commute_with_H_disp);
-            clean_up(disp_double);
+            disp_double.clean_up();
 
             term_vec joined = joinVectors(base_double, disp_double);
-            clean_up(joined);
-            // std::cout << "joined:\n" << joined << std::endl;
+            joined.clean_up();
 
             auto templates = hubbard.templates();
             auto symmetries = hubbard.symmetries();
 
             WickTermCollector wicks;
             wicks_theorem(joined, templates, wicks);
-            clear_etas(wicks);
-            clean_wicks(wicks, symmetries);
+            wicks.clear_etas();
+            wicks.clean_up(symmetries);
             remove_all_x(wicks);
-            clean_wicks(wicks, symmetries);
+            wicks.clean_up(symmetries);
 
             std::cout << "Double commutator:\n" << wicks << std::endl;
         }
@@ -181,11 +180,8 @@ int main(int argc, char** argv) {
 
     std::vector<term_vec> basis_daggered(basis);
     for (auto& t : basis_daggered) {
-        hermitian_conjugate(t);
-        rename_momenta(t, 'k', 'l');
-        // if (debug) {
-        //	rename_momenta(t, 'x', 'y');
-        // }
+        t.hermitian_conjugate();
+        t.rename_momenta('k', 'l');
     }
 
     if (print)
@@ -193,9 +189,9 @@ int main(int argc, char** argv) {
 
     for (std::size_t i = 0U; i < basis.size(); ++i) {
         term_vec commute_with_H = commutator(H, basis[i]);
-        clean_up(commute_with_H);
+        commute_with_H.clean_up();
         if (debug)
-            std::cout << "\\begin{align*}\n\t[ H, " << to_string_without_prefactor(basis[i]) << " ] =" << commute_with_H
+            std::cout << "\\begin{align*}\n\t[ H, " << basis[i].to_string_without_prefactor() << " ] =" << commute_with_H
                       << "\\end{align*}" << std::endl;
 
         for (std::size_t j = 0U; j < basis.size(); ++j) {
@@ -203,16 +199,16 @@ int main(int argc, char** argv) {
                 std::cout << "\\subsection{" << i << "." << j << "}" << std::endl;
             }
             term_vec terms = commutator(basis_daggered[j], commute_with_H);
-            clean_up(terms);
+            terms.clean_up();
 
             if (print_terms || debug)
-                std::cout << "\\begin{align*}\n\t[ " << to_string_without_prefactor(basis_daggered[j]) << ", [H, "
-                          << to_string_without_prefactor(basis[i]) << " ]] =" << terms << "\\end{align*}" << std::endl;
+                std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].to_string_without_prefactor() << ", [H, "
+                          << basis[i].to_string_without_prefactor() << " ]] =" << terms << "\\end{align*}" << std::endl;
 
             WickTermCollector wicks;
             wicks_theorem(terms, templates, wicks);
-            clear_etas(wicks);
-            clean_wicks(wicks, symmetries);
+            wicks.clear_etas();
+            wicks.clean_up(symmetries);
 
             for (auto& wickterm : wicks) {
                 if (MODEL_TYPE != continuum_type)
@@ -284,11 +280,11 @@ int main(int argc, char** argv) {
                     }
                 }
             }
-            clean_wicks(wicks, symmetries);
+            wicks.clean_up(symmetries);
 
             if (debug || print) {
-                std::cout << "\\begin{align*}\n\t\\langle [ " << to_string_without_prefactor(basis_daggered[j])
-                          << ", [H, " << to_string_without_prefactor(basis[i]) << " ]] \\rangle =" << wicks
+                std::cout << "\\begin{align*}\n\t\\langle [ " << basis_daggered[j].to_string_without_prefactor()
+                          << ", [H, " << basis[i].to_string_without_prefactor() << " ]] \\rangle =" << wicks
                           << "\\end{align*}" << std::endl;
             }
 
@@ -306,14 +302,14 @@ int main(int argc, char** argv) {
             terms.clear();
             wicks.clear();
             terms = commutator(basis_daggered[j], basis[i]);
-            clean_up(terms);
+            terms.clean_up();
             wicks_theorem(terms, templates, wicks);
-            clear_etas(wicks);
-            clean_wicks(wicks, symmetries);
+            wicks.clear_etas();
+            wicks.clean_up(symmetries);
 
             if (debug || print)
-                std::cout << "\\begin{align*}\n\t[ " << to_string_without_prefactor(basis_daggered[j]) << ", "
-                          << to_string_without_prefactor(basis[i]) << " ] =" << wicks << "\\end{align*}" << std::endl;
+                std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].to_string_without_prefactor() << ", "
+                          << basis[i].to_string_without_prefactor() << " ] =" << wicks << "\\end{align*}" << std::endl;
             // serialization
             if (!debug) {
                 // create an output file stream and a text archive to serialize the vector

@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace mrock::symbolic_operators {
-std::vector<Term> Hubbard::hamiltonian() const {
+TermCollector Hubbard::hamiltonian() const {
     const Term H_T(1, Coefficient("\\epsilon_0", Momentum('K')), SumContainer{MomentumSum({'K'}), Index::Sigma},
                    std::vector<Operator>(
                        {Operator('K', 1, false, Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
@@ -39,60 +39,60 @@ std::vector<WickOperatorTemplate> Hubbard::templates() const {
             WickOperatorTemplate{{Num_Comparison}, Momentum(), OperatorType::Number},
             WickOperatorTemplate{{Num_Comparison}, Momentum(std::vector<MomentumSymbol>(), true), OperatorType::CDW}};
 }
-std::vector<std::vector<Term>> Hubbard::XP_basis() const {
+std::vector<TermCollector> Hubbard::XP_basis() const {
     return {// 0: phi + phi^+
-            // std::vector<Term>({
+            // TermCollector({
             //	Term(1, std::vector<Operator>({ c_k_down_dagger, c_k })),
             //	Term(1, std::vector<Operator>({ c_k_dagger, c_k_down }))
             //	}),
             // 0: f + f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k})),
                                Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
             // 1: eta + eta^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_Q, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_Q, c_k})),
                                Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_Q_dagger}))}),
             // 2/3: g_up/down +
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q})),
                                Term(1, std::vector<Operator>({c_k_Q_dagger, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q})),
                                Term(1, std::vector<Operator>({c_minus_k_Q_dagger, c_minus_k}))}),
             // 4: transversal magnon, hermitian
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down})),
                                Term(1, std::vector<Operator>({c_k_Q_down_dagger, c_k}))}),
             // 5/6: n_up/down
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))}),
             // 7: f - f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k})),
                                Term(-1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
             // 8: eta - eta^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_Q, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_Q, c_k})),
                                Term(-1, std::vector<Operator>({c_k_dagger, c_minus_k_Q_dagger}))}),
             // 9/10: g_up/down -
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q})),
                                Term(-1, std::vector<Operator>({c_k_Q_dagger, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q})),
                                Term(-1, std::vector<Operator>({c_minus_k_Q_dagger, c_minus_k}))}),
             // 11: transversal magnon, antihermitian
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down})),
                                Term(-1, std::vector<Operator>({c_k_Q_down_dagger, c_k}))})};
 }
-std::vector<std::vector<Term>> Hubbard::STD_basis() const {
+std::vector<TermCollector> Hubbard::STD_basis() const {
     return {// 0/1: f, f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
             // 2/3: n_up/down
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))}),
             // 4/5: g_up/down
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k_Q}))}),
             // 6/7: eta, eta^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k_Q, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_Q_dagger}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k_Q, c_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_Q_dagger}))}),
             // 8/9: transversal magnon
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_Q_down_dagger, c_k}))})};
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k_Q_down}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_Q_down_dagger, c_k}))})};
 }
 std::vector<std::unique_ptr<WickSymmetry>> Hubbard::symmetries() const {
     std::vector<std::unique_ptr<WickSymmetry>> ret;

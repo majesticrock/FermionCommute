@@ -59,7 +59,7 @@ This runs the commutations for the (half-filled) extended Hubbard model using th
 2. The program queries the model for its Hamiltonian (`hamiltonian()`), Wick operator templates (`templates()`), the operator basis (`XP_basis()` or `STD_basis()`), and symmetry objects (`symmetries()`).  
 3. For each pair of basis vectors the program computes the commutators $[H, \text{basis}_i]$ and $[\text{basis}_j^\dagger, [H, \text{basis}_i]]$.  
 4. The raw results are cleaned (normal ordering, removal of trivial sums/multiplicities) and then transformed into a collection of `WickTerm` objects (representing expectation values) by `wicks_theorem(...)`, using the model-supplied Wick operator templates. 
-5. The resulting `WickTermCollector` is post-processed: specific coefficient manipulations or channel rearrangements (model-dependent) are applied, and symmetry simplifications (e.g., spin symmetry, inversion symmetry, phase symmetry) are applied via `clean_wicks(...)`. 
+5. The resulting `WickTermCollector` is post-processed: specific coefficient manipulations or channel rearrangements (model-dependent) are applied, and symmetry simplifications (e.g., spin symmetry, inversion symmetry, phase symmetry) are applied via `WickTermCollector::clean_up(...)`. 
 6. The results are serialized to disk as binary boost archives in `../commutators/<model_subfolder>/` by default. The program constructs filenames such as `wick_M_j_i.bin` and `wick_N_j_i.bin`.
 
 ## Overview of the files
@@ -76,10 +76,10 @@ This runs the commutations for the (half-filled) extended Hubbard model using th
 
 To add a new model, implement a class derived from the project's `DefinitionsBase` interface and provide at least the following methods, analogous to the included `Hubbard` example:
 
-- `std::vector<Term> hamiltonian() const` - return the Hamiltonian as a vector of `Term` objects.
+- `TermCollector hamiltonian() const` - return the Hamiltonian as a vector of `Term` objects.
 - `std::vector<WickOperatorTemplate> templates() const` - return templates that define how ordinary operators map to Wick operator types for your problem. 
-- `std::vector<std::vector<Term>> XP_basis() const` and `STD_basis() const` - define your operator bases used for computing matrix elements. 
-- `std::vector<std::unique_ptr<WickSymmetry>> symmetries() const` - return symmetry objects to be applied during `clean_wicks(...)`.
+- `std::vector<TermCollector> XP_basis() const` and `STD_basis() const` - define your operator bases used for computing matrix elements. 
+- `std::vector<std::unique_ptr<WickSymmetry>> symmetries() const` - return symmetry objects to be applied during `WickTermCollector::clean_up(...)`.
 - `std::string get_subfolder() const` - optional: subfolder name for serialization output.
 
 See the existing files for concrete examples of all these functions.

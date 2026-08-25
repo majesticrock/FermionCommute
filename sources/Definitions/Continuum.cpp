@@ -21,7 +21,7 @@
 #endif
 
 namespace mrock::symbolic_operators {
-std::vector<Term> Continuum::hamiltonian() const {
+TermCollector Continuum::hamiltonian() const {
     const Term H_Kin(1, Coefficient("\\epsilon_0", Momentum('K')), SumContainer{MomentumSum({'K'}), Index::Sigma},
                      std::vector<Operator>(
                          {Operator('K', 1, false, Index::Sigma, true), Operator('K', 1, false, Index::Sigma, false)}));
@@ -90,23 +90,23 @@ std::vector<WickOperatorTemplate> Continuum::templates() const {
     return {WickOperatorTemplate{{SC_Comparison}, Momentum(), OperatorType::SC},
             WickOperatorTemplate{{Num_Comparison}, Momentum(), OperatorType::Number}};
 }
-std::vector<std::vector<Term>> Continuum::XP_basis() const {
+std::vector<TermCollector> Continuum::XP_basis() const {
     return {// 0: f + f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k})),
                                Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
             // 1: n_up + down
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k})),
                                Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))}),
             // 2: f - f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k})),
                                Term(-1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))})};
 }
-std::vector<std::vector<Term>> Continuum::STD_basis() const {
+std::vector<TermCollector> Continuum::STD_basis() const {
     return {// f, f^+
-            std::vector<Term>({Term(1, std::vector<Operator>({c_minus_k, c_k}))}),
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_minus_k, c_k}))}),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_minus_k_dagger}))}),
             // n_up + down
-            std::vector<Term>({Term(1, std::vector<Operator>({c_k_dagger, c_k})),
+            TermCollector({Term(1, std::vector<Operator>({c_k_dagger, c_k})),
                                Term(1, std::vector<Operator>({c_minus_k_dagger, c_minus_k}))})};
 }
 std::vector<std::unique_ptr<WickSymmetry>> Continuum::symmetries() const {
