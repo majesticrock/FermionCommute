@@ -142,8 +142,7 @@ int main(int argc, char** argv) {
             auto templates = hubbard.templates();
             auto symmetries = hubbard.symmetries();
 
-            WickTermCollector wicks;
-            wicks_theorem(joined, templates, wicks);
+            WickTermCollector wicks = wicks_theorem(joined, templates);
             wicks.clear_etas();
             wicks.clean_up(symmetries);
             remove_all_x(wicks);
@@ -205,8 +204,7 @@ int main(int argc, char** argv) {
                 std::cout << "\\begin{align*}\n\t[ " << basis_daggered[j].to_string_without_prefactor() << ", [H, "
                           << basis[i].to_string_without_prefactor() << " ]] =" << terms << "\\end{align*}" << std::endl;
 
-            WickTermCollector wicks;
-            wicks_theorem(terms, templates, wicks);
+            WickTermCollector wicks = wicks_theorem(terms, templates);
             wicks.clear_etas();
             wicks.clean_up(symmetries);
 
@@ -303,7 +301,7 @@ int main(int argc, char** argv) {
             wicks.clear();
             terms = commutator(basis_daggered[j], basis[i]);
             terms.clean_up();
-            wicks_theorem(terms, templates, wicks);
+            wicks = wicks_theorem(terms, templates);
             wicks.clear_etas();
             wicks.clean_up(symmetries);
 
